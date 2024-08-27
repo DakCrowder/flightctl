@@ -3,6 +3,7 @@ package spec
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"testing"
 
 	"github.com/flightctl/flightctl/api/v1alpha1"
@@ -91,6 +92,34 @@ func TestBootstrapCheckRollback(t *testing.T) {
 		require.Equal(wantIsRollback, isRollback)
 	})
 
+}
+
+func TestInitialize(t *testing.T) {
+	require := require.New(t)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockReadWriter := fileio.NewMockReadWriter(ctrl)
+
+	s := &SpecManager{
+		log:              log.NewPrefixLogger("test"),
+		deviceReadWriter: mockReadWriter,
+	}
+
+	_, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	t.Run("failure: writing file fails", func(t *testing.T) {
+		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(errors.New("unable to write file"))
+		err := s.Initialize()
+		require.ErrorContains(err, "unable to write file")
+	})
+
+	t.Run("successful initialization: writes files", func(t *testing.T) {
+		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Times(3).Return(nil)
+		err := s.Initialize()
+		require.NoError(err)
+	})
 }
 
 func createTestSpec(image string) ([]byte, error) {
