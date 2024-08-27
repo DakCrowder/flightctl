@@ -106,9 +106,6 @@ func TestInitialize(t *testing.T) {
 		deviceReadWriter: mockReadWriter,
 	}
 
-	_, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	t.Run("error writing file", func(t *testing.T) {
 		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(errors.New("unable to write file"))
 		err := s.Initialize()
@@ -133,9 +130,6 @@ func TestEnsure(t *testing.T) {
 		log:              log.NewPrefixLogger("test"),
 		deviceReadWriter: mockReadWriter,
 	}
-
-	_, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	t.Run("error checking if file exists", func(t *testing.T) {
 		errMsg := "unable to check if file exists"
@@ -165,6 +159,38 @@ func TestEnsure(t *testing.T) {
 		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
 		err := s.Ensure()
 		require.NoError(err)
+	})
+}
+
+func TestRead(t *testing.T) {
+	require := require.New(t)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockReadWriter := fileio.NewMockReadWriter(ctrl)
+
+	s := &SpecManager{
+		log:              log.NewPrefixLogger("test"),
+		deviceReadWriter: mockReadWriter,
+	}
+
+	t.Run("error when the file read cannot be unmarshaled into a device spec", func(t *testing.T) {
+		invalidSpec := []byte("Not json data")
+		mockReadWriter.EXPECT().ReadFile(gomock.Any()).Return(invalidSpec, nil)
+
+		_, err := s.Read("current")
+		require.ErrorContains(err, "unmarshal device specification:")
+	})
+
+	t.Run("reads a device spec", func(t *testing.T) {
+		image := "flightctl-device:v1"
+		spec, err := createTestSpec(image)
+		require.NoError(err)
+		mockReadWriter.EXPECT().ReadFile(gomock.Any()).Return(spec, nil)
+
+		specFromRead, err := s.Read("current")
+		require.NoError(err)
+		require.Equal(image, specFromRead.Os.Image)
 	})
 }
 
