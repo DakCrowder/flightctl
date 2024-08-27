@@ -109,15 +109,61 @@ func TestInitialize(t *testing.T) {
 	_, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	t.Run("failure: writing file fails", func(t *testing.T) {
+	t.Run("error writing file", func(t *testing.T) {
 		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(errors.New("unable to write file"))
 		err := s.Initialize()
 		require.ErrorContains(err, "unable to write file")
 	})
 
-	t.Run("successful initialization: writes files", func(t *testing.T) {
+	t.Run("successful initialization", func(t *testing.T) {
 		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Times(3).Return(nil)
 		err := s.Initialize()
+		require.NoError(err)
+	})
+}
+
+func TestEnsure(t *testing.T) {
+	require := require.New(t)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockReadWriter := fileio.NewMockReadWriter(ctrl)
+
+	s := &SpecManager{
+		log:              log.NewPrefixLogger("test"),
+		deviceReadWriter: mockReadWriter,
+	}
+
+	_, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	t.Run("error checking if file exists", func(t *testing.T) {
+		errMsg := "unable to check if file exists"
+		mockReadWriter.EXPECT().FileExists(gomock.Any()).Return(false, errors.New(errMsg))
+		err := s.Ensure()
+		require.ErrorContains(err, errMsg)
+	})
+
+	t.Run("error writing file when it does not exist", func(t *testing.T) {
+		errMsg := "write failure"
+		mockReadWriter.EXPECT().FileExists(gomock.Any()).Return(false, nil)
+		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(errors.New(errMsg))
+		err := s.Ensure()
+		require.ErrorContains(err, errMsg)
+	})
+
+	t.Run("files are written when they don't exist", func(t *testing.T) {
+		mockReadWriter.EXPECT().FileExists(gomock.Any()).Times(2).Return(true, nil)
+		mockReadWriter.EXPECT().FileExists(gomock.Any()).Times(1).Return(false, nil)
+		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Times(1).Return(nil)
+		err := s.Ensure()
+		require.NoError(err)
+	})
+
+	t.Run("no files are written when they all exist", func(t *testing.T) {
+		mockReadWriter.EXPECT().FileExists(gomock.Any()).Times(3).Return(true, nil)
+		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+		err := s.Ensure()
 		require.NoError(err)
 	})
 }
