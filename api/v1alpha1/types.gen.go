@@ -477,13 +477,13 @@ type DeviceUpdatedStatusType string
 // DevicesSummary A summary of the devices in the fleet returned when fetching a single Fleet.
 type DevicesSummary struct {
 	// SummaryStatus A breakdown of the devices in the fleet by "summary" status.
-	SummaryStatus map[string]int `json:"summaryStatus"`
+	SummaryStatus *map[string]int `json:"summaryStatus,omitempty"`
 
 	// Total The total number of devices in the fleet.
 	Total int `json:"total"`
 
 	// UpdateStatus A breakdown of the devices in the fleet by "updated" status.
-	UpdateStatus map[string]int `json:"updateStatus"`
+	UpdateStatus *map[string]int `json:"updateStatus,omitempty"`
 }
 
 // DiskResourceMonitorSpec defines model for DiskResourceMonitorSpec.
@@ -651,7 +651,9 @@ type GenericRepoSpec struct {
 type GitConfigProviderSpec struct {
 	ConfigType string `json:"configType"`
 	GitRef     struct {
-		Path string `json:"path"`
+		// MountPath Path to config in device
+		MountPath *string `json:"mountPath,omitempty"`
+		Path      string  `json:"path"`
 
 		// Repository The name of the repository resource to use as the sync source
 		Repository     string `json:"repository"`
