@@ -209,6 +209,59 @@ func TestRead(t *testing.T) {
 	})
 }
 
+func TestUpgrade(t *testing.T) {
+	require := require.New(t)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockReadWriter := fileio.NewMockReadWriter(ctrl)
+
+	desiredPath := "test/desired.json"
+	currentPath := "test/current.json"
+	rollbackPath := "test/rollback/json"
+	s := &SpecManager{
+		log:              log.NewPrefixLogger("test"),
+		deviceReadWriter: mockReadWriter,
+		desiredPath:      desiredPath,
+		currentPath:      currentPath,
+		rollbackPath:     rollbackPath,
+	}
+
+	t.Run("error reading desired spec", func(t *testing.T) {
+		readErr := errors.New("unable to read file")
+		mockReadWriter.EXPECT().ReadFile(desiredPath).Return(nil, readErr)
+
+		err := s.Upgrade()
+		require.ErrorIs(err, readErr)
+	})
+
+	t.Run("error writing desired spec to current", func(t *testing.T) {
+		desiredSpec, err := createTestSpec("flightctl-device:v2")
+		require.NoError(err)
+		mockReadWriter.EXPECT().ReadFile(desiredPath).Return(desiredSpec, nil)
+
+		writeErr := errors.New("failure writing file")
+		mockReadWriter.EXPECT().WriteFile(currentPath, desiredSpec, gomock.Any()).Return(writeErr)
+
+		err = s.Upgrade()
+		require.ErrorIs(err, writeErr)
+	})
+
+	t.Run("clears out the rollback spec", func(t *testing.T) {
+		desiredSpec, err := createTestSpec("flightctl-device:v2")
+		require.NoError(err)
+		mockReadWriter.EXPECT().ReadFile(desiredPath).Return(desiredSpec, nil)
+		mockReadWriter.EXPECT().WriteFile(currentPath, desiredSpec, gomock.Any()).Return(nil)
+
+		emptySpec, err := json.Marshal(&v1alpha1.RenderedDeviceSpec{})
+		require.NoError(err)
+
+		mockReadWriter.EXPECT().WriteFile(rollbackPath, emptySpec, gomock.Any()).Return(nil)
+		err = s.Upgrade()
+		require.NoError(err)
+	})
+}
+
 func createTestSpec(image string) ([]byte, error) {
 	spec := v1alpha1.RenderedDeviceSpec{
 		Os: &v1alpha1.DeviceOSSpec{
