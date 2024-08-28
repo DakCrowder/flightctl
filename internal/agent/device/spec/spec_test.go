@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"os"
 	"testing"
 
 	"github.com/flightctl/flightctl/api/v1alpha1"
@@ -173,6 +174,20 @@ func TestRead(t *testing.T) {
 		log:              log.NewPrefixLogger("test"),
 		deviceReadWriter: mockReadWriter,
 	}
+
+	t.Run("error file not found", func(t *testing.T) {
+		mockReadWriter.EXPECT().ReadFile(gomock.Any()).Return(nil, os.ErrNotExist)
+
+		_, err := s.Read("current")
+		require.ErrorIs(err, ErrMissingRenderedSpec)
+	})
+
+	t.Run("error with file read", func(t *testing.T) {
+		errMsg := "error reading file"
+		mockReadWriter.EXPECT().ReadFile(gomock.Any()).Return(nil, errors.New(errMsg))
+		_, err := s.Read("current")
+		require.ErrorContains(err, errMsg)
+	})
 
 	t.Run("error when the file read cannot be unmarshaled into a device spec", func(t *testing.T) {
 		invalidSpec := []byte("Not json data")
