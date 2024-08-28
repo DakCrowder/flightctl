@@ -341,6 +341,105 @@ func TestIsOSUpdate(t *testing.T) {
 	})
 }
 
+func TestCheckOsReconciliation(t *testing.T) {
+	require := require.New(t)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockReadWriter := fileio.NewMockReadWriter(ctrl)
+	mockBootcClient := container.NewMockBootcClient(ctrl)
+
+	desiredPath := "test/desired.json"
+	s := &SpecManager{
+		log:              log.NewPrefixLogger("test"),
+		deviceReadWriter: mockReadWriter,
+		bootcClient:      mockBootcClient,
+		desiredPath:      desiredPath,
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	emptySpec, err := json.Marshal(&v1alpha1.RenderedDeviceSpec{})
+	require.NoError(err)
+
+	t.Run("error getting bootc status", func(t *testing.T) {
+		bootcErr := errors.New("bootc problem")
+		mockBootcClient.EXPECT().Status(ctx).Return(nil, bootcErr)
+
+		_, _, err := s.CheckOsReconciliation(ctx)
+		// TODO consolodate / have more consistency with how we check errors in the various tests, possibly
+		// worth doing with the audit of messages
+		require.ErrorContains(err, "getting current bootc status: bootc problem")
+	})
+
+	// TODO should these different test cases all have these failure checks for stuff like the read?
+	// could it be consolidated almost like a dependency or shared test case for the various functions?
+	//
+	// e.g. maybe the testing of paths should be taken into the Read test then ignored in other test cases since the methods
+	// being tested are reliant on the Read behavior and don't really care beyond it working
+	t.Run("error reading desired spec", func(t *testing.T) {
+		bootcStatus := &container.BootcHost{}
+		mockBootcClient.EXPECT().Status(ctx).Return(bootcStatus, nil)
+
+		readErr := errors.New("unable to read file")
+		mockReadWriter.EXPECT().ReadFile(desiredPath).Return(emptySpec, readErr)
+
+		_, _, err = s.CheckOsReconciliation(ctx)
+		require.ErrorIs(err, readErr)
+	})
+
+	t.Run("desired os is not set in the spec", func(t *testing.T) {
+		bootedImage := "flightctl-device:v1"
+
+		bootcStatus := &container.BootcHost{}
+		bootcStatus.Status.Booted.Image.Image.Image = bootedImage
+		mockBootcClient.EXPECT().Status(ctx).Return(bootcStatus, nil)
+
+		mockReadWriter.EXPECT().ReadFile(desiredPath).Return(emptySpec, nil)
+
+		bootedOSImage, desiredImageIsBooted, err := s.CheckOsReconciliation(ctx)
+		require.NoError(err)
+		require.Equal(bootedOSImage, bootedImage)
+		require.Equal(false, desiredImageIsBooted)
+	})
+
+	t.Run("booted image and desired image are different", func(t *testing.T) {
+		bootedImage := "flightctl-device:v1"
+		desiredImage := "flightctl-device:v2"
+
+		bootcStatus := &container.BootcHost{}
+		bootcStatus.Status.Booted.Image.Image.Image = bootedImage
+		mockBootcClient.EXPECT().Status(ctx).Return(bootcStatus, nil)
+
+		desiredSpec, err := createTestSpec(desiredImage)
+		require.NoError(err)
+		mockReadWriter.EXPECT().ReadFile(desiredPath).Return(desiredSpec, nil)
+
+		bootedOSImage, desiredImageIsBooted, err := s.CheckOsReconciliation(ctx)
+		require.NoError(err)
+		require.Equal(bootedOSImage, bootedImage)
+		require.Equal(false, desiredImageIsBooted)
+	})
+
+	t.Run("booted image and desired image are the same", func(t *testing.T) {
+		image := "flightctl-device:v2"
+
+		bootcStatus := &container.BootcHost{}
+		bootcStatus.Status.Booted.Image.Image.Image = image
+		mockBootcClient.EXPECT().Status(ctx).Return(bootcStatus, nil)
+
+		desiredSpec, err := createTestSpec(image)
+		require.NoError(err)
+		mockReadWriter.EXPECT().ReadFile(desiredPath).Return(desiredSpec, nil)
+
+		bootedOSImage, desiredImageIsBooted, err := s.CheckOsReconciliation(ctx)
+		require.NoError(err)
+		require.Equal(bootedOSImage, image)
+		require.Equal(true, desiredImageIsBooted)
+	})
+}
+
 func createTestSpec(image string) ([]byte, error) {
 	spec := v1alpha1.RenderedDeviceSpec{
 		Os: &v1alpha1.DeviceOSSpec{
