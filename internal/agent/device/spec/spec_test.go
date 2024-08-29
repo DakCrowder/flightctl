@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/agent/client"
@@ -14,6 +15,7 @@ import (
 	"github.com/flightctl/flightctl/pkg/log"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
+	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 func TestBootstrapCheckRollback(t *testing.T) {
@@ -512,7 +514,7 @@ func TestRollback(t *testing.T) {
 	currentPath := "test/current.json"
 	desiredPath := "test/desired.json"
 	s := &SpecManager{
-		log:              log.NewPrefixLogger("test"),
+		log:              log.NewPrefixLogger("test"), // TODO do i need this logger in all the test cases?  Probably not?
 		deviceReadWriter: mockReadWriter,
 		currentPath:      currentPath,
 		desiredPath:      desiredPath,
@@ -547,12 +549,148 @@ func TestSetClient(t *testing.T) {
 	})
 }
 
+// TODO delete
+// func (s *SpecManager) GetDesired(ctx context.Context, currentRenderedVersion string) (*v1alpha1.RenderedDeviceSpec, error) {
+// 	desired, err := s.Read(Desired)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("read desired rendered spec: %w", err)
+// 	}
+
+// 	rollback, err := s.Read(Rollback)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("read rollback rendered spec: %w", err)
+// 	}
+
+// 	renderedVersion, err := s.getRenderedVersion(currentRenderedVersion, desired.RenderedVersion, rollback.RenderedVersion)
+// 	if err != nil {
+// 		return nil, fmt.Errorf("get next rendered version: %w", err)
+// 	}
+
+// 	newDesired := &v1alpha1.RenderedDeviceSpec{}
+// 	err = wait.ExponentialBackoff(s.backoff, func() (bool, error) {
+// 		return s.getRenderedFromManagementAPIWithRetry(ctx, renderedVersion, newDesired)
+// 	})
+// 	if err != nil {
+// 		// no content means there is no new rendered version
+// 		if errors.Is(err, ErrNoContent) {
+// 			s.log.Debug("No content from management API, falling back to the desired spec on disk")
+// 			// TODO: can we avoid resync or is this necessary?
+// 			return desired, nil
+// 		}
+// 		s.log.Warnf("Failed to get rendered device spec after retry: %v", err)
+// 		return nil, err
+// 	}
+
+// 	s.log.Infof("Received desired rendered spec from management service with rendered version: %s", newDesired.RenderedVersion)
+// 	if newDesired.RenderedVersion == desired.RenderedVersion {
+// 		s.log.Infof("No new rendered version from management service, retry reconciling version: %s", newDesired.RenderedVersion)
+// 		return desired, nil
+// 	}
+
+//		// write to disk
+//		s.log.Infof("Writing desired rendered spec to disk with rendered version: %s", newDesired.RenderedVersion)
+//		if err := s.write(Desired, newDesired); err != nil {
+//			return nil, fmt.Errorf("write rendered spec to disk: %w", err)
+//		}
+//		return newDesired, nil
+//	}
+func TestGetDesired(t *testing.T) {
+	require := require.New(t)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := client.NewMockManagement(ctrl)
+	mockReadWriter := fileio.NewMockReadWriter(ctrl)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	desiredPath := "test/desired.json"
+	rollbackPath := "test/rollback.json"
+	deviceName := "test-device"
+	backoff := wait.Backoff{
+		Cap:      3 * time.Minute,
+		Duration: 10 * time.Second,
+		Factor:   1.5,
+		Steps:    24,
+	}
+	s := &SpecManager{
+		backoff:          backoff,
+		log:              log.NewPrefixLogger("test"),
+		deviceName:       deviceName,
+		deviceReadWriter: mockReadWriter,
+		desiredPath:      desiredPath,
+		rollbackPath:     rollbackPath,
+		managementClient: mockClient,
+	}
+
+	image := "flightctl-device:v2"
+
+	testCases := []struct {
+		Name                      string
+		CurrentRenderedVersion    string
+		DesiredRenderedVersion    string
+		RollbackRenderedVersion   string
+		NewDesiredRenderedVersion string
+		NewDesiredReturnExpected  bool
+	}{
+		{"first", "1", "1", "1", "1", false},
+		{"second", "1", "1", "1", "2", true},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.Name, func(t *testing.T) {
+			desiredSpec, err := createTestSpecWithRenderedVersion(image, testCase.DesiredRenderedVersion)
+			require.NoError(err)
+			mockReadWriter.EXPECT().ReadFile(desiredPath).Return(desiredSpec, nil)
+
+			rollbackSpec, err := createTestSpecWithRenderedVersion(image, testCase.RollbackRenderedVersion)
+			require.NoError(err)
+			mockReadWriter.EXPECT().ReadFile(rollbackPath).Return(rollbackSpec, nil)
+
+			expectedParams := &v1alpha1.GetRenderedDeviceSpecParams{}
+			// TODO this will change
+			expectedParams.KnownRenderedVersion = &testCase.CurrentRenderedVersion
+			apiResponse := &v1alpha1.RenderedDeviceSpec{RenderedVersion: testCase.NewDesiredRenderedVersion}
+			mockClient.EXPECT().GetRenderedDeviceSpec(ctx, gomock.Any(), gomock.Any()).Return(apiResponse, 200, nil)
+
+			if testCase.NewDesiredReturnExpected {
+				mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
+			}
+
+			specResult, err := s.GetDesired(ctx, testCase.CurrentRenderedVersion)
+
+			if testCase.NewDesiredReturnExpected {
+				require.NoError(err)
+				require.Equal(*apiResponse, *specResult)
+			} else {
+				require.NoError(err)
+				unmarshaled := &v1alpha1.RenderedDeviceSpec{}
+				err = json.Unmarshal(desiredSpec, unmarshaled)
+				require.NoError(err)
+				require.Equal(*unmarshaled, *specResult)
+			}
+		})
+	}
+}
+
 func createTestSpec(image string) ([]byte, error) {
 	spec := v1alpha1.RenderedDeviceSpec{
 		Os: &v1alpha1.DeviceOSSpec{
 			Image: image,
 		},
 		RenderedVersion: "1",
+	}
+	return json.Marshal(spec)
+}
+
+// TODO consolidate?
+func createTestSpecWithRenderedVersion(image string, renderedVersion string) ([]byte, error) {
+	spec := v1alpha1.RenderedDeviceSpec{
+		Os: &v1alpha1.DeviceOSSpec{
+			Image: image,
+		},
+		RenderedVersion: renderedVersion,
 	}
 	return json.Marshal(spec)
 }
