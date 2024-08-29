@@ -440,11 +440,54 @@ func TestCheckOsReconciliation(t *testing.T) {
 	})
 }
 
+func TestPrepareRollback(t *testing.T) {
+	require := require.New(t)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockReadWriter := fileio.NewMockReadWriter(ctrl)
+	mockBootcClient := container.NewMockBootcClient(ctrl)
+
+	rollbackPath := "test/rollback.json"
+	s := &SpecManager{
+		log:              log.NewPrefixLogger("test"),
+		deviceReadWriter: mockReadWriter,
+		bootcClient:      mockBootcClient,
+		rollbackPath:     rollbackPath,
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// emptySpec, err := json.Marshal(&v1alpha1.RenderedDeviceSpec{})
+	// require.NoError(err)
+
+	t.Run("uses the os image from the current spec in the rollback spec", func(t *testing.T) {
+		currentImage := "flightctl-device:v1"
+
+		currentSpec, err := createTestSpec(currentImage)
+		require.NoError(err)
+		mockReadWriter.EXPECT().ReadFile(gomock.Any()).Return(currentSpec, nil)
+
+		rollbackSpec := &v1alpha1.RenderedDeviceSpec{
+			RenderedVersion: "1",
+			Os:              &v1alpha1.DeviceOSSpec{Image: currentImage},
+		}
+		marshaled, err := json.Marshal(rollbackSpec)
+		require.NoError(err)
+		mockReadWriter.EXPECT().WriteFile(rollbackPath, marshaled, gomock.Any()).Return(nil)
+
+		err = s.PrepareRollback(ctx)
+		require.NoError(err)
+	})
+}
+
 func createTestSpec(image string) ([]byte, error) {
 	spec := v1alpha1.RenderedDeviceSpec{
 		Os: &v1alpha1.DeviceOSSpec{
 			Image: image,
 		},
+		RenderedVersion: "1",
 	}
 	return json.Marshal(spec)
 }
