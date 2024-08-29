@@ -501,6 +501,43 @@ func TestPrepareRollback(t *testing.T) {
 	})
 }
 
+// func (s *SpecManager) Rollback() error {
+// 	// copy the current rendered spec to the desired rendered spec
+// 	// this will reconcile the device with the desired "rollback" state
+// 	return s.deviceReadWriter.CopyFile(s.currentPath, s.desiredPath)
+// }
+
+func TestRollback(t *testing.T) {
+	require := require.New(t)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockReadWriter := fileio.NewMockReadWriter(ctrl)
+
+	currentPath := "test/current.json"
+	desiredPath := "test/desired.json"
+	s := &SpecManager{
+		log:              log.NewPrefixLogger("test"),
+		deviceReadWriter: mockReadWriter,
+		currentPath:      currentPath,
+		desiredPath:      desiredPath,
+	}
+
+	t.Run("error when copy fails", func(t *testing.T) {
+		copyErr := errors.New("failure to copy file")
+		mockReadWriter.EXPECT().CopyFile(currentPath, desiredPath).Return(copyErr)
+
+		err := s.Rollback()
+		require.ErrorIs(err, copyErr)
+	})
+
+	t.Run("copies the current spec to the desired spec", func(t *testing.T) {
+		mockReadWriter.EXPECT().CopyFile(currentPath, desiredPath).Return(nil)
+		err := s.Rollback()
+		require.NoError(err)
+	})
+}
+
 func createTestSpec(image string) ([]byte, error) {
 	spec := v1alpha1.RenderedDeviceSpec{
 		Os: &v1alpha1.DeviceOSSpec{
