@@ -501,12 +501,6 @@ func TestPrepareRollback(t *testing.T) {
 	})
 }
 
-// func (s *SpecManager) Rollback() error {
-// 	// copy the current rendered spec to the desired rendered spec
-// 	// this will reconcile the device with the desired "rollback" state
-// 	return s.deviceReadWriter.CopyFile(s.currentPath, s.desiredPath)
-// }
-
 func TestRollback(t *testing.T) {
 	require := require.New(t)
 	ctrl := gomock.NewController(t)
