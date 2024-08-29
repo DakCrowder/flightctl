@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/flightctl/flightctl/api/v1alpha1"
+	"github.com/flightctl/flightctl/internal/agent/client"
 	"github.com/flightctl/flightctl/internal/agent/device/fileio"
 	"github.com/flightctl/flightctl/internal/container"
 	"github.com/flightctl/flightctl/pkg/log"
@@ -529,6 +530,20 @@ func TestRollback(t *testing.T) {
 		mockReadWriter.EXPECT().CopyFile(currentPath, desiredPath).Return(nil)
 		err := s.Rollback()
 		require.NoError(err)
+	})
+}
+
+func TestSetClient(t *testing.T) {
+	require := require.New(t)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := client.NewMockManagement(ctrl)
+
+	t.Run("sets the client", func(t *testing.T) {
+		s := &SpecManager{}
+		s.SetClient(mockClient)
+		require.Equal(mockClient, s.managementClient)
 	})
 }
 
