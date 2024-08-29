@@ -459,8 +459,8 @@ func TestPrepareRollback(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// emptySpec, err := json.Marshal(&v1alpha1.RenderedDeviceSpec{})
-	// require.NoError(err)
+	emptySpec, err := json.Marshal(&v1alpha1.RenderedDeviceSpec{})
+	require.NoError(err)
 
 	t.Run("uses the os image from the current spec in the rollback spec", func(t *testing.T) {
 		currentImage := "flightctl-device:v1"
@@ -472,6 +472,25 @@ func TestPrepareRollback(t *testing.T) {
 		rollbackSpec := &v1alpha1.RenderedDeviceSpec{
 			RenderedVersion: "1",
 			Os:              &v1alpha1.DeviceOSSpec{Image: currentImage},
+		}
+		marshaled, err := json.Marshal(rollbackSpec)
+		require.NoError(err)
+		mockReadWriter.EXPECT().WriteFile(rollbackPath, marshaled, gomock.Any()).Return(nil)
+
+		err = s.PrepareRollback(ctx)
+		require.NoError(err)
+	})
+
+	t.Run("falls back to the os image from bootc when the current spec os image is empty", func(t *testing.T) {
+		bootedImage := "flightctl-device:v1"
+		mockReadWriter.EXPECT().ReadFile(gomock.Any()).Return(emptySpec, nil)
+		bootcStatus := &container.BootcHost{}
+		bootcStatus.Status.Booted.Image.Image.Image = bootedImage
+		mockBootcClient.EXPECT().Status(ctx).Return(bootcStatus, nil)
+
+		rollbackSpec := &v1alpha1.RenderedDeviceSpec{
+			RenderedVersion: "",
+			Os:              &v1alpha1.DeviceOSSpec{Image: bootedImage},
 		}
 		marshaled, err := json.Marshal(rollbackSpec)
 		require.NoError(err)
