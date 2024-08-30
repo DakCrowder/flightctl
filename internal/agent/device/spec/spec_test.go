@@ -700,6 +700,34 @@ func TestNewManager(t *testing.T) {
 	})
 }
 
+func Test_getNextRenderedVersion(t *testing.T) {
+	require := require.New(t)
+	testCases := []struct {
+		Name                string
+		RenderedVersion     string
+		NextRenderedVersion string
+		ExpectsError        bool
+	}{
+		{"empty rendered version", "", "", false},
+		{"increments the rendered version", "1", "2", false},
+		{"errors when the rendered version cannot be parsed", "not-a-number", "", true},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.Name, func(t *testing.T) {
+			nextVersion, err := getNextRenderedVersion(testCase.RenderedVersion)
+
+			if testCase.ExpectsError {
+				require.ErrorContains(err, "failed to convert version to integer:")
+			} else {
+				require.NoError(err)
+			}
+
+			require.Equal(testCase.NextRenderedVersion, nextVersion)
+		})
+	}
+}
+
 func createTestSpec(image string) ([]byte, error) {
 	spec := v1alpha1.RenderedDeviceSpec{
 		Os: &v1alpha1.DeviceOSSpec{
