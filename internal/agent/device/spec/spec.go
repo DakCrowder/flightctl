@@ -365,7 +365,7 @@ func (s *SpecManager) pathFromType(specType Type) (string, error) {
 	return filePath, nil
 }
 
-func (m *SpecManager) getRenderedFromManagementAPIWithRetry(
+func (s *SpecManager) getRenderedFromManagementAPIWithRetry(
 	ctx context.Context,
 	renderedVersion string,
 	rendered *v1alpha1.RenderedDeviceSpec,
@@ -375,7 +375,7 @@ func (m *SpecManager) getRenderedFromManagementAPIWithRetry(
 		params.KnownRenderedVersion = &renderedVersion
 	}
 
-	resp, statusCode, err := m.managementClient.GetRenderedDeviceSpec(ctx, m.deviceName, params)
+	resp, statusCode, err := s.managementClient.GetRenderedDeviceSpec(ctx, s.deviceName, params)
 	if err != nil {
 		return false, err
 	}
