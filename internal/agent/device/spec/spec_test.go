@@ -20,6 +20,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
+// TODO expand test cov of IsRollingBack to cover more branches
 func TestBootstrapCheckRollback(t *testing.T) {
 	require := require.New(t)
 	ctrl := gomock.NewController(t)
@@ -112,10 +113,35 @@ func TestInitialize(t *testing.T) {
 		deviceReadWriter: mockReadWriter,
 	}
 
-	t.Run("error writing file", func(t *testing.T) {
-		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(errors.New("unable to write file"))
+	writeErr := fmt.Errorf("write failure")
+
+	t.Run("error writing current file", func(t *testing.T) {
+		// current
+		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(writeErr)
 		err := s.Initialize()
-		require.ErrorContains(err, "unable to write file")
+		require.ErrorContains(err, "writing current rendered spec:")
+	})
+
+	t.Run("error writing desired file", func(t *testing.T) {
+		// current
+		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
+		// desired
+		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(writeErr)
+
+		err := s.Initialize()
+		require.ErrorContains(err, "writing desired rendered spec:")
+	})
+
+	t.Run("error writing rollback file", func(t *testing.T) {
+		// current
+		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
+		// desired
+		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
+		// rollback
+		mockReadWriter.EXPECT().WriteFile(gomock.Any(), gomock.Any(), gomock.Any()).Return(writeErr)
+
+		err := s.Initialize()
+		require.ErrorContains(err, "writing rollback rendered spec:")
 	})
 
 	t.Run("successful initialization", func(t *testing.T) {
