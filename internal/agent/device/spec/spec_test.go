@@ -20,6 +20,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
+// TODO expand test cov / clean up GetDesired tests now that the private methods are better tested
 // TODO expand test cov of IsRollingBack to cover more branches
 func TestBootstrapCheckRollback(t *testing.T) {
 	require := require.New(t)
@@ -578,51 +579,6 @@ func TestSetClient(t *testing.T) {
 	})
 }
 
-// TODO delete
-// func (s *SpecManager) GetDesired(ctx context.Context, currentRenderedVersion string) (*v1alpha1.RenderedDeviceSpec, error) {
-// 	desired, err := s.Read(Desired)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("read desired rendered spec: %w", err)
-// 	}
-
-// 	rollback, err := s.Read(Rollback)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("read rollback rendered spec: %w", err)
-// 	}
-
-// 	renderedVersion, err := s.getRenderedVersion(currentRenderedVersion, desired.RenderedVersion, rollback.RenderedVersion)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("get next rendered version: %w", err)
-// 	}
-
-// 	newDesired := &v1alpha1.RenderedDeviceSpec{}
-// 	err = wait.ExponentialBackoff(s.backoff, func() (bool, error) {
-// 		return s.getRenderedFromManagementAPIWithRetry(ctx, renderedVersion, newDesired)
-// 	})
-// 	if err != nil {
-// 		// no content means there is no new rendered version
-// 		if errors.Is(err, ErrNoContent) {
-// 			s.log.Debug("No content from management API, falling back to the desired spec on disk")
-// 			// TODO: can we avoid resync or is this necessary?
-// 			return desired, nil
-// 		}
-// 		s.log.Warnf("Failed to get rendered device spec after retry: %v", err)
-// 		return nil, err
-// 	}
-
-// 	s.log.Infof("Received desired rendered spec from management service with rendered version: %s", newDesired.RenderedVersion)
-// 	if newDesired.RenderedVersion == desired.RenderedVersion {
-// 		s.log.Infof("No new rendered version from management service, retry reconciling version: %s", newDesired.RenderedVersion)
-// 		return desired, nil
-// 	}
-
-//		// write to disk
-//		s.log.Infof("Writing desired rendered spec to disk with rendered version: %s", newDesired.RenderedVersion)
-//		if err := s.write(Desired, newDesired); err != nil {
-//			return nil, fmt.Errorf("write rendered spec to disk: %w", err)
-//		}
-//		return newDesired, nil
-//	}
 func TestGetDesired(t *testing.T) {
 	require := require.New(t)
 	ctrl := gomock.NewController(t)
@@ -781,6 +737,49 @@ func Test_pathFromType(t *testing.T) {
 			}
 
 			require.Equal(testCase.ExpectedPath, path)
+		})
+	}
+}
+
+func Test_getRenderedVersion(t *testing.T) {
+	require := require.New(t)
+
+	s := &SpecManager{
+		log: log.NewPrefixLogger("test"),
+	}
+
+	testCases := []struct {
+		Name                    string
+		CurrentRenderedVersion  string
+		DesiredRenderedVersion  string
+		RollbackRenderedVersion string
+		ExpectedReturnValue     string
+		ExpectsError            bool
+	}{
+		{"no current rendered version", "", "", "", "", false},
+		{"all versions are equal", "1", "1", "1", "2", false},
+		{"current not equal to rollback", "1", "1", "3", "1", false},
+		{"desired not equal to rollback", "1", "3", "1", "1", false},
+		{"current not equal to desired or rollback", "3", "1", "1", "3", false},
+		{"all versions are different", "1", "2", "3", "1", false},
+		{"invalid versions", "one", "one", "one", "", true},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.Name, func(t *testing.T) {
+			renderedVersion, err := s.getRenderedVersion(
+				testCase.CurrentRenderedVersion,
+				testCase.DesiredRenderedVersion,
+				testCase.RollbackRenderedVersion,
+			)
+
+			if testCase.ExpectsError {
+				require.ErrorContains(err, "get next rendered version:")
+			} else {
+				require.NoError(err)
+			}
+
+			require.Equal(testCase.ExpectedReturnValue, renderedVersion)
 		})
 	}
 }
