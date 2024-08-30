@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -700,6 +701,34 @@ func TestNewManager(t *testing.T) {
 	})
 }
 
+func Test_writeRenderedToFile(t *testing.T) {
+	require := require.New(t)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockWriter := fileio.NewMockWriter(ctrl)
+	filePath := "path/to/write"
+	spec := createSpec("test-image")
+
+	marshaled, err := json.Marshal(spec)
+	require.NoError(err)
+
+	t.Run("returns an error when the write fails", func(t *testing.T) {
+		writeErr := fmt.Errorf("some failure")
+		mockWriter.EXPECT().WriteFile(filePath, marshaled, fileio.DefaultFilePermissions).Return(writeErr)
+
+		err = writeRenderedToFile(mockWriter, spec, filePath)
+		require.EqualError(err, "write default device spec file \"path/to/write\": some failure")
+	})
+
+	t.Run("writes a rendered spec", func(t *testing.T) {
+		mockWriter.EXPECT().WriteFile(filePath, marshaled, fileio.DefaultFilePermissions).Return(nil)
+
+		err = writeRenderedToFile(mockWriter, spec, filePath)
+		require.NoError(err)
+	})
+}
+
 func Test_getNextRenderedVersion(t *testing.T) {
 	require := require.New(t)
 	testCases := []struct {
@@ -756,5 +785,15 @@ func createTestBackoff() wait.Backoff {
 		Duration: 10 * time.Second,
 		Factor:   1.5,
 		Steps:    24,
+	}
+}
+
+// TODO make this the default and have a specific marshal call?
+func createSpec(image string) *v1alpha1.RenderedDeviceSpec {
+	return &v1alpha1.RenderedDeviceSpec{
+		Os: &v1alpha1.DeviceOSSpec{
+			Image: image,
+		},
+		RenderedVersion: "1",
 	}
 }
