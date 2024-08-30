@@ -703,6 +703,26 @@ func TestNewManager(t *testing.T) {
 	})
 }
 
+func TestIsUpdating(t *testing.T) {
+	require := require.New(t)
+
+	t.Run("current rendered version not equal to desired rendered version", func(t *testing.T) {
+		res := IsUpdating(
+			&v1alpha1.RenderedDeviceSpec{RenderedVersion: "4"},
+			&v1alpha1.RenderedDeviceSpec{RenderedVersion: "9"},
+		)
+		require.True(res)
+	})
+
+	t.Run("current rendered version equal to desired rendered version", func(t *testing.T) {
+		res := IsUpdating(
+			&v1alpha1.RenderedDeviceSpec{RenderedVersion: "4"},
+			&v1alpha1.RenderedDeviceSpec{RenderedVersion: "4"},
+		)
+		require.False(res)
+	})
+}
+
 func Test_getRenderedFromManagementAPIWithRetry(t *testing.T) {
 	require := require.New(t)
 	ctrl := gomock.NewController(t)
