@@ -723,6 +723,42 @@ func TestIsUpdating(t *testing.T) {
 	})
 }
 
+func Test_pathFromType(t *testing.T) {
+	require := require.New(t)
+
+	s := &SpecManager{
+		currentPath:  "test/current.json",
+		desiredPath:  "test/desired.json",
+		rollbackPath: "test/rollback.json",
+	}
+
+	testCases := []struct {
+		Name          string
+		SpecType      Type
+		ExpectedPath  string
+		ExpectedError bool
+	}{
+		{"current", "current", s.currentPath, false},
+		{"desired", "desired", s.desiredPath, false},
+		{"rollback", "rollback", s.rollbackPath, false},
+		{"invalid spec type", "rainbow", "", true},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.Name, func(t *testing.T) {
+			path, err := s.pathFromType(testCase.SpecType)
+
+			if testCase.ExpectedError {
+				require.ErrorContains(err, "unknown spec type: rainbow")
+			} else {
+				require.NoError(err)
+			}
+
+			require.Equal(testCase.ExpectedPath, path)
+		})
+	}
+}
+
 func Test_getRenderedFromManagementAPIWithRetry(t *testing.T) {
 	require := require.New(t)
 	ctrl := gomock.NewController(t)
