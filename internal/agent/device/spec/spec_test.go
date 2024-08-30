@@ -674,6 +674,32 @@ func TestGetDesired(t *testing.T) {
 	}
 }
 
+func TestNewManager(t *testing.T) {
+	require := require.New(t)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockReadWriter := fileio.NewMockReadWriter(ctrl)
+	mockBootcClient := container.NewMockBootcClient(ctrl)
+	logger := log.NewPrefixLogger("test")
+	backoff := createTestBackoff()
+
+	t.Run("constructs file paths for the spec files", func(t *testing.T) {
+		manager := NewManager(
+			"device-name",
+			"test/directory/structure/",
+			mockReadWriter,
+			mockBootcClient,
+			backoff,
+			logger,
+		)
+
+		require.Equal("test/directory/structure/current.json", manager.currentPath)
+		require.Equal("test/directory/structure/desired.json", manager.desiredPath)
+		require.Equal("test/directory/structure/rollback.json", manager.rollbackPath)
+	})
+}
+
 func createTestSpec(image string) ([]byte, error) {
 	spec := v1alpha1.RenderedDeviceSpec{
 		Os: &v1alpha1.DeviceOSSpec{
@@ -693,4 +719,14 @@ func createTestSpecWithRenderedVersion(image string, renderedVersion string) ([]
 		RenderedVersion: renderedVersion,
 	}
 	return json.Marshal(spec)
+}
+
+// TODO change these values
+func createTestBackoff() wait.Backoff {
+	return wait.Backoff{
+		Cap:      3 * time.Minute,
+		Duration: 10 * time.Second,
+		Factor:   1.5,
+		Steps:    24,
+	}
 }
