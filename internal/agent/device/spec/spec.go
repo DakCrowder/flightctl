@@ -413,6 +413,7 @@ func readRenderedSpecFromFile(
 	return &current, nil
 }
 
+// TODO handle nil rendered?
 func writeRenderedToFile(writer fileio.Writer, rendered *v1alpha1.RenderedDeviceSpec, filePath string) error {
 	renderedBytes, err := json.Marshal(rendered)
 	if err != nil {

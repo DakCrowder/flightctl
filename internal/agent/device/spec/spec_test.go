@@ -167,6 +167,7 @@ func TestEnsure(t *testing.T) {
 	})
 }
 
+// TODO remove some of these test cases as they have been moved to the private method test case
 func TestRead(t *testing.T) {
 	require := require.New(t)
 	ctrl := gomock.NewController(t)
@@ -698,6 +699,49 @@ func TestNewManager(t *testing.T) {
 		require.Equal("test/directory/structure/current.json", manager.currentPath)
 		require.Equal("test/directory/structure/desired.json", manager.desiredPath)
 		require.Equal("test/directory/structure/rollback.json", manager.rollbackPath)
+	})
+}
+
+func Test_readRenderedSpecFromFile(t *testing.T) {
+	require := require.New(t)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockReader := fileio.NewMockReader(ctrl)
+	filePath := "test/path/spec.json"
+
+	t.Run("error when the file does not exist", func(t *testing.T) {
+		mockReader.EXPECT().ReadFile(filePath).Return(nil, os.ErrNotExist)
+
+		_, err := readRenderedSpecFromFile(mockReader, filePath)
+		require.ErrorIs(err, ErrMissingRenderedSpec)
+	})
+
+	t.Run("error reading file", func(t *testing.T) {
+		readErr := fmt.Errorf("some failure")
+		mockReader.EXPECT().ReadFile(filePath).Return(nil, readErr)
+
+		_, err := readRenderedSpecFromFile(mockReader, filePath)
+		require.EqualError(err, "read device specification from 'test/path/spec.json': some failure")
+	})
+
+	t.Run("error when the file is not a valid spec", func(t *testing.T) {
+		invalidSpec := []byte("Not json data for a spec")
+		mockReader.EXPECT().ReadFile(filePath).Return(invalidSpec, nil)
+
+		_, err := readRenderedSpecFromFile(mockReader, filePath)
+		require.ErrorContains(err, "unmarshal device specification:")
+	})
+
+	t.Run("returns the read spec", func(t *testing.T) {
+		image := "flightctl-device:v1"
+		spec, err := createTestSpec(image)
+		require.NoError(err)
+		mockReader.EXPECT().ReadFile(gomock.Any()).Return(spec, nil)
+
+		specFromRead, err := readRenderedSpecFromFile(mockReader, filePath)
+		require.NoError(err)
+		require.Equal(image, specFromRead.Os.Image)
 	})
 }
 
