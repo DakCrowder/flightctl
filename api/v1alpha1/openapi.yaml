@@ -2528,7 +2528,6 @@ components:
         - apiVersion
         - kind
         - metadata
-        - spec
       description: Repository represents a Git repository or an HTTP endpoint
     HttpConfig:
       type: object
@@ -3825,9 +3824,6 @@ components:
       description: A summary of the devices in the fleet returned when fetching a single Fleet.
       required:
       - total
-      - applicationStatus
-      - summaryStatus
-      - updateStatus
       properties:
         total:
           type: integer
