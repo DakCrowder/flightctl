@@ -250,7 +250,7 @@ type CertificateSigningRequestSpec struct {
 	Extra *map[string][]string `json:"extra,omitempty"`
 
 	// Request The base64-encoded PEM-encoded PKCS#10 CSR. Matches the spec.request field in a kubernetes CertificateSigningRequest resource
-	Request []byte `json:"request"`
+	Request *[]byte `json:"request"`
 
 	// SignerName Indicates the requested signer, and is a qualified name
 	SignerName string `json:"signerName"`
@@ -517,16 +517,16 @@ type DeviceUpdatedStatusType string
 // DevicesSummary A summary of the devices in the fleet returned when fetching a single Fleet.
 type DevicesSummary struct {
 	// ApplicationStatus A breakdown of the devices in the fleet by "application" status.
-	ApplicationStatus map[string]int64 `json:"applicationStatus"`
+	ApplicationStatus *map[string]int64 `json:"applicationStatus"`
 
 	// SummaryStatus A breakdown of the devices in the fleet by "summary" status.
-	SummaryStatus map[string]int64 `json:"summaryStatus"`
+	SummaryStatus *map[string]int64 `json:"summaryStatus"`
 
 	// Total The total number of devices in the fleet.
 	Total int64 `json:"total"`
 
 	// UpdateStatus A breakdown of the devices in the fleet by "updated" status.
-	UpdateStatus map[string]int64 `json:"updateStatus"`
+	UpdateStatus *map[string]int64 `json:"updateStatus"`
 }
 
 // DiskResourceMonitorSpec defines model for DiskResourceMonitorSpec.
@@ -1016,8 +1016,8 @@ type Repository struct {
 	Kind string `json:"kind"`
 
 	// Metadata ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
-	Metadata ObjectMeta     `json:"metadata"`
-	Spec     RepositorySpec `json:"spec"`
+	Metadata ObjectMeta      `json:"metadata"`
+	Spec     *RepositorySpec `json:"spec"`
 
 	// Status RepositoryStatus represents information about the status of a repository. Status may trail the actual state of a repository.
 	Status *RepositoryStatus `json:"status,omitempty"`

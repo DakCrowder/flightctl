@@ -4068,10 +4068,12 @@ components:
     ConditionType:
       type: string
       enum:
-      - 'Approved'             # EnrollmentRequest and CertificateSigningRequest
+      - 'Approved'             # EnrollmentRequest
+      - 'Approved'             # CertificateSigningRequest
       - 'Denied'               # CertificateSigningRequest
       - 'Failed'               # CertificateSigningRequest
-      - 'Accessible'           # Repository and ResourceSync
+      - 'Accessible'           # Repository
+      - 'Accessible'           # ResourceSync
       - 'ResourceParsed'       # ResourceSync
       - 'Synced'               # ResourceSync
       - 'OverlappingSelectors' # Fleet
@@ -4080,10 +4082,12 @@ components:
       - 'SpecValid'            # Device (service condition)
       - 'MultipleOwners'       # Device (service condition)
       x-enum-varnames:
-      - Approved
+      - EnrollmentRequestApproved
+      - CertificateSigningRequestApproved
       - CertificateSigningRequestDenied
       - CertificateSigningRequestFailed
-      - Accessible
+      - RepositoryAccessible
+      - ResourceSyncAccessible
       - ResourceSyncResourceParsed
       - ResourceSyncSynced
       - FleetOverlappingSelectors
