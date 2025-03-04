@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -27,14 +28,14 @@ type Device struct {
 	// Conditions set by the service, as opposed to the agent.
 	ServiceConditions *JSONField[ServiceConditions]
 
-	// The rendered ignition config, exposed in a separate endpoint.
-	RenderedConfig *string
+	// The rendered device config
+	RenderedConfig *JSONField[*[]api.ConfigProviderSpec] `gorm:"type:jsonb"`
 
 	// Timestamp when the device was rendered
 	RenderTimestamp time.Time
 
 	// The rendered application provided by the service.
-	RenderedApplications *JSONField[*[]api.RenderedApplicationSpec] `gorm:"type:jsonb"`
+	RenderedApplications *JSONField[*[]api.ApplicationProviderSpec] `gorm:"type:jsonb"`
 
 	// Join table with the relationship of devices to repositories (only maintained for standalone devices)
 	Repositories []Repository `gorm:"many2many:device_repos;constraint:OnDelete:CASCADE;"`
@@ -106,14 +107,53 @@ func NewDeviceFromApiResource(resource *api.Device) (*Device, error) {
 	}, nil
 }
 
+func DeviceAPIVersion() string {
+	return fmt.Sprintf("%s/%s", api.APIGroup, api.DeviceAPIVersion)
+}
+
 func (d *Device) ToApiResource(opts ...APIResourceOption) (*api.Device, error) {
 	if d == nil {
 		return &api.Device{}, nil
 	}
 
+	var apiOpts = &apiResourceOptions{}
+	for _, opt := range opts {
+		opt(apiOpts)
+	}
+
 	spec := api.DeviceSpec{}
 	if d.Spec != nil {
 		spec = d.Spec.Data
+	}
+
+	if apiOpts.isRendered {
+		annotations := util.EnsureMap(d.Annotations)
+		renderedVersion, ok := annotations[api.DeviceAnnotationRenderedVersion]
+		if !ok {
+			return nil, flterrors.ErrNoRenderedVersion
+		}
+		var console *api.DeviceConsole
+
+		if val, ok := d.Annotations[api.DeviceAnnotationConsole]; ok {
+			console = &api.DeviceConsole{
+				SessionMetadata: "",
+				SessionID:       val,
+			}
+		}
+
+		// if we have a console request we ignore the rendered version
+		// TODO: bump the rendered version instead?
+		if console == nil && apiOpts.knownRenderedVersion != nil && renderedVersion == *apiOpts.knownRenderedVersion {
+			return nil, nil
+		}
+		// TODO: handle multiple consoles, for now we just encapsulate our one console in a list
+		var consoles *[]api.DeviceConsole
+		if console != nil {
+			consoles = &[]api.DeviceConsole{*console}
+		}
+		spec.Config = d.RenderedConfig.Data
+		spec.Applications = d.RenderedApplications.Data
+		spec.Consoles = consoles
 	}
 
 	status := api.NewDeviceStatus()
@@ -133,7 +173,7 @@ func (d *Device) ToApiResource(opts ...APIResourceOption) (*api.Device, error) {
 		resourceVersion = lo.ToPtr(strconv.FormatInt(*d.ResourceVersion, 10))
 	}
 	return &api.Device{
-		ApiVersion: api.DeviceAPIVersion,
+		ApiVersion: DeviceAPIVersion(),
 		Kind:       api.DeviceKind,
 		Metadata: api.ObjectMeta{
 			Name:              lo.ToPtr(d.Name),
@@ -165,7 +205,7 @@ func DevicesToApiResource(devices []Device, cont *string, numRemaining *int64) (
 		updateStatuses[updateStatus] = updateStatuses[updateStatus] + 1
 	}
 	ret := api.DeviceList{
-		ApiVersion: api.DeviceAPIVersion,
+		ApiVersion: DeviceAPIVersion(),
 		Kind:       api.DeviceListKind,
 		Items:      deviceList,
 		Metadata:   api.ListMeta{},

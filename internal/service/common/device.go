@@ -31,10 +31,10 @@ func ReplaceDeviceStatus(ctx context.Context, st store.Store, log logrus.FieldLo
 
 	device := request.Body
 	if errs := validateDeviceStatus(device); len(errs) > 0 {
-		return server.ReplaceDeviceStatus400JSONResponse{Message: errors.Join(errs...).Error()}, nil
+		return server.ReplaceDeviceStatus400JSONResponse(api.StatusBadRequest(errors.Join(errs...).Error())), nil
 	}
 	if request.Name != *request.Body.Metadata.Name {
-		return server.ReplaceDeviceStatus400JSONResponse{Message: "resource name specified in metadata does not match name in path"}, nil
+		return server.ReplaceDeviceStatus400JSONResponse(api.StatusBadRequest("resource name specified in metadata does not match name in path")), nil
 	}
 	device.Status.LastSeen = time.Now()
 
@@ -44,9 +44,9 @@ func ReplaceDeviceStatus(ctx context.Context, st store.Store, log logrus.FieldLo
 	if err != nil {
 		switch {
 		case errors.Is(err, flterrors.ErrResourceIsNil), errors.Is(err, flterrors.ErrResourceNameIsNil):
-			return server.ReplaceDeviceStatus400JSONResponse{Message: err.Error()}, nil
+			return server.ReplaceDeviceStatus400JSONResponse(api.StatusBadRequest(err.Error())), nil
 		case errors.Is(err, flterrors.ErrResourceNotFound):
-			return server.ReplaceDeviceStatus400JSONResponse{}, nil
+			return server.ReplaceDeviceStatus404JSONResponse(api.StatusResourceNotFound("Device", request.Name)), nil
 		default:
 			return nil, err
 		}
@@ -63,11 +63,11 @@ func ReplaceDeviceStatus(ctx context.Context, st store.Store, log logrus.FieldLo
 	case err == nil:
 		return server.ReplaceDeviceStatus200JSONResponse(*result), nil
 	case errors.Is(err, flterrors.ErrResourceIsNil):
-		return server.ReplaceDeviceStatus400JSONResponse{Message: err.Error()}, nil
+		return server.ReplaceDeviceStatus400JSONResponse(api.StatusBadRequest(err.Error())), nil
 	case errors.Is(err, flterrors.ErrResourceNameIsNil):
-		return server.ReplaceDeviceStatus400JSONResponse{Message: err.Error()}, nil
+		return server.ReplaceDeviceStatus400JSONResponse(api.StatusBadRequest(err.Error())), nil
 	case errors.Is(err, flterrors.ErrResourceNotFound):
-		return server.ReplaceDeviceStatus404JSONResponse{}, nil
+		return server.ReplaceDeviceStatus404JSONResponse(api.StatusResourceNotFound("Device", request.Name)), nil
 	default:
 		return nil, err
 	}
@@ -146,15 +146,35 @@ func updateServerSideDeviceStatus(device *api.Device) bool {
 
 func updateServerSideLifecycleStatus(device *api.Device) bool {
 	lastLifecycleStatus := device.Status.Lifecycle.Status
+	lastLifecycleInfo := device.Status.Lifecycle.Info
 
-	if device.IsDecommissioning() {
+	// check device-reported Conditions to see if lifecycle status needs update
+	condition := api.FindStatusCondition(device.Status.Conditions, api.DeviceDecommissioning)
+	if condition == nil {
+		return false
+	}
+
+	if condition.IsDecomError() {
+		device.Status.Lifecycle = api.DeviceLifecycleStatus{
+			Info:   lo.ToPtr("Device has errored while decommissioning"),
+			Status: api.DeviceLifecycleStatusDecommissioned,
+		}
+	}
+
+	if condition.IsDecomComplete() {
+		device.Status.Lifecycle = api.DeviceLifecycleStatus{
+			Info:   lo.ToPtr("Device has completed decommissioning"),
+			Status: api.DeviceLifecycleStatusDecommissioned,
+		}
+	}
+
+	if condition.IsDecomStarted() {
 		device.Status.Lifecycle = api.DeviceLifecycleStatus{
 			Info:   lo.ToPtr("Device has acknowledged decommissioning request"),
 			Status: api.DeviceLifecycleStatusDecommissioning,
 		}
 	}
-
-	return device.Status.Lifecycle.Status != lastLifecycleStatus
+	return device.Status.Lifecycle.Status != lastLifecycleStatus && device.Status.Lifecycle.Info != lastLifecycleInfo
 }
 
 func updateServerSideDeviceUpdatedStatus(ctx context.Context, st store.Store, log logrus.FieldLogger, orgId uuid.UUID, device *api.Device) bool {
@@ -217,7 +237,7 @@ func updateServerSideApplicationStatus(device *api.Device) bool {
 		device.Status.ApplicationsSummary.Info = lo.ToPtr(fmt.Sprintf("The device is disconnected (last seen more than %s).", humanize.Time(time.Now().Add(-api.DeviceDisconnectedTimeout))))
 		return device.Status.ApplicationsSummary.Status != lastApplicationSummaryStatus
 	}
-	if device.IsRebooting() {
+	if device.IsRebooting() && len(device.Status.Applications) > 0 {
 		device.Status.ApplicationsSummary.Status = api.ApplicationsSummaryStatusDegraded
 		device.Status.ApplicationsSummary.Info = lo.ToPtr(DeviceStatusInfoRebooting)
 		return device.Status.ApplicationsSummary.Status != lastApplicationSummaryStatus
@@ -250,24 +270,25 @@ func updateServerSideApplicationStatus(device *api.Device) bool {
 	return device.Status.ApplicationsSummary.Status != lastApplicationSummaryStatus
 }
 
-func GetRenderedDeviceSpec(ctx context.Context, st store.Store, _ logrus.FieldLogger, request server.GetRenderedDeviceSpecRequestObject, consoleGrpcEndpoint string) (server.GetRenderedDeviceSpecResponseObject, error) {
+func GetRenderedDevice(ctx context.Context, st store.Store, log logrus.FieldLogger, request server.GetRenderedDeviceRequestObject, consoleGrpcEndpoint string) (server.GetRenderedDeviceResponseObject, error) {
 	orgId := store.NullOrgId
 
 	result, err := st.Device().GetRendered(ctx, orgId, request.Name, request.Params.KnownRenderedVersion, consoleGrpcEndpoint)
+
 	switch {
 	case err == nil:
 		if result == nil {
-			return server.GetRenderedDeviceSpec204Response{}, nil
+			return server.GetRenderedDevice204Response{}, nil
 		}
-		return server.GetRenderedDeviceSpec200JSONResponse(*result), nil
+		return server.GetRenderedDevice200JSONResponse(*result), nil
 	case errors.Is(err, flterrors.ErrResourceNotFound):
-		return server.GetRenderedDeviceSpec404JSONResponse{}, nil
+		return server.GetRenderedDevice404JSONResponse(api.StatusResourceNotFound("Device", request.Name)), nil
 	case errors.Is(err, flterrors.ErrResourceOwnerIsNil):
-		return server.GetRenderedDeviceSpec409JSONResponse{Message: err.Error()}, nil
+		return server.GetRenderedDevice409JSONResponse(api.StatusResourceVersionConflict(err.Error())), nil
 	case errors.Is(err, flterrors.ErrTemplateVersionIsNil):
-		return server.GetRenderedDeviceSpec409JSONResponse{Message: err.Error()}, nil
+		return server.GetRenderedDevice409JSONResponse(api.StatusResourceVersionConflict(err.Error())), nil
 	case errors.Is(err, flterrors.ErrInvalidTemplateVersion):
-		return server.GetRenderedDeviceSpec409JSONResponse{Message: err.Error()}, nil
+		return server.GetRenderedDevice409JSONResponse(api.StatusResourceVersionConflict(err.Error())), nil
 	default:
 		return nil, err
 	}

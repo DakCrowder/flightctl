@@ -69,14 +69,11 @@ type ServerInterface interface {
 	// (PUT /api/v1/devices/{name})
 	ReplaceDevice(w http.ResponseWriter, r *http.Request, name string)
 
-	// (GET /api/v1/devices/{name}/console)
-	RequestConsole(w http.ResponseWriter, r *http.Request, name string)
-
 	// (PUT /api/v1/devices/{name}/decommission)
 	DecommissionDevice(w http.ResponseWriter, r *http.Request, name string)
 
 	// (GET /api/v1/devices/{name}/rendered)
-	GetRenderedDeviceSpec(w http.ResponseWriter, r *http.Request, name string, params GetRenderedDeviceSpecParams)
+	GetRenderedDevice(w http.ResponseWriter, r *http.Request, name string, params GetRenderedDeviceParams)
 
 	// (GET /api/v1/devices/{name}/status)
 	ReadDeviceStatus(w http.ResponseWriter, r *http.Request, name string)
@@ -300,18 +297,13 @@ func (_ Unimplemented) ReplaceDevice(w http.ResponseWriter, r *http.Request, nam
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// (GET /api/v1/devices/{name}/console)
-func (_ Unimplemented) RequestConsole(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
 // (PUT /api/v1/devices/{name}/decommission)
 func (_ Unimplemented) DecommissionDevice(w http.ResponseWriter, r *http.Request, name string) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
 // (GET /api/v1/devices/{name}/rendered)
-func (_ Unimplemented) GetRenderedDeviceSpec(w http.ResponseWriter, r *http.Request, name string, params GetRenderedDeviceSpecParams) {
+func (_ Unimplemented) GetRenderedDevice(w http.ResponseWriter, r *http.Request, name string, params GetRenderedDeviceParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -570,22 +562,22 @@ func (siw *ServerInterfaceWrapper) AuthValidate(w http.ResponseWriter, r *http.R
 
 	headers := r.Header
 
-	// ------------- Optional header parameter "Authentication" -------------
-	if valueList, found := headers[http.CanonicalHeaderKey("Authentication")]; found {
-		var Authentication string
+	// ------------- Optional header parameter "Authorization" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("Authorization")]; found {
+		var Authorization string
 		n := len(valueList)
 		if n != 1 {
-			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Authentication", Count: n})
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "Authorization", Count: n})
 			return
 		}
 
-		err = runtime.BindStyledParameterWithOptions("simple", "Authentication", valueList[0], &Authentication, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
+		err = runtime.BindStyledParameterWithOptions("simple", "Authorization", valueList[0], &Authorization, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: false})
 		if err != nil {
-			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Authentication", Err: err})
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "Authorization", Err: err})
 			return
 		}
 
-		params.Authentication = &Authentication
+		params.Authorization = &Authorization
 
 	}
 
@@ -1006,32 +998,6 @@ func (siw *ServerInterfaceWrapper) ReplaceDevice(w http.ResponseWriter, r *http.
 	handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
-// RequestConsole operation middleware
-func (siw *ServerInterfaceWrapper) RequestConsole(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.RequestConsole(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
 // DecommissionDevice operation middleware
 func (siw *ServerInterfaceWrapper) DecommissionDevice(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -1058,8 +1024,8 @@ func (siw *ServerInterfaceWrapper) DecommissionDevice(w http.ResponseWriter, r *
 	handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
-// GetRenderedDeviceSpec operation middleware
-func (siw *ServerInterfaceWrapper) GetRenderedDeviceSpec(w http.ResponseWriter, r *http.Request) {
+// GetRenderedDevice operation middleware
+func (siw *ServerInterfaceWrapper) GetRenderedDevice(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var err error
@@ -1074,7 +1040,7 @@ func (siw *ServerInterfaceWrapper) GetRenderedDeviceSpec(w http.ResponseWriter, 
 	}
 
 	// Parameter object where we will unmarshal all parameters from the context
-	var params GetRenderedDeviceSpecParams
+	var params GetRenderedDeviceParams
 
 	// ------------- Optional query parameter "knownRenderedVersion" -------------
 
@@ -1085,7 +1051,7 @@ func (siw *ServerInterfaceWrapper) GetRenderedDeviceSpec(w http.ResponseWriter, 
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetRenderedDeviceSpec(w, r, name, params)
+		siw.Handler.GetRenderedDevice(w, r, name, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2483,13 +2449,10 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Put(options.BaseURL+"/api/v1/devices/{name}", wrapper.ReplaceDevice)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/devices/{name}/console", wrapper.RequestConsole)
-	})
-	r.Group(func(r chi.Router) {
 		r.Put(options.BaseURL+"/api/v1/devices/{name}/decommission", wrapper.DecommissionDevice)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/devices/{name}/rendered", wrapper.GetRenderedDeviceSpec)
+		r.Get(options.BaseURL+"/api/v1/devices/{name}/rendered", wrapper.GetRenderedDevice)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/v1/devices/{name}/status", wrapper.ReadDeviceStatus)
@@ -2683,7 +2646,7 @@ func (response AuthValidate418Response) VisitAuthValidateResponse(w http.Respons
 	return nil
 }
 
-type AuthValidate500JSONResponse Error
+type AuthValidate500JSONResponse Status
 
 func (response AuthValidate500JSONResponse) VisitAuthValidateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2708,7 +2671,7 @@ func (response DeleteCertificateSigningRequests200JSONResponse) VisitDeleteCerti
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteCertificateSigningRequests401JSONResponse Error
+type DeleteCertificateSigningRequests401JSONResponse Status
 
 func (response DeleteCertificateSigningRequests401JSONResponse) VisitDeleteCertificateSigningRequestsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2717,7 +2680,7 @@ func (response DeleteCertificateSigningRequests401JSONResponse) VisitDeleteCerti
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteCertificateSigningRequests403JSONResponse Error
+type DeleteCertificateSigningRequests403JSONResponse Status
 
 func (response DeleteCertificateSigningRequests403JSONResponse) VisitDeleteCertificateSigningRequestsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2726,7 +2689,7 @@ func (response DeleteCertificateSigningRequests403JSONResponse) VisitDeleteCerti
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteCertificateSigningRequests503JSONResponse Error
+type DeleteCertificateSigningRequests503JSONResponse Status
 
 func (response DeleteCertificateSigningRequests503JSONResponse) VisitDeleteCertificateSigningRequestsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2752,7 +2715,7 @@ func (response ListCertificateSigningRequests200JSONResponse) VisitListCertifica
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListCertificateSigningRequests400JSONResponse Error
+type ListCertificateSigningRequests400JSONResponse Status
 
 func (response ListCertificateSigningRequests400JSONResponse) VisitListCertificateSigningRequestsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2761,7 +2724,7 @@ func (response ListCertificateSigningRequests400JSONResponse) VisitListCertifica
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListCertificateSigningRequests401JSONResponse Error
+type ListCertificateSigningRequests401JSONResponse Status
 
 func (response ListCertificateSigningRequests401JSONResponse) VisitListCertificateSigningRequestsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2770,7 +2733,7 @@ func (response ListCertificateSigningRequests401JSONResponse) VisitListCertifica
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListCertificateSigningRequests403JSONResponse Error
+type ListCertificateSigningRequests403JSONResponse Status
 
 func (response ListCertificateSigningRequests403JSONResponse) VisitListCertificateSigningRequestsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2779,7 +2742,7 @@ func (response ListCertificateSigningRequests403JSONResponse) VisitListCertifica
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListCertificateSigningRequests503JSONResponse Error
+type ListCertificateSigningRequests503JSONResponse Status
 
 func (response ListCertificateSigningRequests503JSONResponse) VisitListCertificateSigningRequestsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2805,7 +2768,7 @@ func (response CreateCertificateSigningRequest201JSONResponse) VisitCreateCertif
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateCertificateSigningRequest400JSONResponse Error
+type CreateCertificateSigningRequest400JSONResponse Status
 
 func (response CreateCertificateSigningRequest400JSONResponse) VisitCreateCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2814,7 +2777,7 @@ func (response CreateCertificateSigningRequest400JSONResponse) VisitCreateCertif
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateCertificateSigningRequest401JSONResponse Error
+type CreateCertificateSigningRequest401JSONResponse Status
 
 func (response CreateCertificateSigningRequest401JSONResponse) VisitCreateCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2823,7 +2786,7 @@ func (response CreateCertificateSigningRequest401JSONResponse) VisitCreateCertif
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateCertificateSigningRequest403JSONResponse Error
+type CreateCertificateSigningRequest403JSONResponse Status
 
 func (response CreateCertificateSigningRequest403JSONResponse) VisitCreateCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2832,7 +2795,7 @@ func (response CreateCertificateSigningRequest403JSONResponse) VisitCreateCertif
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateCertificateSigningRequest409JSONResponse Error
+type CreateCertificateSigningRequest409JSONResponse Status
 
 func (response CreateCertificateSigningRequest409JSONResponse) VisitCreateCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2841,7 +2804,7 @@ func (response CreateCertificateSigningRequest409JSONResponse) VisitCreateCertif
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateCertificateSigningRequest503JSONResponse Error
+type CreateCertificateSigningRequest503JSONResponse Status
 
 func (response CreateCertificateSigningRequest503JSONResponse) VisitCreateCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2867,7 +2830,7 @@ func (response DeleteCertificateSigningRequest200JSONResponse) VisitDeleteCertif
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteCertificateSigningRequest401JSONResponse Error
+type DeleteCertificateSigningRequest401JSONResponse Status
 
 func (response DeleteCertificateSigningRequest401JSONResponse) VisitDeleteCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2876,7 +2839,7 @@ func (response DeleteCertificateSigningRequest401JSONResponse) VisitDeleteCertif
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteCertificateSigningRequest403JSONResponse Error
+type DeleteCertificateSigningRequest403JSONResponse Status
 
 func (response DeleteCertificateSigningRequest403JSONResponse) VisitDeleteCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2885,7 +2848,7 @@ func (response DeleteCertificateSigningRequest403JSONResponse) VisitDeleteCertif
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteCertificateSigningRequest404JSONResponse Error
+type DeleteCertificateSigningRequest404JSONResponse Status
 
 func (response DeleteCertificateSigningRequest404JSONResponse) VisitDeleteCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2894,7 +2857,7 @@ func (response DeleteCertificateSigningRequest404JSONResponse) VisitDeleteCertif
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteCertificateSigningRequest503JSONResponse Error
+type DeleteCertificateSigningRequest503JSONResponse Status
 
 func (response DeleteCertificateSigningRequest503JSONResponse) VisitDeleteCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2920,7 +2883,7 @@ func (response ReadCertificateSigningRequest200JSONResponse) VisitReadCertificat
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadCertificateSigningRequest401JSONResponse Error
+type ReadCertificateSigningRequest401JSONResponse Status
 
 func (response ReadCertificateSigningRequest401JSONResponse) VisitReadCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2929,7 +2892,7 @@ func (response ReadCertificateSigningRequest401JSONResponse) VisitReadCertificat
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadCertificateSigningRequest403JSONResponse Error
+type ReadCertificateSigningRequest403JSONResponse Status
 
 func (response ReadCertificateSigningRequest403JSONResponse) VisitReadCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2938,7 +2901,7 @@ func (response ReadCertificateSigningRequest403JSONResponse) VisitReadCertificat
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadCertificateSigningRequest404JSONResponse Error
+type ReadCertificateSigningRequest404JSONResponse Status
 
 func (response ReadCertificateSigningRequest404JSONResponse) VisitReadCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2947,7 +2910,7 @@ func (response ReadCertificateSigningRequest404JSONResponse) VisitReadCertificat
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadCertificateSigningRequest503JSONResponse Error
+type ReadCertificateSigningRequest503JSONResponse Status
 
 func (response ReadCertificateSigningRequest503JSONResponse) VisitReadCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2974,7 +2937,7 @@ func (response PatchCertificateSigningRequest200JSONResponse) VisitPatchCertific
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchCertificateSigningRequest400JSONResponse Error
+type PatchCertificateSigningRequest400JSONResponse Status
 
 func (response PatchCertificateSigningRequest400JSONResponse) VisitPatchCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2983,7 +2946,7 @@ func (response PatchCertificateSigningRequest400JSONResponse) VisitPatchCertific
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchCertificateSigningRequest401JSONResponse Error
+type PatchCertificateSigningRequest401JSONResponse Status
 
 func (response PatchCertificateSigningRequest401JSONResponse) VisitPatchCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2992,7 +2955,7 @@ func (response PatchCertificateSigningRequest401JSONResponse) VisitPatchCertific
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchCertificateSigningRequest403JSONResponse Error
+type PatchCertificateSigningRequest403JSONResponse Status
 
 func (response PatchCertificateSigningRequest403JSONResponse) VisitPatchCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3001,7 +2964,7 @@ func (response PatchCertificateSigningRequest403JSONResponse) VisitPatchCertific
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchCertificateSigningRequest404JSONResponse Error
+type PatchCertificateSigningRequest404JSONResponse Status
 
 func (response PatchCertificateSigningRequest404JSONResponse) VisitPatchCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3010,7 +2973,7 @@ func (response PatchCertificateSigningRequest404JSONResponse) VisitPatchCertific
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchCertificateSigningRequest409JSONResponse Error
+type PatchCertificateSigningRequest409JSONResponse Status
 
 func (response PatchCertificateSigningRequest409JSONResponse) VisitPatchCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3019,7 +2982,7 @@ func (response PatchCertificateSigningRequest409JSONResponse) VisitPatchCertific
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchCertificateSigningRequest503JSONResponse Error
+type PatchCertificateSigningRequest503JSONResponse Status
 
 func (response PatchCertificateSigningRequest503JSONResponse) VisitPatchCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3055,7 +3018,7 @@ func (response ReplaceCertificateSigningRequest201JSONResponse) VisitReplaceCert
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceCertificateSigningRequest400JSONResponse Error
+type ReplaceCertificateSigningRequest400JSONResponse Status
 
 func (response ReplaceCertificateSigningRequest400JSONResponse) VisitReplaceCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3064,7 +3027,7 @@ func (response ReplaceCertificateSigningRequest400JSONResponse) VisitReplaceCert
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceCertificateSigningRequest401JSONResponse Error
+type ReplaceCertificateSigningRequest401JSONResponse Status
 
 func (response ReplaceCertificateSigningRequest401JSONResponse) VisitReplaceCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3073,7 +3036,7 @@ func (response ReplaceCertificateSigningRequest401JSONResponse) VisitReplaceCert
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceCertificateSigningRequest403JSONResponse Error
+type ReplaceCertificateSigningRequest403JSONResponse Status
 
 func (response ReplaceCertificateSigningRequest403JSONResponse) VisitReplaceCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3082,7 +3045,7 @@ func (response ReplaceCertificateSigningRequest403JSONResponse) VisitReplaceCert
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceCertificateSigningRequest404JSONResponse Error
+type ReplaceCertificateSigningRequest404JSONResponse Status
 
 func (response ReplaceCertificateSigningRequest404JSONResponse) VisitReplaceCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3091,7 +3054,7 @@ func (response ReplaceCertificateSigningRequest404JSONResponse) VisitReplaceCert
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceCertificateSigningRequest409JSONResponse Error
+type ReplaceCertificateSigningRequest409JSONResponse Status
 
 func (response ReplaceCertificateSigningRequest409JSONResponse) VisitReplaceCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3100,7 +3063,7 @@ func (response ReplaceCertificateSigningRequest409JSONResponse) VisitReplaceCert
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceCertificateSigningRequest503JSONResponse Error
+type ReplaceCertificateSigningRequest503JSONResponse Status
 
 func (response ReplaceCertificateSigningRequest503JSONResponse) VisitReplaceCertificateSigningRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3127,7 +3090,7 @@ func (response UpdateCertificateSigningRequestApproval200JSONResponse) VisitUpda
 	return json.NewEncoder(w).Encode(response)
 }
 
-type UpdateCertificateSigningRequestApproval400JSONResponse Error
+type UpdateCertificateSigningRequestApproval400JSONResponse Status
 
 func (response UpdateCertificateSigningRequestApproval400JSONResponse) VisitUpdateCertificateSigningRequestApprovalResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3136,7 +3099,7 @@ func (response UpdateCertificateSigningRequestApproval400JSONResponse) VisitUpda
 	return json.NewEncoder(w).Encode(response)
 }
 
-type UpdateCertificateSigningRequestApproval401JSONResponse Error
+type UpdateCertificateSigningRequestApproval401JSONResponse Status
 
 func (response UpdateCertificateSigningRequestApproval401JSONResponse) VisitUpdateCertificateSigningRequestApprovalResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3145,7 +3108,7 @@ func (response UpdateCertificateSigningRequestApproval401JSONResponse) VisitUpda
 	return json.NewEncoder(w).Encode(response)
 }
 
-type UpdateCertificateSigningRequestApproval403JSONResponse Error
+type UpdateCertificateSigningRequestApproval403JSONResponse Status
 
 func (response UpdateCertificateSigningRequestApproval403JSONResponse) VisitUpdateCertificateSigningRequestApprovalResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3154,7 +3117,7 @@ func (response UpdateCertificateSigningRequestApproval403JSONResponse) VisitUpda
 	return json.NewEncoder(w).Encode(response)
 }
 
-type UpdateCertificateSigningRequestApproval404JSONResponse Error
+type UpdateCertificateSigningRequestApproval404JSONResponse Status
 
 func (response UpdateCertificateSigningRequestApproval404JSONResponse) VisitUpdateCertificateSigningRequestApprovalResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3163,7 +3126,7 @@ func (response UpdateCertificateSigningRequestApproval404JSONResponse) VisitUpda
 	return json.NewEncoder(w).Encode(response)
 }
 
-type UpdateCertificateSigningRequestApproval409JSONResponse Error
+type UpdateCertificateSigningRequestApproval409JSONResponse Status
 
 func (response UpdateCertificateSigningRequestApproval409JSONResponse) VisitUpdateCertificateSigningRequestApprovalResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3172,7 +3135,7 @@ func (response UpdateCertificateSigningRequestApproval409JSONResponse) VisitUpda
 	return json.NewEncoder(w).Encode(response)
 }
 
-type UpdateCertificateSigningRequestApproval503JSONResponse Error
+type UpdateCertificateSigningRequestApproval503JSONResponse Status
 
 func (response UpdateCertificateSigningRequestApproval503JSONResponse) VisitUpdateCertificateSigningRequestApprovalResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3197,7 +3160,7 @@ func (response DeleteDevices200JSONResponse) VisitDeleteDevicesResponse(w http.R
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteDevices401JSONResponse Error
+type DeleteDevices401JSONResponse Status
 
 func (response DeleteDevices401JSONResponse) VisitDeleteDevicesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3206,7 +3169,7 @@ func (response DeleteDevices401JSONResponse) VisitDeleteDevicesResponse(w http.R
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteDevices403JSONResponse Error
+type DeleteDevices403JSONResponse Status
 
 func (response DeleteDevices403JSONResponse) VisitDeleteDevicesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3215,7 +3178,7 @@ func (response DeleteDevices403JSONResponse) VisitDeleteDevicesResponse(w http.R
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteDevices503JSONResponse Error
+type DeleteDevices503JSONResponse Status
 
 func (response DeleteDevices503JSONResponse) VisitDeleteDevicesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3241,7 +3204,7 @@ func (response ListDevices200JSONResponse) VisitListDevicesResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListDevices400JSONResponse Error
+type ListDevices400JSONResponse Status
 
 func (response ListDevices400JSONResponse) VisitListDevicesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3250,7 +3213,7 @@ func (response ListDevices400JSONResponse) VisitListDevicesResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListDevices401JSONResponse Error
+type ListDevices401JSONResponse Status
 
 func (response ListDevices401JSONResponse) VisitListDevicesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3259,7 +3222,7 @@ func (response ListDevices401JSONResponse) VisitListDevicesResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListDevices403JSONResponse Error
+type ListDevices403JSONResponse Status
 
 func (response ListDevices403JSONResponse) VisitListDevicesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3268,7 +3231,7 @@ func (response ListDevices403JSONResponse) VisitListDevicesResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListDevices503JSONResponse Error
+type ListDevices503JSONResponse Status
 
 func (response ListDevices503JSONResponse) VisitListDevicesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3294,7 +3257,7 @@ func (response CreateDevice201JSONResponse) VisitCreateDeviceResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateDevice400JSONResponse Error
+type CreateDevice400JSONResponse Status
 
 func (response CreateDevice400JSONResponse) VisitCreateDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3303,7 +3266,7 @@ func (response CreateDevice400JSONResponse) VisitCreateDeviceResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateDevice401JSONResponse Error
+type CreateDevice401JSONResponse Status
 
 func (response CreateDevice401JSONResponse) VisitCreateDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3312,7 +3275,7 @@ func (response CreateDevice401JSONResponse) VisitCreateDeviceResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateDevice403JSONResponse Error
+type CreateDevice403JSONResponse Status
 
 func (response CreateDevice403JSONResponse) VisitCreateDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3321,7 +3284,7 @@ func (response CreateDevice403JSONResponse) VisitCreateDeviceResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateDevice409JSONResponse Error
+type CreateDevice409JSONResponse Status
 
 func (response CreateDevice409JSONResponse) VisitCreateDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3330,7 +3293,7 @@ func (response CreateDevice409JSONResponse) VisitCreateDeviceResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateDevice503JSONResponse Error
+type CreateDevice503JSONResponse Status
 
 func (response CreateDevice503JSONResponse) VisitCreateDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3356,7 +3319,7 @@ func (response DeleteDevice200JSONResponse) VisitDeleteDeviceResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteDevice401JSONResponse Error
+type DeleteDevice401JSONResponse Status
 
 func (response DeleteDevice401JSONResponse) VisitDeleteDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3365,7 +3328,7 @@ func (response DeleteDevice401JSONResponse) VisitDeleteDeviceResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteDevice403JSONResponse Error
+type DeleteDevice403JSONResponse Status
 
 func (response DeleteDevice403JSONResponse) VisitDeleteDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3374,7 +3337,7 @@ func (response DeleteDevice403JSONResponse) VisitDeleteDeviceResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteDevice404JSONResponse Error
+type DeleteDevice404JSONResponse Status
 
 func (response DeleteDevice404JSONResponse) VisitDeleteDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3383,7 +3346,7 @@ func (response DeleteDevice404JSONResponse) VisitDeleteDeviceResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteDevice503JSONResponse Error
+type DeleteDevice503JSONResponse Status
 
 func (response DeleteDevice503JSONResponse) VisitDeleteDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3409,7 +3372,7 @@ func (response ReadDevice200JSONResponse) VisitReadDeviceResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadDevice401JSONResponse Error
+type ReadDevice401JSONResponse Status
 
 func (response ReadDevice401JSONResponse) VisitReadDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3418,7 +3381,7 @@ func (response ReadDevice401JSONResponse) VisitReadDeviceResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadDevice403JSONResponse Error
+type ReadDevice403JSONResponse Status
 
 func (response ReadDevice403JSONResponse) VisitReadDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3427,7 +3390,7 @@ func (response ReadDevice403JSONResponse) VisitReadDeviceResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadDevice404JSONResponse Error
+type ReadDevice404JSONResponse Status
 
 func (response ReadDevice404JSONResponse) VisitReadDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3436,7 +3399,7 @@ func (response ReadDevice404JSONResponse) VisitReadDeviceResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadDevice503JSONResponse Error
+type ReadDevice503JSONResponse Status
 
 func (response ReadDevice503JSONResponse) VisitReadDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3463,7 +3426,7 @@ func (response PatchDevice200JSONResponse) VisitPatchDeviceResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchDevice400JSONResponse Error
+type PatchDevice400JSONResponse Status
 
 func (response PatchDevice400JSONResponse) VisitPatchDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3472,7 +3435,7 @@ func (response PatchDevice400JSONResponse) VisitPatchDeviceResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchDevice401JSONResponse Error
+type PatchDevice401JSONResponse Status
 
 func (response PatchDevice401JSONResponse) VisitPatchDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3481,7 +3444,7 @@ func (response PatchDevice401JSONResponse) VisitPatchDeviceResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchDevice403JSONResponse Error
+type PatchDevice403JSONResponse Status
 
 func (response PatchDevice403JSONResponse) VisitPatchDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3490,7 +3453,7 @@ func (response PatchDevice403JSONResponse) VisitPatchDeviceResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchDevice404JSONResponse Error
+type PatchDevice404JSONResponse Status
 
 func (response PatchDevice404JSONResponse) VisitPatchDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3499,7 +3462,7 @@ func (response PatchDevice404JSONResponse) VisitPatchDeviceResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchDevice409JSONResponse Error
+type PatchDevice409JSONResponse Status
 
 func (response PatchDevice409JSONResponse) VisitPatchDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3508,7 +3471,7 @@ func (response PatchDevice409JSONResponse) VisitPatchDeviceResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchDevice503JSONResponse Error
+type PatchDevice503JSONResponse Status
 
 func (response PatchDevice503JSONResponse) VisitPatchDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3544,7 +3507,7 @@ func (response ReplaceDevice201JSONResponse) VisitReplaceDeviceResponse(w http.R
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceDevice400JSONResponse Error
+type ReplaceDevice400JSONResponse Status
 
 func (response ReplaceDevice400JSONResponse) VisitReplaceDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3553,7 +3516,7 @@ func (response ReplaceDevice400JSONResponse) VisitReplaceDeviceResponse(w http.R
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceDevice401JSONResponse Error
+type ReplaceDevice401JSONResponse Status
 
 func (response ReplaceDevice401JSONResponse) VisitReplaceDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3562,7 +3525,7 @@ func (response ReplaceDevice401JSONResponse) VisitReplaceDeviceResponse(w http.R
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceDevice403JSONResponse Error
+type ReplaceDevice403JSONResponse Status
 
 func (response ReplaceDevice403JSONResponse) VisitReplaceDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3571,7 +3534,7 @@ func (response ReplaceDevice403JSONResponse) VisitReplaceDeviceResponse(w http.R
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceDevice404JSONResponse Error
+type ReplaceDevice404JSONResponse Status
 
 func (response ReplaceDevice404JSONResponse) VisitReplaceDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3580,7 +3543,7 @@ func (response ReplaceDevice404JSONResponse) VisitReplaceDeviceResponse(w http.R
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceDevice409JSONResponse Error
+type ReplaceDevice409JSONResponse Status
 
 func (response ReplaceDevice409JSONResponse) VisitReplaceDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3589,71 +3552,9 @@ func (response ReplaceDevice409JSONResponse) VisitReplaceDeviceResponse(w http.R
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceDevice503JSONResponse Error
+type ReplaceDevice503JSONResponse Status
 
 func (response ReplaceDevice503JSONResponse) VisitReplaceDeviceResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(503)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type RequestConsoleRequestObject struct {
-	Name string `json:"name"`
-}
-
-type RequestConsoleResponseObject interface {
-	VisitRequestConsoleResponse(w http.ResponseWriter) error
-}
-
-type RequestConsole200JSONResponse DeviceConsole
-
-func (response RequestConsole200JSONResponse) VisitRequestConsoleResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type RequestConsole401JSONResponse Error
-
-func (response RequestConsole401JSONResponse) VisitRequestConsoleResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(401)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type RequestConsole403JSONResponse Error
-
-func (response RequestConsole403JSONResponse) VisitRequestConsoleResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(403)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type RequestConsole404JSONResponse Error
-
-func (response RequestConsole404JSONResponse) VisitRequestConsoleResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(404)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type RequestConsole409JSONResponse Error
-
-func (response RequestConsole409JSONResponse) VisitRequestConsoleResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(409)
-
-	return json.NewEncoder(w).Encode(response)
-}
-
-type RequestConsole503JSONResponse Error
-
-func (response RequestConsole503JSONResponse) VisitRequestConsoleResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(503)
 
@@ -3678,7 +3579,7 @@ func (response DecommissionDevice200JSONResponse) VisitDecommissionDeviceRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DecommissionDevice400JSONResponse Error
+type DecommissionDevice400JSONResponse Status
 
 func (response DecommissionDevice400JSONResponse) VisitDecommissionDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3687,7 +3588,7 @@ func (response DecommissionDevice400JSONResponse) VisitDecommissionDeviceRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DecommissionDevice401JSONResponse Error
+type DecommissionDevice401JSONResponse Status
 
 func (response DecommissionDevice401JSONResponse) VisitDecommissionDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3696,7 +3597,7 @@ func (response DecommissionDevice401JSONResponse) VisitDecommissionDeviceRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DecommissionDevice403JSONResponse Error
+type DecommissionDevice403JSONResponse Status
 
 func (response DecommissionDevice403JSONResponse) VisitDecommissionDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3705,7 +3606,7 @@ func (response DecommissionDevice403JSONResponse) VisitDecommissionDeviceRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DecommissionDevice404JSONResponse Error
+type DecommissionDevice404JSONResponse Status
 
 func (response DecommissionDevice404JSONResponse) VisitDecommissionDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3714,7 +3615,7 @@ func (response DecommissionDevice404JSONResponse) VisitDecommissionDeviceRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DecommissionDevice503JSONResponse Error
+type DecommissionDevice503JSONResponse Status
 
 func (response DecommissionDevice503JSONResponse) VisitDecommissionDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3723,71 +3624,71 @@ func (response DecommissionDevice503JSONResponse) VisitDecommissionDeviceRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetRenderedDeviceSpecRequestObject struct {
+type GetRenderedDeviceRequestObject struct {
 	Name   string `json:"name"`
-	Params GetRenderedDeviceSpecParams
+	Params GetRenderedDeviceParams
 }
 
-type GetRenderedDeviceSpecResponseObject interface {
-	VisitGetRenderedDeviceSpecResponse(w http.ResponseWriter) error
+type GetRenderedDeviceResponseObject interface {
+	VisitGetRenderedDeviceResponse(w http.ResponseWriter) error
 }
 
-type GetRenderedDeviceSpec200JSONResponse RenderedDeviceSpec
+type GetRenderedDevice200JSONResponse Device
 
-func (response GetRenderedDeviceSpec200JSONResponse) VisitGetRenderedDeviceSpecResponse(w http.ResponseWriter) error {
+func (response GetRenderedDevice200JSONResponse) VisitGetRenderedDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetRenderedDeviceSpec204Response struct {
+type GetRenderedDevice204Response struct {
 }
 
-func (response GetRenderedDeviceSpec204Response) VisitGetRenderedDeviceSpecResponse(w http.ResponseWriter) error {
+func (response GetRenderedDevice204Response) VisitGetRenderedDeviceResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
 }
 
-type GetRenderedDeviceSpec401JSONResponse Error
+type GetRenderedDevice401JSONResponse Status
 
-func (response GetRenderedDeviceSpec401JSONResponse) VisitGetRenderedDeviceSpecResponse(w http.ResponseWriter) error {
+func (response GetRenderedDevice401JSONResponse) VisitGetRenderedDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetRenderedDeviceSpec403JSONResponse Error
+type GetRenderedDevice403JSONResponse Status
 
-func (response GetRenderedDeviceSpec403JSONResponse) VisitGetRenderedDeviceSpecResponse(w http.ResponseWriter) error {
+func (response GetRenderedDevice403JSONResponse) VisitGetRenderedDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(403)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetRenderedDeviceSpec404JSONResponse Error
+type GetRenderedDevice404JSONResponse Status
 
-func (response GetRenderedDeviceSpec404JSONResponse) VisitGetRenderedDeviceSpecResponse(w http.ResponseWriter) error {
+func (response GetRenderedDevice404JSONResponse) VisitGetRenderedDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(404)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetRenderedDeviceSpec409JSONResponse Error
+type GetRenderedDevice409JSONResponse Status
 
-func (response GetRenderedDeviceSpec409JSONResponse) VisitGetRenderedDeviceSpecResponse(w http.ResponseWriter) error {
+func (response GetRenderedDevice409JSONResponse) VisitGetRenderedDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(409)
 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetRenderedDeviceSpec503JSONResponse Error
+type GetRenderedDevice503JSONResponse Status
 
-func (response GetRenderedDeviceSpec503JSONResponse) VisitGetRenderedDeviceSpecResponse(w http.ResponseWriter) error {
+func (response GetRenderedDevice503JSONResponse) VisitGetRenderedDeviceResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(503)
 
@@ -3811,7 +3712,7 @@ func (response ReadDeviceStatus200JSONResponse) VisitReadDeviceStatusResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadDeviceStatus401JSONResponse Error
+type ReadDeviceStatus401JSONResponse Status
 
 func (response ReadDeviceStatus401JSONResponse) VisitReadDeviceStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3820,7 +3721,7 @@ func (response ReadDeviceStatus401JSONResponse) VisitReadDeviceStatusResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadDeviceStatus403JSONResponse Error
+type ReadDeviceStatus403JSONResponse Status
 
 func (response ReadDeviceStatus403JSONResponse) VisitReadDeviceStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3829,7 +3730,7 @@ func (response ReadDeviceStatus403JSONResponse) VisitReadDeviceStatusResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadDeviceStatus404JSONResponse Error
+type ReadDeviceStatus404JSONResponse Status
 
 func (response ReadDeviceStatus404JSONResponse) VisitReadDeviceStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3838,7 +3739,7 @@ func (response ReadDeviceStatus404JSONResponse) VisitReadDeviceStatusResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadDeviceStatus503JSONResponse Error
+type ReadDeviceStatus503JSONResponse Status
 
 func (response ReadDeviceStatus503JSONResponse) VisitReadDeviceStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3865,7 +3766,7 @@ func (response PatchDeviceStatus200JSONResponse) VisitPatchDeviceStatusResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchDeviceStatus400JSONResponse Error
+type PatchDeviceStatus400JSONResponse Status
 
 func (response PatchDeviceStatus400JSONResponse) VisitPatchDeviceStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3874,7 +3775,7 @@ func (response PatchDeviceStatus400JSONResponse) VisitPatchDeviceStatusResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchDeviceStatus401JSONResponse Error
+type PatchDeviceStatus401JSONResponse Status
 
 func (response PatchDeviceStatus401JSONResponse) VisitPatchDeviceStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3883,7 +3784,7 @@ func (response PatchDeviceStatus401JSONResponse) VisitPatchDeviceStatusResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchDeviceStatus403JSONResponse Error
+type PatchDeviceStatus403JSONResponse Status
 
 func (response PatchDeviceStatus403JSONResponse) VisitPatchDeviceStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3892,7 +3793,7 @@ func (response PatchDeviceStatus403JSONResponse) VisitPatchDeviceStatusResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchDeviceStatus404JSONResponse Error
+type PatchDeviceStatus404JSONResponse Status
 
 func (response PatchDeviceStatus404JSONResponse) VisitPatchDeviceStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3901,7 +3802,7 @@ func (response PatchDeviceStatus404JSONResponse) VisitPatchDeviceStatusResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchDeviceStatus503JSONResponse Error
+type PatchDeviceStatus503JSONResponse Status
 
 func (response PatchDeviceStatus503JSONResponse) VisitPatchDeviceStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3928,7 +3829,7 @@ func (response ReplaceDeviceStatus200JSONResponse) VisitReplaceDeviceStatusRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceDeviceStatus400JSONResponse Error
+type ReplaceDeviceStatus400JSONResponse Status
 
 func (response ReplaceDeviceStatus400JSONResponse) VisitReplaceDeviceStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3937,7 +3838,7 @@ func (response ReplaceDeviceStatus400JSONResponse) VisitReplaceDeviceStatusRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceDeviceStatus401JSONResponse Error
+type ReplaceDeviceStatus401JSONResponse Status
 
 func (response ReplaceDeviceStatus401JSONResponse) VisitReplaceDeviceStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3946,7 +3847,7 @@ func (response ReplaceDeviceStatus401JSONResponse) VisitReplaceDeviceStatusRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceDeviceStatus403JSONResponse Error
+type ReplaceDeviceStatus403JSONResponse Status
 
 func (response ReplaceDeviceStatus403JSONResponse) VisitReplaceDeviceStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3955,7 +3856,7 @@ func (response ReplaceDeviceStatus403JSONResponse) VisitReplaceDeviceStatusRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceDeviceStatus404JSONResponse Error
+type ReplaceDeviceStatus404JSONResponse Status
 
 func (response ReplaceDeviceStatus404JSONResponse) VisitReplaceDeviceStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3964,7 +3865,7 @@ func (response ReplaceDeviceStatus404JSONResponse) VisitReplaceDeviceStatusRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceDeviceStatus503JSONResponse Error
+type ReplaceDeviceStatus503JSONResponse Status
 
 func (response ReplaceDeviceStatus503JSONResponse) VisitReplaceDeviceStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3990,7 +3891,7 @@ func (response GetEnrollmentConfig200JSONResponse) VisitGetEnrollmentConfigRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetEnrollmentConfig400JSONResponse Error
+type GetEnrollmentConfig400JSONResponse Status
 
 func (response GetEnrollmentConfig400JSONResponse) VisitGetEnrollmentConfigResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3999,7 +3900,7 @@ func (response GetEnrollmentConfig400JSONResponse) VisitGetEnrollmentConfigRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetEnrollmentConfig401JSONResponse Error
+type GetEnrollmentConfig401JSONResponse Status
 
 func (response GetEnrollmentConfig401JSONResponse) VisitGetEnrollmentConfigResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4008,7 +3909,7 @@ func (response GetEnrollmentConfig401JSONResponse) VisitGetEnrollmentConfigRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetEnrollmentConfig403JSONResponse Error
+type GetEnrollmentConfig403JSONResponse Status
 
 func (response GetEnrollmentConfig403JSONResponse) VisitGetEnrollmentConfigResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4017,7 +3918,7 @@ func (response GetEnrollmentConfig403JSONResponse) VisitGetEnrollmentConfigRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetEnrollmentConfig404JSONResponse Error
+type GetEnrollmentConfig404JSONResponse Status
 
 func (response GetEnrollmentConfig404JSONResponse) VisitGetEnrollmentConfigResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4026,7 +3927,7 @@ func (response GetEnrollmentConfig404JSONResponse) VisitGetEnrollmentConfigRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetEnrollmentConfig503JSONResponse Error
+type GetEnrollmentConfig503JSONResponse Status
 
 func (response GetEnrollmentConfig503JSONResponse) VisitGetEnrollmentConfigResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4051,7 +3952,7 @@ func (response DeleteEnrollmentRequests200JSONResponse) VisitDeleteEnrollmentReq
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteEnrollmentRequests401JSONResponse Error
+type DeleteEnrollmentRequests401JSONResponse Status
 
 func (response DeleteEnrollmentRequests401JSONResponse) VisitDeleteEnrollmentRequestsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4060,7 +3961,7 @@ func (response DeleteEnrollmentRequests401JSONResponse) VisitDeleteEnrollmentReq
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteEnrollmentRequests403JSONResponse Error
+type DeleteEnrollmentRequests403JSONResponse Status
 
 func (response DeleteEnrollmentRequests403JSONResponse) VisitDeleteEnrollmentRequestsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4069,7 +3970,7 @@ func (response DeleteEnrollmentRequests403JSONResponse) VisitDeleteEnrollmentReq
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteEnrollmentRequests503JSONResponse Error
+type DeleteEnrollmentRequests503JSONResponse Status
 
 func (response DeleteEnrollmentRequests503JSONResponse) VisitDeleteEnrollmentRequestsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4095,7 +3996,7 @@ func (response ListEnrollmentRequests200JSONResponse) VisitListEnrollmentRequest
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListEnrollmentRequests400JSONResponse Error
+type ListEnrollmentRequests400JSONResponse Status
 
 func (response ListEnrollmentRequests400JSONResponse) VisitListEnrollmentRequestsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4104,7 +4005,7 @@ func (response ListEnrollmentRequests400JSONResponse) VisitListEnrollmentRequest
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListEnrollmentRequests401JSONResponse Error
+type ListEnrollmentRequests401JSONResponse Status
 
 func (response ListEnrollmentRequests401JSONResponse) VisitListEnrollmentRequestsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4113,7 +4014,7 @@ func (response ListEnrollmentRequests401JSONResponse) VisitListEnrollmentRequest
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListEnrollmentRequests403JSONResponse Error
+type ListEnrollmentRequests403JSONResponse Status
 
 func (response ListEnrollmentRequests403JSONResponse) VisitListEnrollmentRequestsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4122,7 +4023,7 @@ func (response ListEnrollmentRequests403JSONResponse) VisitListEnrollmentRequest
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListEnrollmentRequests503JSONResponse Error
+type ListEnrollmentRequests503JSONResponse Status
 
 func (response ListEnrollmentRequests503JSONResponse) VisitListEnrollmentRequestsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4148,7 +4049,7 @@ func (response CreateEnrollmentRequest201JSONResponse) VisitCreateEnrollmentRequ
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateEnrollmentRequest400JSONResponse Error
+type CreateEnrollmentRequest400JSONResponse Status
 
 func (response CreateEnrollmentRequest400JSONResponse) VisitCreateEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4157,7 +4058,7 @@ func (response CreateEnrollmentRequest400JSONResponse) VisitCreateEnrollmentRequ
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateEnrollmentRequest401JSONResponse Error
+type CreateEnrollmentRequest401JSONResponse Status
 
 func (response CreateEnrollmentRequest401JSONResponse) VisitCreateEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4166,7 +4067,7 @@ func (response CreateEnrollmentRequest401JSONResponse) VisitCreateEnrollmentRequ
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateEnrollmentRequest403JSONResponse Error
+type CreateEnrollmentRequest403JSONResponse Status
 
 func (response CreateEnrollmentRequest403JSONResponse) VisitCreateEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4175,7 +4076,7 @@ func (response CreateEnrollmentRequest403JSONResponse) VisitCreateEnrollmentRequ
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateEnrollmentRequest409JSONResponse Error
+type CreateEnrollmentRequest409JSONResponse Status
 
 func (response CreateEnrollmentRequest409JSONResponse) VisitCreateEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4184,7 +4085,7 @@ func (response CreateEnrollmentRequest409JSONResponse) VisitCreateEnrollmentRequ
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateEnrollmentRequest503JSONResponse Error
+type CreateEnrollmentRequest503JSONResponse Status
 
 func (response CreateEnrollmentRequest503JSONResponse) VisitCreateEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4210,7 +4111,7 @@ func (response DeleteEnrollmentRequest200JSONResponse) VisitDeleteEnrollmentRequ
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteEnrollmentRequest401JSONResponse Error
+type DeleteEnrollmentRequest401JSONResponse Status
 
 func (response DeleteEnrollmentRequest401JSONResponse) VisitDeleteEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4219,7 +4120,7 @@ func (response DeleteEnrollmentRequest401JSONResponse) VisitDeleteEnrollmentRequ
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteEnrollmentRequest403JSONResponse Error
+type DeleteEnrollmentRequest403JSONResponse Status
 
 func (response DeleteEnrollmentRequest403JSONResponse) VisitDeleteEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4228,7 +4129,7 @@ func (response DeleteEnrollmentRequest403JSONResponse) VisitDeleteEnrollmentRequ
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteEnrollmentRequest404JSONResponse Error
+type DeleteEnrollmentRequest404JSONResponse Status
 
 func (response DeleteEnrollmentRequest404JSONResponse) VisitDeleteEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4237,7 +4138,7 @@ func (response DeleteEnrollmentRequest404JSONResponse) VisitDeleteEnrollmentRequ
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteEnrollmentRequest503JSONResponse Error
+type DeleteEnrollmentRequest503JSONResponse Status
 
 func (response DeleteEnrollmentRequest503JSONResponse) VisitDeleteEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4263,7 +4164,7 @@ func (response ReadEnrollmentRequest200JSONResponse) VisitReadEnrollmentRequestR
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadEnrollmentRequest401JSONResponse Error
+type ReadEnrollmentRequest401JSONResponse Status
 
 func (response ReadEnrollmentRequest401JSONResponse) VisitReadEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4272,7 +4173,7 @@ func (response ReadEnrollmentRequest401JSONResponse) VisitReadEnrollmentRequestR
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadEnrollmentRequest403JSONResponse Error
+type ReadEnrollmentRequest403JSONResponse Status
 
 func (response ReadEnrollmentRequest403JSONResponse) VisitReadEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4281,7 +4182,7 @@ func (response ReadEnrollmentRequest403JSONResponse) VisitReadEnrollmentRequestR
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadEnrollmentRequest404JSONResponse Error
+type ReadEnrollmentRequest404JSONResponse Status
 
 func (response ReadEnrollmentRequest404JSONResponse) VisitReadEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4290,7 +4191,7 @@ func (response ReadEnrollmentRequest404JSONResponse) VisitReadEnrollmentRequestR
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadEnrollmentRequest503JSONResponse Error
+type ReadEnrollmentRequest503JSONResponse Status
 
 func (response ReadEnrollmentRequest503JSONResponse) VisitReadEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4317,7 +4218,7 @@ func (response PatchEnrollmentRequest200JSONResponse) VisitPatchEnrollmentReques
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchEnrollmentRequest400JSONResponse Error
+type PatchEnrollmentRequest400JSONResponse Status
 
 func (response PatchEnrollmentRequest400JSONResponse) VisitPatchEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4326,7 +4227,7 @@ func (response PatchEnrollmentRequest400JSONResponse) VisitPatchEnrollmentReques
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchEnrollmentRequest401JSONResponse Error
+type PatchEnrollmentRequest401JSONResponse Status
 
 func (response PatchEnrollmentRequest401JSONResponse) VisitPatchEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4335,7 +4236,7 @@ func (response PatchEnrollmentRequest401JSONResponse) VisitPatchEnrollmentReques
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchEnrollmentRequest403JSONResponse Error
+type PatchEnrollmentRequest403JSONResponse Status
 
 func (response PatchEnrollmentRequest403JSONResponse) VisitPatchEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4344,7 +4245,7 @@ func (response PatchEnrollmentRequest403JSONResponse) VisitPatchEnrollmentReques
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchEnrollmentRequest404JSONResponse Error
+type PatchEnrollmentRequest404JSONResponse Status
 
 func (response PatchEnrollmentRequest404JSONResponse) VisitPatchEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4353,7 +4254,7 @@ func (response PatchEnrollmentRequest404JSONResponse) VisitPatchEnrollmentReques
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchEnrollmentRequest409JSONResponse Error
+type PatchEnrollmentRequest409JSONResponse Status
 
 func (response PatchEnrollmentRequest409JSONResponse) VisitPatchEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4362,7 +4263,7 @@ func (response PatchEnrollmentRequest409JSONResponse) VisitPatchEnrollmentReques
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchEnrollmentRequest503JSONResponse Error
+type PatchEnrollmentRequest503JSONResponse Status
 
 func (response PatchEnrollmentRequest503JSONResponse) VisitPatchEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4398,7 +4299,7 @@ func (response ReplaceEnrollmentRequest201JSONResponse) VisitReplaceEnrollmentRe
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceEnrollmentRequest400JSONResponse Error
+type ReplaceEnrollmentRequest400JSONResponse Status
 
 func (response ReplaceEnrollmentRequest400JSONResponse) VisitReplaceEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4407,7 +4308,7 @@ func (response ReplaceEnrollmentRequest400JSONResponse) VisitReplaceEnrollmentRe
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceEnrollmentRequest401JSONResponse Error
+type ReplaceEnrollmentRequest401JSONResponse Status
 
 func (response ReplaceEnrollmentRequest401JSONResponse) VisitReplaceEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4416,7 +4317,7 @@ func (response ReplaceEnrollmentRequest401JSONResponse) VisitReplaceEnrollmentRe
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceEnrollmentRequest403JSONResponse Error
+type ReplaceEnrollmentRequest403JSONResponse Status
 
 func (response ReplaceEnrollmentRequest403JSONResponse) VisitReplaceEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4425,7 +4326,7 @@ func (response ReplaceEnrollmentRequest403JSONResponse) VisitReplaceEnrollmentRe
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceEnrollmentRequest404JSONResponse Error
+type ReplaceEnrollmentRequest404JSONResponse Status
 
 func (response ReplaceEnrollmentRequest404JSONResponse) VisitReplaceEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4434,7 +4335,7 @@ func (response ReplaceEnrollmentRequest404JSONResponse) VisitReplaceEnrollmentRe
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceEnrollmentRequest409JSONResponse Error
+type ReplaceEnrollmentRequest409JSONResponse Status
 
 func (response ReplaceEnrollmentRequest409JSONResponse) VisitReplaceEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4443,7 +4344,7 @@ func (response ReplaceEnrollmentRequest409JSONResponse) VisitReplaceEnrollmentRe
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceEnrollmentRequest503JSONResponse Error
+type ReplaceEnrollmentRequest503JSONResponse Status
 
 func (response ReplaceEnrollmentRequest503JSONResponse) VisitReplaceEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4470,7 +4371,7 @@ func (response ApproveEnrollmentRequest200JSONResponse) VisitApproveEnrollmentRe
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ApproveEnrollmentRequest400JSONResponse Error
+type ApproveEnrollmentRequest400JSONResponse Status
 
 func (response ApproveEnrollmentRequest400JSONResponse) VisitApproveEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4479,7 +4380,7 @@ func (response ApproveEnrollmentRequest400JSONResponse) VisitApproveEnrollmentRe
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ApproveEnrollmentRequest401JSONResponse Error
+type ApproveEnrollmentRequest401JSONResponse Status
 
 func (response ApproveEnrollmentRequest401JSONResponse) VisitApproveEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4488,7 +4389,7 @@ func (response ApproveEnrollmentRequest401JSONResponse) VisitApproveEnrollmentRe
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ApproveEnrollmentRequest403JSONResponse Error
+type ApproveEnrollmentRequest403JSONResponse Status
 
 func (response ApproveEnrollmentRequest403JSONResponse) VisitApproveEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4497,7 +4398,7 @@ func (response ApproveEnrollmentRequest403JSONResponse) VisitApproveEnrollmentRe
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ApproveEnrollmentRequest404JSONResponse Error
+type ApproveEnrollmentRequest404JSONResponse Status
 
 func (response ApproveEnrollmentRequest404JSONResponse) VisitApproveEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4506,7 +4407,7 @@ func (response ApproveEnrollmentRequest404JSONResponse) VisitApproveEnrollmentRe
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ApproveEnrollmentRequest503JSONResponse Error
+type ApproveEnrollmentRequest503JSONResponse Status
 
 func (response ApproveEnrollmentRequest503JSONResponse) VisitApproveEnrollmentRequestResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4532,7 +4433,7 @@ func (response ReadEnrollmentRequestStatus200JSONResponse) VisitReadEnrollmentRe
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadEnrollmentRequestStatus401JSONResponse Error
+type ReadEnrollmentRequestStatus401JSONResponse Status
 
 func (response ReadEnrollmentRequestStatus401JSONResponse) VisitReadEnrollmentRequestStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4541,7 +4442,7 @@ func (response ReadEnrollmentRequestStatus401JSONResponse) VisitReadEnrollmentRe
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadEnrollmentRequestStatus403JSONResponse Error
+type ReadEnrollmentRequestStatus403JSONResponse Status
 
 func (response ReadEnrollmentRequestStatus403JSONResponse) VisitReadEnrollmentRequestStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4550,7 +4451,7 @@ func (response ReadEnrollmentRequestStatus403JSONResponse) VisitReadEnrollmentRe
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadEnrollmentRequestStatus404JSONResponse Error
+type ReadEnrollmentRequestStatus404JSONResponse Status
 
 func (response ReadEnrollmentRequestStatus404JSONResponse) VisitReadEnrollmentRequestStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4559,7 +4460,7 @@ func (response ReadEnrollmentRequestStatus404JSONResponse) VisitReadEnrollmentRe
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadEnrollmentRequestStatus503JSONResponse Error
+type ReadEnrollmentRequestStatus503JSONResponse Status
 
 func (response ReadEnrollmentRequestStatus503JSONResponse) VisitReadEnrollmentRequestStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4586,7 +4487,7 @@ func (response PatchEnrollmentRequestStatus200JSONResponse) VisitPatchEnrollment
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchEnrollmentRequestStatus400JSONResponse Error
+type PatchEnrollmentRequestStatus400JSONResponse Status
 
 func (response PatchEnrollmentRequestStatus400JSONResponse) VisitPatchEnrollmentRequestStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4595,7 +4496,7 @@ func (response PatchEnrollmentRequestStatus400JSONResponse) VisitPatchEnrollment
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchEnrollmentRequestStatus401JSONResponse Error
+type PatchEnrollmentRequestStatus401JSONResponse Status
 
 func (response PatchEnrollmentRequestStatus401JSONResponse) VisitPatchEnrollmentRequestStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4604,7 +4505,7 @@ func (response PatchEnrollmentRequestStatus401JSONResponse) VisitPatchEnrollment
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchEnrollmentRequestStatus403JSONResponse Error
+type PatchEnrollmentRequestStatus403JSONResponse Status
 
 func (response PatchEnrollmentRequestStatus403JSONResponse) VisitPatchEnrollmentRequestStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4613,7 +4514,7 @@ func (response PatchEnrollmentRequestStatus403JSONResponse) VisitPatchEnrollment
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchEnrollmentRequestStatus404JSONResponse Error
+type PatchEnrollmentRequestStatus404JSONResponse Status
 
 func (response PatchEnrollmentRequestStatus404JSONResponse) VisitPatchEnrollmentRequestStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4622,7 +4523,7 @@ func (response PatchEnrollmentRequestStatus404JSONResponse) VisitPatchEnrollment
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchEnrollmentRequestStatus409JSONResponse Error
+type PatchEnrollmentRequestStatus409JSONResponse Status
 
 func (response PatchEnrollmentRequestStatus409JSONResponse) VisitPatchEnrollmentRequestStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4631,7 +4532,7 @@ func (response PatchEnrollmentRequestStatus409JSONResponse) VisitPatchEnrollment
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchEnrollmentRequestStatus503JSONResponse Error
+type PatchEnrollmentRequestStatus503JSONResponse Status
 
 func (response PatchEnrollmentRequestStatus503JSONResponse) VisitPatchEnrollmentRequestStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4658,7 +4559,7 @@ func (response ReplaceEnrollmentRequestStatus200JSONResponse) VisitReplaceEnroll
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceEnrollmentRequestStatus401JSONResponse Error
+type ReplaceEnrollmentRequestStatus401JSONResponse Status
 
 func (response ReplaceEnrollmentRequestStatus401JSONResponse) VisitReplaceEnrollmentRequestStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4667,7 +4568,7 @@ func (response ReplaceEnrollmentRequestStatus401JSONResponse) VisitReplaceEnroll
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceEnrollmentRequestStatus403JSONResponse Error
+type ReplaceEnrollmentRequestStatus403JSONResponse Status
 
 func (response ReplaceEnrollmentRequestStatus403JSONResponse) VisitReplaceEnrollmentRequestStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4676,7 +4577,7 @@ func (response ReplaceEnrollmentRequestStatus403JSONResponse) VisitReplaceEnroll
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceEnrollmentRequestStatus404JSONResponse Error
+type ReplaceEnrollmentRequestStatus404JSONResponse Status
 
 func (response ReplaceEnrollmentRequestStatus404JSONResponse) VisitReplaceEnrollmentRequestStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4685,7 +4586,7 @@ func (response ReplaceEnrollmentRequestStatus404JSONResponse) VisitReplaceEnroll
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceEnrollmentRequestStatus503JSONResponse Error
+type ReplaceEnrollmentRequestStatus503JSONResponse Status
 
 func (response ReplaceEnrollmentRequestStatus503JSONResponse) VisitReplaceEnrollmentRequestStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4710,7 +4611,7 @@ func (response DeleteFleets200JSONResponse) VisitDeleteFleetsResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteFleets401JSONResponse Error
+type DeleteFleets401JSONResponse Status
 
 func (response DeleteFleets401JSONResponse) VisitDeleteFleetsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4719,7 +4620,7 @@ func (response DeleteFleets401JSONResponse) VisitDeleteFleetsResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteFleets403JSONResponse Error
+type DeleteFleets403JSONResponse Status
 
 func (response DeleteFleets403JSONResponse) VisitDeleteFleetsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4728,7 +4629,7 @@ func (response DeleteFleets403JSONResponse) VisitDeleteFleetsResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteFleets503JSONResponse Error
+type DeleteFleets503JSONResponse Status
 
 func (response DeleteFleets503JSONResponse) VisitDeleteFleetsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4754,7 +4655,7 @@ func (response ListFleets200JSONResponse) VisitListFleetsResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListFleets400JSONResponse Error
+type ListFleets400JSONResponse Status
 
 func (response ListFleets400JSONResponse) VisitListFleetsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4763,7 +4664,7 @@ func (response ListFleets400JSONResponse) VisitListFleetsResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListFleets401JSONResponse Error
+type ListFleets401JSONResponse Status
 
 func (response ListFleets401JSONResponse) VisitListFleetsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4772,7 +4673,7 @@ func (response ListFleets401JSONResponse) VisitListFleetsResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListFleets403JSONResponse Error
+type ListFleets403JSONResponse Status
 
 func (response ListFleets403JSONResponse) VisitListFleetsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4781,7 +4682,7 @@ func (response ListFleets403JSONResponse) VisitListFleetsResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListFleets503JSONResponse Error
+type ListFleets503JSONResponse Status
 
 func (response ListFleets503JSONResponse) VisitListFleetsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4807,7 +4708,7 @@ func (response CreateFleet201JSONResponse) VisitCreateFleetResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateFleet400JSONResponse Error
+type CreateFleet400JSONResponse Status
 
 func (response CreateFleet400JSONResponse) VisitCreateFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4816,7 +4717,7 @@ func (response CreateFleet400JSONResponse) VisitCreateFleetResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateFleet401JSONResponse Error
+type CreateFleet401JSONResponse Status
 
 func (response CreateFleet401JSONResponse) VisitCreateFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4825,7 +4726,7 @@ func (response CreateFleet401JSONResponse) VisitCreateFleetResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateFleet403JSONResponse Error
+type CreateFleet403JSONResponse Status
 
 func (response CreateFleet403JSONResponse) VisitCreateFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4834,7 +4735,7 @@ func (response CreateFleet403JSONResponse) VisitCreateFleetResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateFleet409JSONResponse Error
+type CreateFleet409JSONResponse Status
 
 func (response CreateFleet409JSONResponse) VisitCreateFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4843,7 +4744,7 @@ func (response CreateFleet409JSONResponse) VisitCreateFleetResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateFleet503JSONResponse Error
+type CreateFleet503JSONResponse Status
 
 func (response CreateFleet503JSONResponse) VisitCreateFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4869,7 +4770,7 @@ func (response DeleteTemplateVersions200JSONResponse) VisitDeleteTemplateVersion
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteTemplateVersions401JSONResponse Error
+type DeleteTemplateVersions401JSONResponse Status
 
 func (response DeleteTemplateVersions401JSONResponse) VisitDeleteTemplateVersionsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4878,7 +4779,7 @@ func (response DeleteTemplateVersions401JSONResponse) VisitDeleteTemplateVersion
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteTemplateVersions403JSONResponse Error
+type DeleteTemplateVersions403JSONResponse Status
 
 func (response DeleteTemplateVersions403JSONResponse) VisitDeleteTemplateVersionsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4887,7 +4788,7 @@ func (response DeleteTemplateVersions403JSONResponse) VisitDeleteTemplateVersion
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteTemplateVersions503JSONResponse Error
+type DeleteTemplateVersions503JSONResponse Status
 
 func (response DeleteTemplateVersions503JSONResponse) VisitDeleteTemplateVersionsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4914,7 +4815,7 @@ func (response ListTemplateVersions200JSONResponse) VisitListTemplateVersionsRes
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListTemplateVersions400JSONResponse Error
+type ListTemplateVersions400JSONResponse Status
 
 func (response ListTemplateVersions400JSONResponse) VisitListTemplateVersionsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4923,7 +4824,7 @@ func (response ListTemplateVersions400JSONResponse) VisitListTemplateVersionsRes
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListTemplateVersions401JSONResponse Error
+type ListTemplateVersions401JSONResponse Status
 
 func (response ListTemplateVersions401JSONResponse) VisitListTemplateVersionsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4932,7 +4833,7 @@ func (response ListTemplateVersions401JSONResponse) VisitListTemplateVersionsRes
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListTemplateVersions403JSONResponse Error
+type ListTemplateVersions403JSONResponse Status
 
 func (response ListTemplateVersions403JSONResponse) VisitListTemplateVersionsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4941,7 +4842,7 @@ func (response ListTemplateVersions403JSONResponse) VisitListTemplateVersionsRes
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListTemplateVersions503JSONResponse Error
+type ListTemplateVersions503JSONResponse Status
 
 func (response ListTemplateVersions503JSONResponse) VisitListTemplateVersionsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4968,7 +4869,7 @@ func (response DeleteTemplateVersion200JSONResponse) VisitDeleteTemplateVersionR
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteTemplateVersion401JSONResponse Error
+type DeleteTemplateVersion401JSONResponse Status
 
 func (response DeleteTemplateVersion401JSONResponse) VisitDeleteTemplateVersionResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4977,7 +4878,7 @@ func (response DeleteTemplateVersion401JSONResponse) VisitDeleteTemplateVersionR
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteTemplateVersion403JSONResponse Error
+type DeleteTemplateVersion403JSONResponse Status
 
 func (response DeleteTemplateVersion403JSONResponse) VisitDeleteTemplateVersionResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4986,7 +4887,7 @@ func (response DeleteTemplateVersion403JSONResponse) VisitDeleteTemplateVersionR
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteTemplateVersion404JSONResponse Error
+type DeleteTemplateVersion404JSONResponse Status
 
 func (response DeleteTemplateVersion404JSONResponse) VisitDeleteTemplateVersionResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -4995,7 +4896,7 @@ func (response DeleteTemplateVersion404JSONResponse) VisitDeleteTemplateVersionR
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteTemplateVersion503JSONResponse Error
+type DeleteTemplateVersion503JSONResponse Status
 
 func (response DeleteTemplateVersion503JSONResponse) VisitDeleteTemplateVersionResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5022,7 +4923,7 @@ func (response ReadTemplateVersion200JSONResponse) VisitReadTemplateVersionRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadTemplateVersion401JSONResponse Error
+type ReadTemplateVersion401JSONResponse Status
 
 func (response ReadTemplateVersion401JSONResponse) VisitReadTemplateVersionResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5031,7 +4932,7 @@ func (response ReadTemplateVersion401JSONResponse) VisitReadTemplateVersionRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadTemplateVersion403JSONResponse Error
+type ReadTemplateVersion403JSONResponse Status
 
 func (response ReadTemplateVersion403JSONResponse) VisitReadTemplateVersionResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5040,7 +4941,7 @@ func (response ReadTemplateVersion403JSONResponse) VisitReadTemplateVersionRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadTemplateVersion404JSONResponse Error
+type ReadTemplateVersion404JSONResponse Status
 
 func (response ReadTemplateVersion404JSONResponse) VisitReadTemplateVersionResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5049,7 +4950,7 @@ func (response ReadTemplateVersion404JSONResponse) VisitReadTemplateVersionRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadTemplateVersion503JSONResponse Error
+type ReadTemplateVersion503JSONResponse Status
 
 func (response ReadTemplateVersion503JSONResponse) VisitReadTemplateVersionResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5075,7 +4976,7 @@ func (response DeleteFleet200JSONResponse) VisitDeleteFleetResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteFleet401JSONResponse Error
+type DeleteFleet401JSONResponse Status
 
 func (response DeleteFleet401JSONResponse) VisitDeleteFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5084,7 +4985,7 @@ func (response DeleteFleet401JSONResponse) VisitDeleteFleetResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteFleet403JSONResponse Error
+type DeleteFleet403JSONResponse Status
 
 func (response DeleteFleet403JSONResponse) VisitDeleteFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5093,7 +4994,7 @@ func (response DeleteFleet403JSONResponse) VisitDeleteFleetResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteFleet404JSONResponse Error
+type DeleteFleet404JSONResponse Status
 
 func (response DeleteFleet404JSONResponse) VisitDeleteFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5102,7 +5003,7 @@ func (response DeleteFleet404JSONResponse) VisitDeleteFleetResponse(w http.Respo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteFleet503JSONResponse Error
+type DeleteFleet503JSONResponse Status
 
 func (response DeleteFleet503JSONResponse) VisitDeleteFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5129,7 +5030,7 @@ func (response ReadFleet200JSONResponse) VisitReadFleetResponse(w http.ResponseW
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadFleet401JSONResponse Error
+type ReadFleet401JSONResponse Status
 
 func (response ReadFleet401JSONResponse) VisitReadFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5138,7 +5039,7 @@ func (response ReadFleet401JSONResponse) VisitReadFleetResponse(w http.ResponseW
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadFleet403JSONResponse Error
+type ReadFleet403JSONResponse Status
 
 func (response ReadFleet403JSONResponse) VisitReadFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5147,7 +5048,7 @@ func (response ReadFleet403JSONResponse) VisitReadFleetResponse(w http.ResponseW
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadFleet404JSONResponse Error
+type ReadFleet404JSONResponse Status
 
 func (response ReadFleet404JSONResponse) VisitReadFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5156,7 +5057,7 @@ func (response ReadFleet404JSONResponse) VisitReadFleetResponse(w http.ResponseW
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadFleet503JSONResponse Error
+type ReadFleet503JSONResponse Status
 
 func (response ReadFleet503JSONResponse) VisitReadFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5183,7 +5084,7 @@ func (response PatchFleet200JSONResponse) VisitPatchFleetResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchFleet400JSONResponse Error
+type PatchFleet400JSONResponse Status
 
 func (response PatchFleet400JSONResponse) VisitPatchFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5192,7 +5093,7 @@ func (response PatchFleet400JSONResponse) VisitPatchFleetResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchFleet401JSONResponse Error
+type PatchFleet401JSONResponse Status
 
 func (response PatchFleet401JSONResponse) VisitPatchFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5201,7 +5102,7 @@ func (response PatchFleet401JSONResponse) VisitPatchFleetResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchFleet403JSONResponse Error
+type PatchFleet403JSONResponse Status
 
 func (response PatchFleet403JSONResponse) VisitPatchFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5210,7 +5111,7 @@ func (response PatchFleet403JSONResponse) VisitPatchFleetResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchFleet404JSONResponse Error
+type PatchFleet404JSONResponse Status
 
 func (response PatchFleet404JSONResponse) VisitPatchFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5219,7 +5120,7 @@ func (response PatchFleet404JSONResponse) VisitPatchFleetResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchFleet409JSONResponse Error
+type PatchFleet409JSONResponse Status
 
 func (response PatchFleet409JSONResponse) VisitPatchFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5228,7 +5129,7 @@ func (response PatchFleet409JSONResponse) VisitPatchFleetResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchFleet503JSONResponse Error
+type PatchFleet503JSONResponse Status
 
 func (response PatchFleet503JSONResponse) VisitPatchFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5264,7 +5165,7 @@ func (response ReplaceFleet201JSONResponse) VisitReplaceFleetResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceFleet400JSONResponse Error
+type ReplaceFleet400JSONResponse Status
 
 func (response ReplaceFleet400JSONResponse) VisitReplaceFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5273,7 +5174,7 @@ func (response ReplaceFleet400JSONResponse) VisitReplaceFleetResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceFleet401JSONResponse Error
+type ReplaceFleet401JSONResponse Status
 
 func (response ReplaceFleet401JSONResponse) VisitReplaceFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5282,7 +5183,7 @@ func (response ReplaceFleet401JSONResponse) VisitReplaceFleetResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceFleet403JSONResponse Error
+type ReplaceFleet403JSONResponse Status
 
 func (response ReplaceFleet403JSONResponse) VisitReplaceFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5291,7 +5192,7 @@ func (response ReplaceFleet403JSONResponse) VisitReplaceFleetResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceFleet404JSONResponse Error
+type ReplaceFleet404JSONResponse Status
 
 func (response ReplaceFleet404JSONResponse) VisitReplaceFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5300,7 +5201,7 @@ func (response ReplaceFleet404JSONResponse) VisitReplaceFleetResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceFleet409JSONResponse Error
+type ReplaceFleet409JSONResponse Status
 
 func (response ReplaceFleet409JSONResponse) VisitReplaceFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5309,7 +5210,7 @@ func (response ReplaceFleet409JSONResponse) VisitReplaceFleetResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceFleet503JSONResponse Error
+type ReplaceFleet503JSONResponse Status
 
 func (response ReplaceFleet503JSONResponse) VisitReplaceFleetResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5335,7 +5236,7 @@ func (response ReadFleetStatus200JSONResponse) VisitReadFleetStatusResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadFleetStatus401JSONResponse Error
+type ReadFleetStatus401JSONResponse Status
 
 func (response ReadFleetStatus401JSONResponse) VisitReadFleetStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5344,7 +5245,7 @@ func (response ReadFleetStatus401JSONResponse) VisitReadFleetStatusResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadFleetStatus403JSONResponse Error
+type ReadFleetStatus403JSONResponse Status
 
 func (response ReadFleetStatus403JSONResponse) VisitReadFleetStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5353,7 +5254,7 @@ func (response ReadFleetStatus403JSONResponse) VisitReadFleetStatusResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadFleetStatus404JSONResponse Error
+type ReadFleetStatus404JSONResponse Status
 
 func (response ReadFleetStatus404JSONResponse) VisitReadFleetStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5362,7 +5263,7 @@ func (response ReadFleetStatus404JSONResponse) VisitReadFleetStatusResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadFleetStatus503JSONResponse Error
+type ReadFleetStatus503JSONResponse Status
 
 func (response ReadFleetStatus503JSONResponse) VisitReadFleetStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5389,7 +5290,7 @@ func (response PatchFleetStatus200JSONResponse) VisitPatchFleetStatusResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchFleetStatus400JSONResponse Error
+type PatchFleetStatus400JSONResponse Status
 
 func (response PatchFleetStatus400JSONResponse) VisitPatchFleetStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5398,7 +5299,7 @@ func (response PatchFleetStatus400JSONResponse) VisitPatchFleetStatusResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchFleetStatus401JSONResponse Error
+type PatchFleetStatus401JSONResponse Status
 
 func (response PatchFleetStatus401JSONResponse) VisitPatchFleetStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5407,7 +5308,7 @@ func (response PatchFleetStatus401JSONResponse) VisitPatchFleetStatusResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchFleetStatus403JSONResponse Error
+type PatchFleetStatus403JSONResponse Status
 
 func (response PatchFleetStatus403JSONResponse) VisitPatchFleetStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5416,7 +5317,7 @@ func (response PatchFleetStatus403JSONResponse) VisitPatchFleetStatusResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchFleetStatus404JSONResponse Error
+type PatchFleetStatus404JSONResponse Status
 
 func (response PatchFleetStatus404JSONResponse) VisitPatchFleetStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5425,7 +5326,7 @@ func (response PatchFleetStatus404JSONResponse) VisitPatchFleetStatusResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchFleetStatus503JSONResponse Error
+type PatchFleetStatus503JSONResponse Status
 
 func (response PatchFleetStatus503JSONResponse) VisitPatchFleetStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5452,7 +5353,7 @@ func (response ReplaceFleetStatus200JSONResponse) VisitReplaceFleetStatusRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceFleetStatus401JSONResponse Error
+type ReplaceFleetStatus401JSONResponse Status
 
 func (response ReplaceFleetStatus401JSONResponse) VisitReplaceFleetStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5461,7 +5362,7 @@ func (response ReplaceFleetStatus401JSONResponse) VisitReplaceFleetStatusRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceFleetStatus403JSONResponse Error
+type ReplaceFleetStatus403JSONResponse Status
 
 func (response ReplaceFleetStatus403JSONResponse) VisitReplaceFleetStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5470,7 +5371,7 @@ func (response ReplaceFleetStatus403JSONResponse) VisitReplaceFleetStatusRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceFleetStatus404JSONResponse Error
+type ReplaceFleetStatus404JSONResponse Status
 
 func (response ReplaceFleetStatus404JSONResponse) VisitReplaceFleetStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5479,7 +5380,7 @@ func (response ReplaceFleetStatus404JSONResponse) VisitReplaceFleetStatusRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceFleetStatus503JSONResponse Error
+type ReplaceFleetStatus503JSONResponse Status
 
 func (response ReplaceFleetStatus503JSONResponse) VisitReplaceFleetStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5504,7 +5405,7 @@ func (response DeleteRepositories200JSONResponse) VisitDeleteRepositoriesRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteRepositories401JSONResponse Error
+type DeleteRepositories401JSONResponse Status
 
 func (response DeleteRepositories401JSONResponse) VisitDeleteRepositoriesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5513,7 +5414,7 @@ func (response DeleteRepositories401JSONResponse) VisitDeleteRepositoriesRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteRepositories403JSONResponse Error
+type DeleteRepositories403JSONResponse Status
 
 func (response DeleteRepositories403JSONResponse) VisitDeleteRepositoriesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5522,7 +5423,7 @@ func (response DeleteRepositories403JSONResponse) VisitDeleteRepositoriesRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteRepositories503JSONResponse Error
+type DeleteRepositories503JSONResponse Status
 
 func (response DeleteRepositories503JSONResponse) VisitDeleteRepositoriesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5548,7 +5449,7 @@ func (response ListRepositories200JSONResponse) VisitListRepositoriesResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListRepositories400JSONResponse Error
+type ListRepositories400JSONResponse Status
 
 func (response ListRepositories400JSONResponse) VisitListRepositoriesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5557,7 +5458,7 @@ func (response ListRepositories400JSONResponse) VisitListRepositoriesResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListRepositories401JSONResponse Error
+type ListRepositories401JSONResponse Status
 
 func (response ListRepositories401JSONResponse) VisitListRepositoriesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5566,7 +5467,7 @@ func (response ListRepositories401JSONResponse) VisitListRepositoriesResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListRepositories403JSONResponse Error
+type ListRepositories403JSONResponse Status
 
 func (response ListRepositories403JSONResponse) VisitListRepositoriesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5575,7 +5476,7 @@ func (response ListRepositories403JSONResponse) VisitListRepositoriesResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListRepositories503JSONResponse Error
+type ListRepositories503JSONResponse Status
 
 func (response ListRepositories503JSONResponse) VisitListRepositoriesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5601,7 +5502,7 @@ func (response CreateRepository201JSONResponse) VisitCreateRepositoryResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateRepository400JSONResponse Error
+type CreateRepository400JSONResponse Status
 
 func (response CreateRepository400JSONResponse) VisitCreateRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5610,7 +5511,7 @@ func (response CreateRepository400JSONResponse) VisitCreateRepositoryResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateRepository401JSONResponse Error
+type CreateRepository401JSONResponse Status
 
 func (response CreateRepository401JSONResponse) VisitCreateRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5619,7 +5520,7 @@ func (response CreateRepository401JSONResponse) VisitCreateRepositoryResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateRepository403JSONResponse Error
+type CreateRepository403JSONResponse Status
 
 func (response CreateRepository403JSONResponse) VisitCreateRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5628,7 +5529,7 @@ func (response CreateRepository403JSONResponse) VisitCreateRepositoryResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateRepository409JSONResponse Error
+type CreateRepository409JSONResponse Status
 
 func (response CreateRepository409JSONResponse) VisitCreateRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5637,7 +5538,7 @@ func (response CreateRepository409JSONResponse) VisitCreateRepositoryResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateRepository503JSONResponse Error
+type CreateRepository503JSONResponse Status
 
 func (response CreateRepository503JSONResponse) VisitCreateRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5663,7 +5564,7 @@ func (response DeleteRepository200JSONResponse) VisitDeleteRepositoryResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteRepository401JSONResponse Error
+type DeleteRepository401JSONResponse Status
 
 func (response DeleteRepository401JSONResponse) VisitDeleteRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5672,7 +5573,7 @@ func (response DeleteRepository401JSONResponse) VisitDeleteRepositoryResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteRepository403JSONResponse Error
+type DeleteRepository403JSONResponse Status
 
 func (response DeleteRepository403JSONResponse) VisitDeleteRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5681,7 +5582,7 @@ func (response DeleteRepository403JSONResponse) VisitDeleteRepositoryResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteRepository404JSONResponse Error
+type DeleteRepository404JSONResponse Status
 
 func (response DeleteRepository404JSONResponse) VisitDeleteRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5690,7 +5591,7 @@ func (response DeleteRepository404JSONResponse) VisitDeleteRepositoryResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteRepository503JSONResponse Error
+type DeleteRepository503JSONResponse Status
 
 func (response DeleteRepository503JSONResponse) VisitDeleteRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5716,7 +5617,7 @@ func (response ReadRepository200JSONResponse) VisitReadRepositoryResponse(w http
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadRepository401JSONResponse Error
+type ReadRepository401JSONResponse Status
 
 func (response ReadRepository401JSONResponse) VisitReadRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5725,7 +5626,7 @@ func (response ReadRepository401JSONResponse) VisitReadRepositoryResponse(w http
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadRepository403JSONResponse Error
+type ReadRepository403JSONResponse Status
 
 func (response ReadRepository403JSONResponse) VisitReadRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5734,7 +5635,7 @@ func (response ReadRepository403JSONResponse) VisitReadRepositoryResponse(w http
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadRepository404JSONResponse Error
+type ReadRepository404JSONResponse Status
 
 func (response ReadRepository404JSONResponse) VisitReadRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5743,7 +5644,7 @@ func (response ReadRepository404JSONResponse) VisitReadRepositoryResponse(w http
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadRepository503JSONResponse Error
+type ReadRepository503JSONResponse Status
 
 func (response ReadRepository503JSONResponse) VisitReadRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5770,7 +5671,7 @@ func (response PatchRepository200JSONResponse) VisitPatchRepositoryResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchRepository400JSONResponse Error
+type PatchRepository400JSONResponse Status
 
 func (response PatchRepository400JSONResponse) VisitPatchRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5779,7 +5680,7 @@ func (response PatchRepository400JSONResponse) VisitPatchRepositoryResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchRepository401JSONResponse Error
+type PatchRepository401JSONResponse Status
 
 func (response PatchRepository401JSONResponse) VisitPatchRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5788,7 +5689,7 @@ func (response PatchRepository401JSONResponse) VisitPatchRepositoryResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchRepository403JSONResponse Error
+type PatchRepository403JSONResponse Status
 
 func (response PatchRepository403JSONResponse) VisitPatchRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5797,7 +5698,7 @@ func (response PatchRepository403JSONResponse) VisitPatchRepositoryResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchRepository404JSONResponse Error
+type PatchRepository404JSONResponse Status
 
 func (response PatchRepository404JSONResponse) VisitPatchRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5806,7 +5707,7 @@ func (response PatchRepository404JSONResponse) VisitPatchRepositoryResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchRepository409JSONResponse Error
+type PatchRepository409JSONResponse Status
 
 func (response PatchRepository409JSONResponse) VisitPatchRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5815,7 +5716,7 @@ func (response PatchRepository409JSONResponse) VisitPatchRepositoryResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchRepository503JSONResponse Error
+type PatchRepository503JSONResponse Status
 
 func (response PatchRepository503JSONResponse) VisitPatchRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5851,7 +5752,7 @@ func (response ReplaceRepository201JSONResponse) VisitReplaceRepositoryResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceRepository400JSONResponse Error
+type ReplaceRepository400JSONResponse Status
 
 func (response ReplaceRepository400JSONResponse) VisitReplaceRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5860,7 +5761,7 @@ func (response ReplaceRepository400JSONResponse) VisitReplaceRepositoryResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceRepository401JSONResponse Error
+type ReplaceRepository401JSONResponse Status
 
 func (response ReplaceRepository401JSONResponse) VisitReplaceRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5869,7 +5770,7 @@ func (response ReplaceRepository401JSONResponse) VisitReplaceRepositoryResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceRepository403JSONResponse Error
+type ReplaceRepository403JSONResponse Status
 
 func (response ReplaceRepository403JSONResponse) VisitReplaceRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5878,7 +5779,7 @@ func (response ReplaceRepository403JSONResponse) VisitReplaceRepositoryResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceRepository404JSONResponse Error
+type ReplaceRepository404JSONResponse Status
 
 func (response ReplaceRepository404JSONResponse) VisitReplaceRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5887,7 +5788,7 @@ func (response ReplaceRepository404JSONResponse) VisitReplaceRepositoryResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceRepository409JSONResponse Error
+type ReplaceRepository409JSONResponse Status
 
 func (response ReplaceRepository409JSONResponse) VisitReplaceRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5896,7 +5797,7 @@ func (response ReplaceRepository409JSONResponse) VisitReplaceRepositoryResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceRepository503JSONResponse Error
+type ReplaceRepository503JSONResponse Status
 
 func (response ReplaceRepository503JSONResponse) VisitReplaceRepositoryResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5921,7 +5822,7 @@ func (response DeleteResourceSyncs200JSONResponse) VisitDeleteResourceSyncsRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteResourceSyncs401JSONResponse Error
+type DeleteResourceSyncs401JSONResponse Status
 
 func (response DeleteResourceSyncs401JSONResponse) VisitDeleteResourceSyncsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5930,7 +5831,7 @@ func (response DeleteResourceSyncs401JSONResponse) VisitDeleteResourceSyncsRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteResourceSyncs403JSONResponse Error
+type DeleteResourceSyncs403JSONResponse Status
 
 func (response DeleteResourceSyncs403JSONResponse) VisitDeleteResourceSyncsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5939,7 +5840,7 @@ func (response DeleteResourceSyncs403JSONResponse) VisitDeleteResourceSyncsRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteResourceSyncs503JSONResponse Error
+type DeleteResourceSyncs503JSONResponse Status
 
 func (response DeleteResourceSyncs503JSONResponse) VisitDeleteResourceSyncsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5965,7 +5866,7 @@ func (response ListResourceSync200JSONResponse) VisitListResourceSyncResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListResourceSync400JSONResponse Error
+type ListResourceSync400JSONResponse Status
 
 func (response ListResourceSync400JSONResponse) VisitListResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5974,7 +5875,7 @@ func (response ListResourceSync400JSONResponse) VisitListResourceSyncResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListResourceSync401JSONResponse Error
+type ListResourceSync401JSONResponse Status
 
 func (response ListResourceSync401JSONResponse) VisitListResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5983,7 +5884,7 @@ func (response ListResourceSync401JSONResponse) VisitListResourceSyncResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListResourceSync403JSONResponse Error
+type ListResourceSync403JSONResponse Status
 
 func (response ListResourceSync403JSONResponse) VisitListResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -5992,7 +5893,7 @@ func (response ListResourceSync403JSONResponse) VisitListResourceSyncResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ListResourceSync503JSONResponse Error
+type ListResourceSync503JSONResponse Status
 
 func (response ListResourceSync503JSONResponse) VisitListResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6018,7 +5919,7 @@ func (response CreateResourceSync201JSONResponse) VisitCreateResourceSyncRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateResourceSync400JSONResponse Error
+type CreateResourceSync400JSONResponse Status
 
 func (response CreateResourceSync400JSONResponse) VisitCreateResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6027,7 +5928,7 @@ func (response CreateResourceSync400JSONResponse) VisitCreateResourceSyncRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateResourceSync401JSONResponse Error
+type CreateResourceSync401JSONResponse Status
 
 func (response CreateResourceSync401JSONResponse) VisitCreateResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6036,7 +5937,7 @@ func (response CreateResourceSync401JSONResponse) VisitCreateResourceSyncRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateResourceSync403JSONResponse Error
+type CreateResourceSync403JSONResponse Status
 
 func (response CreateResourceSync403JSONResponse) VisitCreateResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6045,7 +5946,7 @@ func (response CreateResourceSync403JSONResponse) VisitCreateResourceSyncRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateResourceSync409JSONResponse Error
+type CreateResourceSync409JSONResponse Status
 
 func (response CreateResourceSync409JSONResponse) VisitCreateResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6054,7 +5955,7 @@ func (response CreateResourceSync409JSONResponse) VisitCreateResourceSyncRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type CreateResourceSync503JSONResponse Error
+type CreateResourceSync503JSONResponse Status
 
 func (response CreateResourceSync503JSONResponse) VisitCreateResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6080,7 +5981,7 @@ func (response DeleteResourceSync200JSONResponse) VisitDeleteResourceSyncRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteResourceSync401JSONResponse Error
+type DeleteResourceSync401JSONResponse Status
 
 func (response DeleteResourceSync401JSONResponse) VisitDeleteResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6089,7 +5990,7 @@ func (response DeleteResourceSync401JSONResponse) VisitDeleteResourceSyncRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteResourceSync403JSONResponse Error
+type DeleteResourceSync403JSONResponse Status
 
 func (response DeleteResourceSync403JSONResponse) VisitDeleteResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6098,7 +5999,7 @@ func (response DeleteResourceSync403JSONResponse) VisitDeleteResourceSyncRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteResourceSync404JSONResponse Error
+type DeleteResourceSync404JSONResponse Status
 
 func (response DeleteResourceSync404JSONResponse) VisitDeleteResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6107,7 +6008,7 @@ func (response DeleteResourceSync404JSONResponse) VisitDeleteResourceSyncRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type DeleteResourceSync503JSONResponse Error
+type DeleteResourceSync503JSONResponse Status
 
 func (response DeleteResourceSync503JSONResponse) VisitDeleteResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6133,7 +6034,7 @@ func (response ReadResourceSync200JSONResponse) VisitReadResourceSyncResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadResourceSync401JSONResponse Error
+type ReadResourceSync401JSONResponse Status
 
 func (response ReadResourceSync401JSONResponse) VisitReadResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6142,7 +6043,7 @@ func (response ReadResourceSync401JSONResponse) VisitReadResourceSyncResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadResourceSync403JSONResponse Error
+type ReadResourceSync403JSONResponse Status
 
 func (response ReadResourceSync403JSONResponse) VisitReadResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6151,7 +6052,7 @@ func (response ReadResourceSync403JSONResponse) VisitReadResourceSyncResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadResourceSync404JSONResponse Error
+type ReadResourceSync404JSONResponse Status
 
 func (response ReadResourceSync404JSONResponse) VisitReadResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6160,7 +6061,7 @@ func (response ReadResourceSync404JSONResponse) VisitReadResourceSyncResponse(w 
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReadResourceSync503JSONResponse Error
+type ReadResourceSync503JSONResponse Status
 
 func (response ReadResourceSync503JSONResponse) VisitReadResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6187,7 +6088,7 @@ func (response PatchResourceSync200JSONResponse) VisitPatchResourceSyncResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchResourceSync400JSONResponse Error
+type PatchResourceSync400JSONResponse Status
 
 func (response PatchResourceSync400JSONResponse) VisitPatchResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6196,7 +6097,7 @@ func (response PatchResourceSync400JSONResponse) VisitPatchResourceSyncResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchResourceSync401JSONResponse Error
+type PatchResourceSync401JSONResponse Status
 
 func (response PatchResourceSync401JSONResponse) VisitPatchResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6205,7 +6106,7 @@ func (response PatchResourceSync401JSONResponse) VisitPatchResourceSyncResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchResourceSync403JSONResponse Error
+type PatchResourceSync403JSONResponse Status
 
 func (response PatchResourceSync403JSONResponse) VisitPatchResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6214,7 +6115,7 @@ func (response PatchResourceSync403JSONResponse) VisitPatchResourceSyncResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchResourceSync404JSONResponse Error
+type PatchResourceSync404JSONResponse Status
 
 func (response PatchResourceSync404JSONResponse) VisitPatchResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6223,7 +6124,7 @@ func (response PatchResourceSync404JSONResponse) VisitPatchResourceSyncResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchResourceSync409JSONResponse Error
+type PatchResourceSync409JSONResponse Status
 
 func (response PatchResourceSync409JSONResponse) VisitPatchResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6232,7 +6133,7 @@ func (response PatchResourceSync409JSONResponse) VisitPatchResourceSyncResponse(
 	return json.NewEncoder(w).Encode(response)
 }
 
-type PatchResourceSync503JSONResponse Error
+type PatchResourceSync503JSONResponse Status
 
 func (response PatchResourceSync503JSONResponse) VisitPatchResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6268,7 +6169,7 @@ func (response ReplaceResourceSync201JSONResponse) VisitReplaceResourceSyncRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceResourceSync400JSONResponse Error
+type ReplaceResourceSync400JSONResponse Status
 
 func (response ReplaceResourceSync400JSONResponse) VisitReplaceResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6277,7 +6178,7 @@ func (response ReplaceResourceSync400JSONResponse) VisitReplaceResourceSyncRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceResourceSync401JSONResponse Error
+type ReplaceResourceSync401JSONResponse Status
 
 func (response ReplaceResourceSync401JSONResponse) VisitReplaceResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6286,7 +6187,7 @@ func (response ReplaceResourceSync401JSONResponse) VisitReplaceResourceSyncRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceResourceSync403JSONResponse Error
+type ReplaceResourceSync403JSONResponse Status
 
 func (response ReplaceResourceSync403JSONResponse) VisitReplaceResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6295,7 +6196,7 @@ func (response ReplaceResourceSync403JSONResponse) VisitReplaceResourceSyncRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceResourceSync404JSONResponse Error
+type ReplaceResourceSync404JSONResponse Status
 
 func (response ReplaceResourceSync404JSONResponse) VisitReplaceResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6304,7 +6205,7 @@ func (response ReplaceResourceSync404JSONResponse) VisitReplaceResourceSyncRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceResourceSync409JSONResponse Error
+type ReplaceResourceSync409JSONResponse Status
 
 func (response ReplaceResourceSync409JSONResponse) VisitReplaceResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6313,7 +6214,7 @@ func (response ReplaceResourceSync409JSONResponse) VisitReplaceResourceSyncRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
-type ReplaceResourceSync503JSONResponse Error
+type ReplaceResourceSync503JSONResponse Status
 
 func (response ReplaceResourceSync503JSONResponse) VisitReplaceResourceSyncResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6338,7 +6239,7 @@ func (response GetVersion200JSONResponse) VisitGetVersionResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetVersion403JSONResponse Error
+type GetVersion403JSONResponse Status
 
 func (response GetVersion403JSONResponse) VisitGetVersionResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6347,7 +6248,7 @@ func (response GetVersion403JSONResponse) VisitGetVersionResponse(w http.Respons
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetVersion503JSONResponse Error
+type GetVersion503JSONResponse Status
 
 func (response GetVersion503JSONResponse) VisitGetVersionResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -6410,14 +6311,11 @@ type StrictServerInterface interface {
 	// (PUT /api/v1/devices/{name})
 	ReplaceDevice(ctx context.Context, request ReplaceDeviceRequestObject) (ReplaceDeviceResponseObject, error)
 
-	// (GET /api/v1/devices/{name}/console)
-	RequestConsole(ctx context.Context, request RequestConsoleRequestObject) (RequestConsoleResponseObject, error)
-
 	// (PUT /api/v1/devices/{name}/decommission)
 	DecommissionDevice(ctx context.Context, request DecommissionDeviceRequestObject) (DecommissionDeviceResponseObject, error)
 
 	// (GET /api/v1/devices/{name}/rendered)
-	GetRenderedDeviceSpec(ctx context.Context, request GetRenderedDeviceSpecRequestObject) (GetRenderedDeviceSpecResponseObject, error)
+	GetRenderedDevice(ctx context.Context, request GetRenderedDeviceRequestObject) (GetRenderedDeviceResponseObject, error)
 
 	// (GET /api/v1/devices/{name}/status)
 	ReadDeviceStatus(ctx context.Context, request ReadDeviceStatusRequestObject) (ReadDeviceStatusResponseObject, error)
@@ -7062,32 +6960,6 @@ func (sh *strictHandler) ReplaceDevice(w http.ResponseWriter, r *http.Request, n
 	}
 }
 
-// RequestConsole operation middleware
-func (sh *strictHandler) RequestConsole(w http.ResponseWriter, r *http.Request, name string) {
-	var request RequestConsoleRequestObject
-
-	request.Name = name
-
-	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.RequestConsole(ctx, request.(RequestConsoleRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "RequestConsole")
-	}
-
-	response, err := handler(r.Context(), w, r, request)
-
-	if err != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(RequestConsoleResponseObject); ok {
-		if err := validResponse.VisitRequestConsoleResponse(w); err != nil {
-			sh.options.ResponseErrorHandlerFunc(w, r, err)
-		}
-	} else if response != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
 // DecommissionDevice operation middleware
 func (sh *strictHandler) DecommissionDevice(w http.ResponseWriter, r *http.Request, name string) {
 	var request DecommissionDeviceRequestObject
@@ -7121,26 +6993,26 @@ func (sh *strictHandler) DecommissionDevice(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-// GetRenderedDeviceSpec operation middleware
-func (sh *strictHandler) GetRenderedDeviceSpec(w http.ResponseWriter, r *http.Request, name string, params GetRenderedDeviceSpecParams) {
-	var request GetRenderedDeviceSpecRequestObject
+// GetRenderedDevice operation middleware
+func (sh *strictHandler) GetRenderedDevice(w http.ResponseWriter, r *http.Request, name string, params GetRenderedDeviceParams) {
+	var request GetRenderedDeviceRequestObject
 
 	request.Name = name
 	request.Params = params
 
 	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
-		return sh.ssi.GetRenderedDeviceSpec(ctx, request.(GetRenderedDeviceSpecRequestObject))
+		return sh.ssi.GetRenderedDevice(ctx, request.(GetRenderedDeviceRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "GetRenderedDeviceSpec")
+		handler = middleware(handler, "GetRenderedDevice")
 	}
 
 	response, err := handler(r.Context(), w, r, request)
 
 	if err != nil {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(GetRenderedDeviceSpecResponseObject); ok {
-		if err := validResponse.VisitGetRenderedDeviceSpecResponse(w); err != nil {
+	} else if validResponse, ok := response.(GetRenderedDeviceResponseObject); ok {
+		if err := validResponse.VisitGetRenderedDeviceResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

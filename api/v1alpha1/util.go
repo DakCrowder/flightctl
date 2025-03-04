@@ -106,12 +106,7 @@ func (c ConfigProviderSpec) Type() (ConfigProviderType, error) {
 }
 
 // Type returns the type of the application provider.
-func (a ApplicationSpec) Type() (ApplicationProviderType, error) {
-	return getApplicationType(a.union)
-}
-
-// Type returns the type of the application provider.
-func (a RenderedApplicationSpec) Type() (ApplicationProviderType, error) {
+func (a ApplicationProviderSpec) Type() (ApplicationProviderType, error) {
 	return getApplicationType(a.union)
 }
 
@@ -204,8 +199,8 @@ func configsAreEqual(c1, c2 *[]ConfigProviderSpec) bool {
 	})
 }
 
-func applicationsAreEqual(c1, c2 *[]ApplicationSpec) bool {
-	return slices.EqualFunc(lo.FromPtr(c1), lo.FromPtr(c2), func(item1 ApplicationSpec, item2 ApplicationSpec) bool {
+func applicationsAreEqual(c1, c2 *[]ApplicationProviderSpec) bool {
+	return slices.EqualFunc(lo.FromPtr(c1), lo.FromPtr(c2), func(item1 ApplicationProviderSpec, item2 ApplicationProviderSpec) bool {
 		type1, err := item1.Type()
 		if err != nil {
 			return false
@@ -272,6 +267,11 @@ func DeviceSpecsAreEqual(d1, d2 DeviceSpec) bool {
 
 	// Check Resources
 	if !resourcesAreEqual(d1.Resources, d2.Resources) {
+		return false
+	}
+
+	// Check Decommission
+	if !reflect.DeepEqual(d1.Decommissioning, d2.Decommissioning) {
 		return false
 	}
 
@@ -410,4 +410,13 @@ func (e MatchExpression) String() string {
 		return ""
 	}
 	return sb.String()
+}
+
+// GetConsoles returns the list of DeviceConsole objects, or an empty list if the field is nil.
+func (rd DeviceSpec) GetConsoles() []DeviceConsole {
+	if rd.Consoles == nil {
+		return []DeviceConsole{}
+	} else {
+		return *rd.Consoles
+	}
 }

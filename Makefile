@@ -53,7 +53,7 @@ help:
 	@echo "    redeploy-*       redeploy the api,worker,periodic containers in kind"
 	@echo "    deploy-db:       deploy only the database as a container, for testing"
 	@echo "    deploy-mq:       deploy only the message queue broker as a container"
-	@echo "    deploy-quadlets: deploy FlightCtl using Quadlets"
+	@echo "    deploy-quadlets: deploy the Flight Control service using Quadlets"
 	@echo "    clean:           clean up all containers and volumes"
 	@echo "    cluster:         create a kind cluster and load the flightctl-server image"
 	@echo "    clean-cluster:   kill the kind cluster only"
@@ -80,6 +80,10 @@ build: bin build-cli
 		./cmd/flightctl-api \
 		./cmd/flightctl-periodic \
 		./cmd/flightctl-worker
+
+bin/flightctl-agent: bin $(GO_FILES)
+	CGO_CFLAGS='-flto' GOOS=$(GOOS) GOARCH=$(GOARCH) go build -buildvcs=false $(GO_BUILD_FLAGS) -o $(GOBIN) \
+		./cmd/flightctl-agent 
 
 build-cli: bin
 	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build -buildvcs=false $(GO_BUILD_FLAGS) -o $(GOBIN) ./cmd/flightctl
