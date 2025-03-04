@@ -92,8 +92,8 @@ func main() {
 	// TODO should this also call systemd to spin up services (can be an arg)
 	// or be renamed generator
 	var rootCmd = &cobra.Command{
-		Use:   "install",
-		Short: "Install the flightctl quadlet files based on supplied config",
+		Use:   "generate",
+		Short: "Generate flightctl quadlet files based on supplied config",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := run(configDirectory, systemdUnitDirectory, userConfigDirectory)
 			if err != nil {
@@ -130,8 +130,9 @@ func run(configDirectory string, systemdUnitDirectory string, userConfigDirector
 		}
 	}
 
-	// Move top level files like the .network and .slice files
-	err = ensureFiles(config.ConfigDirectory, config.SystemdUnitDirectory, config)
+	// Move non service specific files like the .network and .slice files
+	baseFilePath := fmt.Sprintf("%s/base", config.ConfigDirectory)
+	err = ensureFiles(baseFilePath, config.SystemdUnitDirectory, config)
 	if err != nil {
 		return fmt.Errorf("error moving top level static files: %v", err)
 	}

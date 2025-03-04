@@ -83,7 +83,7 @@ build: bin build-cli
 
 bin/flightctl-agent: bin $(GO_FILES)
 	CGO_CFLAGS='-flto' GOOS=$(GOOS) GOARCH=$(GOARCH) go build -buildvcs=false $(GO_BUILD_FLAGS) -o $(GOBIN) \
-		./cmd/flightctl-agent 
+		./cmd/flightctl-agent
 
 build-cli: bin
 	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build -buildvcs=false $(GO_BUILD_FLAGS) -o $(GOBIN) ./cmd/flightctl
@@ -231,6 +231,5 @@ fix-spelling:
 # include the deployment targets
 include deploy/deploy.mk
 include deploy/agent-vm.mk
-include deploy/quadlet.mk
 include test/test.mk
 include test/scripts/agent-images/agent-images.mk

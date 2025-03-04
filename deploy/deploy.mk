@@ -54,4 +54,21 @@ kill-db:
 kill-kv:
 	systemctl --user stop flightctl-kv-standalone.service
 
+build-generator:
+	go build -o bin/flightctl-podman-generator deploy/podman/generator/generator.go
+
+test-template:
+	rm -rf deploy/test/test-systemd-output
+	rm -rf deploy/test/installer/test-config-output
+	./bin/flightctl-podman-generator \
+		-c deploy/podman \
+		-s deploy/test/test-systemd-output \
+		-u deploy/test/test-config-output
+
+generate-quadlets:
+	./bin/flightctl-podman-generator \
+		-c deploy/podman \
+		-s ~/.config/containers/systemd \
+		-u ~/.config/flightctl
+
 .PHONY: deploy-db deploy cluster
