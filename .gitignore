@@ -6,5 +6,8 @@
 /packaging/rpm/flightctl-*.tar.gz
 /packaging/rpm/flightctl-*-build/
 /packaging/rpm/flightctl-*-vendor.tar.bz2
+/packaging/rpm-installer/noarch/
+/packaging/rpm-installer/*.build*
+/packaging/rpm-installer/*.rpm
 flightctl-*.rpm
 *.tar
