@@ -1,0 +1,12 @@
+FROM quay.io/centos-bootc/centos-bootc:stream9
+
+# Copy locally built services rpm
+COPY /bin/rpm/flightctl-services-*.rpm /tmp/
+
+# Install the rpm
+RUN dnf -y localinstall /tmp/flightctl-services-*.rpm && \
+    dnf clean all && \
+    rm -rf /tmp/*
+
+# Enable the flightctl service to start at boot
+RUN systemctl enable flightctl.target
