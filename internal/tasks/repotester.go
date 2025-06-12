@@ -44,6 +44,7 @@ func (r *RepoTester) TestRepositories(ctx context.Context) {
 	continueToken := (*string)(nil)
 
 	for {
+		// TODO add a handler to fetch repositories across organizations
 		repositories, status := r.serviceHandler.ListRepositories(ctx, api.ListRepositoriesParams{
 			Limit:    &limit,
 			Continue: continueToken,

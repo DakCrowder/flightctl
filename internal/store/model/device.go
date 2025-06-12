@@ -177,6 +177,7 @@ func (d *Device) ToApiResource(opts ...APIResourceOption) (*api.Device, error) {
 			Annotations:       lo.ToPtr(util.EnsureMap(d.Resource.Annotations)),
 			Generation:        d.Generation,
 			Owner:             d.Owner,
+			OrganizationID:    lo.ToPtr(d.OrgID),
 			ResourceVersion:   resourceVersion,
 		},
 		Spec:   &spec,

@@ -176,6 +176,10 @@ var _ = Describe("DeviceStore create", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(deleted).To(BeTrue())
 			Expect(called).To(BeTrue())
+
+			allDevices, err := devStore.List(ctx, orgId, store.ListParams{})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(allDevices.Items).To(HaveLen(2))
 		})
 
 		It("Delete device success when not found", func() {
@@ -312,6 +316,25 @@ var _ = Describe("DeviceStore create", func() {
 			devices, err = devStore.List(ctx, orgId, listParams)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(devices.Items)).To(Equal(2))
+		})
+
+		It("List segments by organization", func() {
+			secondOrgId, _ := uuid.NewUUID()
+			testutil.CreateTestDevices(ctx, 3, devStore, secondOrgId, nil, false)
+
+			orgOneDevices, err := devStore.List(ctx, orgId, store.ListParams{})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(orgOneDevices.Items)).To(Equal(3))
+			for _, device := range orgOneDevices.Items {
+				Expect(*device.Metadata.OrganizationID).To(Equal(orgId))
+			}
+
+			orgTwoDevices, err := devStore.List(ctx, secondOrgId, store.ListParams{})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(orgTwoDevices.Items)).To(Equal(3))
+			for _, device := range orgTwoDevices.Items {
+				Expect(*device.Metadata.OrganizationID).To(Equal(secondOrgId))
+			}
 		})
 
 		It("CreateOrUpdateDevice create mode", func() {
