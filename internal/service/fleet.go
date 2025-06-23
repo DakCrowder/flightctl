@@ -14,7 +14,10 @@ import (
 )
 
 func (h *ServiceHandler) CreateFleet(ctx context.Context, fleet api.Fleet) (*api.Fleet, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	// don't set fields that are managed by the service
 	fleet.Status = nil
@@ -34,7 +37,10 @@ func (h *ServiceHandler) CreateFleet(ctx context.Context, fleet api.Fleet) (*api
 }
 
 func (h *ServiceHandler) ListFleets(ctx context.Context, params api.ListFleetsParams) (*api.FleetList, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	listParams, status := prepareListParams(params.Continue, params.LabelSelector, params.FieldSelector, params.Limit)
 	if status != api.StatusOK() {
@@ -57,14 +63,20 @@ func (h *ServiceHandler) ListFleets(ctx context.Context, params api.ListFleetsPa
 }
 
 func (h *ServiceHandler) GetFleet(ctx context.Context, name string, params api.GetFleetParams) (*api.Fleet, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	result, err := h.store.Fleet().Get(ctx, orgId, name, store.GetWithDeviceSummary(util.DefaultBoolIfNil(params.AddDevicesSummary, false)))
 	return result, StoreErrorToApiStatus(err, false, api.FleetKind, &name)
 }
 
 func (h *ServiceHandler) ReplaceFleet(ctx context.Context, name string, fleet api.Fleet) (*api.Fleet, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	// don't overwrite fields that are managed by the service
 	isInternal := IsInternalRequest(ctx)
@@ -90,7 +102,10 @@ func (h *ServiceHandler) ReplaceFleet(ctx context.Context, name string, fleet ap
 }
 
 func (h *ServiceHandler) DeleteFleet(ctx context.Context, name string) api.Status {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	f, err := h.store.Fleet().Get(ctx, orgId, name)
 	if err != nil {
@@ -113,14 +128,20 @@ func (h *ServiceHandler) DeleteFleet(ctx context.Context, name string) api.Statu
 }
 
 func (h *ServiceHandler) GetFleetStatus(ctx context.Context, name string) (*api.Fleet, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	result, err := h.store.Fleet().Get(ctx, orgId, name)
 	return result, StoreErrorToApiStatus(err, false, api.FleetKind, &name)
 }
 
 func (h *ServiceHandler) ReplaceFleetStatus(ctx context.Context, name string, fleet api.Fleet) (*api.Fleet, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	result, err := h.store.Fleet().UpdateStatus(ctx, orgId, &fleet)
 	return result, StoreErrorToApiStatus(err, false, api.FleetKind, &name)
@@ -128,7 +149,10 @@ func (h *ServiceHandler) ReplaceFleetStatus(ctx context.Context, name string, fl
 
 // Only metadata.labels and spec can be patched. If we try to patch other fields, HTTP 400 Bad Request is returned.
 func (h *ServiceHandler) PatchFleet(ctx context.Context, name string, patch api.PatchRequest) (*api.Fleet, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	currentObj, err := h.store.Fleet().Get(ctx, orgId, name)
 	if err != nil {
@@ -172,42 +196,60 @@ func (h *ServiceHandler) PatchFleet(ctx context.Context, name string, patch api.
 }
 
 func (h *ServiceHandler) ListFleetRolloutDeviceSelection(ctx context.Context) (*api.FleetList, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	result, err := h.store.Fleet().ListRolloutDeviceSelection(ctx, orgId)
 	return result, StoreErrorToApiStatus(err, false, api.FleetKind, nil)
 }
 
 func (h *ServiceHandler) ListDisruptionBudgetFleets(ctx context.Context) (*api.FleetList, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	result, err := h.store.Fleet().ListDisruptionBudgetFleets(ctx, orgId)
 	return result, StoreErrorToApiStatus(err, false, api.FleetKind, nil)
 }
 
 func (h *ServiceHandler) UpdateFleetConditions(ctx context.Context, name string, conditions []api.Condition) api.Status {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	err := h.store.Fleet().UpdateConditions(ctx, orgId, name, conditions)
 	return StoreErrorToApiStatus(err, false, api.FleetKind, &name)
 }
 
 func (h *ServiceHandler) UpdateFleetAnnotations(ctx context.Context, name string, annotations map[string]string, deleteKeys []string) api.Status {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	err := h.store.Fleet().UpdateAnnotations(ctx, orgId, name, annotations, deleteKeys)
 	return StoreErrorToApiStatus(err, false, api.FleetKind, &name)
 }
 
 func (h *ServiceHandler) OverwriteFleetRepositoryRefs(ctx context.Context, name string, repositoryNames ...string) api.Status {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	err := h.store.Fleet().OverwriteRepositoryRefs(ctx, orgId, name, repositoryNames...)
 	return StoreErrorToApiStatus(err, false, api.FleetKind, &name)
 }
 
 func (h *ServiceHandler) GetFleetRepositoryRefs(ctx context.Context, name string) (*api.RepositoryList, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	result, err := h.store.Fleet().GetRepositoryRefs(ctx, orgId, name)
 	return result, StoreErrorToApiStatus(err, false, api.FleetKind, &name)

@@ -6,15 +6,20 @@ import (
 	"fmt"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
+	"github.com/flightctl/flightctl/internal/flterrors"
 	"github.com/flightctl/flightctl/internal/kvstore"
 	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/store/selector"
+	"github.com/flightctl/flightctl/internal/util"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 )
 
 func (h *ServiceHandler) CreateTemplateVersion(ctx context.Context, tv api.TemplateVersion, immediateRollout bool) (*api.TemplateVersion, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	if errs := tv.Validate(); len(errs) > 0 {
 		return nil, api.StatusBadRequest(errors.Join(errs...).Error())
@@ -34,7 +39,10 @@ func (h *ServiceHandler) CreateTemplateVersion(ctx context.Context, tv api.Templ
 func (h *ServiceHandler) ListTemplateVersions(ctx context.Context, fleet string, params api.ListTemplateVersionsParams) (*api.TemplateVersionList, api.Status) {
 	var err error
 
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	listParams, status := prepareListParams(params.Continue, params.LabelSelector, params.FieldSelector, params.Limit)
 	if status != api.StatusOK() {
@@ -76,14 +84,20 @@ func (h *ServiceHandler) ListTemplateVersions(ctx context.Context, fleet string,
 }
 
 func (h *ServiceHandler) GetTemplateVersion(ctx context.Context, fleet string, name string) (*api.TemplateVersion, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	result, err := h.store.TemplateVersion().Get(ctx, orgId, fleet, name)
 	return result, StoreErrorToApiStatus(err, false, api.TemplateVersionKind, &name)
 }
 
 func (h *ServiceHandler) DeleteTemplateVersion(ctx context.Context, fleet string, name string) api.Status {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	tvkey := kvstore.TemplateVersionKey{OrgID: orgId, Fleet: fleet, TemplateVersion: name}
 	err := h.kvStore.DeleteKeysForTemplateVersion(ctx, tvkey.ComposeKey())
@@ -96,7 +110,10 @@ func (h *ServiceHandler) DeleteTemplateVersion(ctx context.Context, fleet string
 }
 
 func (h *ServiceHandler) GetLatestTemplateVersion(ctx context.Context, fleet string) (*api.TemplateVersion, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	result, err := h.store.TemplateVersion().GetLatest(ctx, orgId, fleet)
 	return result, StoreErrorToApiStatus(err, false, api.TemplateVersionKind, nil)

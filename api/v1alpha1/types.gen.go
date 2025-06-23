@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/oapi-codegen/runtime"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 // Defines values for AppType.
@@ -1483,6 +1484,36 @@ type ObjectReference struct {
 
 	// Name The name of the referenced object.
 	Name string `json:"name"`
+}
+
+// Organization defines model for Organization.
+type Organization struct {
+	// ApiVersion APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources.
+	ApiVersion *string `json:"apiVersion,omitempty"`
+
+	// DisplayName Human readable name shown to users.
+	DisplayName *string `json:"displayName,omitempty"`
+
+	// Id The unique identifier for the organization.
+	Id *openapi_types.UUID `json:"id,omitempty"`
+
+	// Kind Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds.
+	Kind *string `json:"kind,omitempty"`
+}
+
+// OrganizationList OrganizationList is a list of Organizations.
+type OrganizationList struct {
+	// ApiVersion APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources.
+	ApiVersion string `json:"apiVersion"`
+
+	// Items List of Organizations.
+	Items []Organization `json:"items"`
+
+	// Kind Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds.
+	Kind string `json:"kind"`
+
+	// Metadata ListMeta describes metadata that synthetic resources must have, including lists and various status objects. A resource may have only one of {ObjectMeta, ListMeta}.
+	Metadata ListMeta `json:"metadata"`
 }
 
 // PatchRequest defines model for PatchRequest.

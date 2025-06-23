@@ -15,6 +15,7 @@ import (
 	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/store/model"
 	"github.com/flightctl/flightctl/internal/store/selector"
+	"github.com/flightctl/flightctl/internal/util"
 	"github.com/flightctl/flightctl/internal/util/validation"
 	"github.com/google/uuid"
 )
@@ -25,7 +26,10 @@ func (h *ServiceHandler) CreateDevice(ctx context.Context, device api.Device) (*
 		return nil, api.StatusBadRequest(flterrors.ErrDecommission.Error())
 	}
 
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	// don't set fields that are managed by the service
 	device.Status = nil
@@ -59,7 +63,10 @@ func convertDeviceListParams(params api.ListDevicesParams, annotationSelector *s
 }
 
 func (h *ServiceHandler) ListDevices(ctx context.Context, params api.ListDevicesParams, annotationSelector *selector.AnnotationSelector) (*api.DeviceList, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 	storeParams, status := convertDeviceListParams(params, annotationSelector)
 	if status.Code != http.StatusOK {
 		return nil, status
@@ -116,7 +123,10 @@ func (h *ServiceHandler) ListDevicesByServiceCondition(ctx context.Context, cond
 }
 
 func (h *ServiceHandler) GetDevice(ctx context.Context, name string) (*api.Device, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	result, err := h.store.Device().Get(ctx, orgId, name)
 	return result, StoreErrorToApiStatus(err, false, api.DeviceKind, &name)
@@ -136,7 +146,10 @@ func (h *ServiceHandler) ReplaceDevice(ctx context.Context, name string, device 
 		return nil, api.StatusBadRequest(flterrors.ErrDecommission.Error())
 	}
 
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	// don't overwrite fields that are managed by the service for external requests
 	isNotInternal := !IsInternalRequest(ctx)
@@ -181,7 +194,10 @@ func (h *ServiceHandler) UpdateDevice(ctx context.Context, name string, device a
 		return nil, flterrors.ErrDecommission
 	}
 
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, flterrors.ErrInvalidOrganizationID
+	}
 
 	// don't overwrite fields that are managed by the service for external requests
 	if !IsInternalRequest(ctx) {
@@ -216,7 +232,10 @@ func (h *ServiceHandler) UpdateDevice(ctx context.Context, name string, device a
 }
 
 func (h *ServiceHandler) DeleteDevice(ctx context.Context, name string) api.Status {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	deleted, err := h.store.Device().Delete(ctx, orgId, name, h.callbackManager.DeviceUpdatedCallback)
 	status := StoreErrorToApiStatus(err, false, api.DeviceKind, &name)
@@ -228,7 +247,10 @@ func (h *ServiceHandler) DeleteDevice(ctx context.Context, name string) api.Stat
 
 // (GET /api/v1/devices/{name}/status)
 func (h *ServiceHandler) GetDeviceStatus(ctx context.Context, name string) (*api.Device, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	result, err := h.store.Device().Get(ctx, orgId, name)
 	return result, StoreErrorToApiStatus(err, false, api.DeviceKind, &name)
@@ -241,7 +263,10 @@ func validateDeviceStatus(d *api.Device) []error {
 }
 
 func (h *ServiceHandler) ReplaceDeviceStatus(ctx context.Context, name string, device api.Device) (*api.Device, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	if errs := validateDeviceStatus(&device); len(errs) > 0 {
 		return nil, api.StatusBadRequest(errors.Join(errs...).Error())
@@ -273,7 +298,10 @@ func (h *ServiceHandler) ReplaceDeviceStatus(ctx context.Context, name string, d
 }
 
 func (h *ServiceHandler) PatchDeviceStatus(ctx context.Context, name string, patch api.PatchRequest) (*api.Device, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	currentObj, err := h.store.Device().Get(ctx, orgId, name)
 	if err != nil {
@@ -329,7 +357,10 @@ func (h *ServiceHandler) PatchDeviceStatus(ctx context.Context, name string, pat
 }
 
 func (h *ServiceHandler) GetRenderedDevice(ctx context.Context, name string, params api.GetRenderedDeviceParams) (*api.Device, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	result, err := h.store.Device().GetRendered(ctx, orgId, name, params.KnownRenderedVersion, h.agentEndpoint)
 	if err == nil && result == nil {
@@ -340,7 +371,10 @@ func (h *ServiceHandler) GetRenderedDevice(ctx context.Context, name string, par
 
 // Only metadata.labels and spec can be patched. If we try to patch other fields, HTTP 400 Bad Request is returned.
 func (h *ServiceHandler) PatchDevice(ctx context.Context, name string, patch api.PatchRequest) (*api.Device, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	currentObj, err := h.store.Device().Get(ctx, orgId, name)
 	if err != nil {
@@ -395,7 +429,10 @@ func (h *ServiceHandler) PatchDevice(ctx context.Context, name string, patch api
 }
 
 func (h *ServiceHandler) DecommissionDevice(ctx context.Context, name string, decom api.DeviceDecommission) (*api.Device, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	deviceObj, err := h.store.Device().Get(ctx, orgId, name)
 	if err != nil {
@@ -428,37 +465,55 @@ func (h *ServiceHandler) DecommissionDevice(ctx context.Context, name string, de
 }
 
 func (h *ServiceHandler) UpdateDeviceAnnotations(ctx context.Context, name string, annotations map[string]string, deleteKeys []string) api.Status {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 	err := h.store.Device().UpdateAnnotations(ctx, orgId, name, annotations, deleteKeys)
 	return StoreErrorToApiStatus(err, false, api.DeviceKind, &name)
 }
 
 func (h *ServiceHandler) UpdateRenderedDevice(ctx context.Context, name, renderedConfig, renderedApplications string) api.Status {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 	err := h.store.Device().UpdateRendered(ctx, orgId, name, renderedConfig, renderedApplications)
 	return StoreErrorToApiStatus(err, false, api.DeviceKind, &name)
 }
 
 func (h *ServiceHandler) SetDeviceServiceConditions(ctx context.Context, name string, conditions []api.Condition) api.Status {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 	err := h.store.Device().SetServiceConditions(ctx, orgId, name, conditions)
 	return StoreErrorToApiStatus(err, false, api.DeviceKind, &name)
 }
 
 func (h *ServiceHandler) OverwriteDeviceRepositoryRefs(ctx context.Context, name string, repositoryNames ...string) api.Status {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 	err := h.store.Device().OverwriteRepositoryRefs(ctx, orgId, name, repositoryNames...)
 	return StoreErrorToApiStatus(err, false, api.DeviceKind, &name)
 }
 
 func (h *ServiceHandler) GetDeviceRepositoryRefs(ctx context.Context, name string) (*api.RepositoryList, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 	result, err := h.store.Device().GetRepositoryRefs(ctx, orgId, name)
 	return result, StoreErrorToApiStatus(err, false, api.DeviceKind, &name)
 }
 
 func (h *ServiceHandler) CountDevices(ctx context.Context, params api.ListDevicesParams, annotationSelector *selector.AnnotationSelector) (int64, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return 0, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 	storeParams, status := convertDeviceListParams(params, annotationSelector)
 	if status.Code != http.StatusOK {
 		return 0, status
@@ -468,13 +523,19 @@ func (h *ServiceHandler) CountDevices(ctx context.Context, params api.ListDevice
 }
 
 func (h *ServiceHandler) UnmarkDevicesRolloutSelection(ctx context.Context, fleetName string) api.Status {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 	err := h.store.Device().UnmarkRolloutSelection(ctx, orgId, fleetName)
 	return StoreErrorToApiStatus(err, false, api.DeviceKind, nil)
 }
 
 func (h *ServiceHandler) MarkDevicesRolloutSelection(ctx context.Context, params api.ListDevicesParams, annotationSelector *selector.AnnotationSelector, limit *int) api.Status {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 	storeParams, status := convertDeviceListParams(params, annotationSelector)
 	if status.Code != http.StatusOK {
 		return status
@@ -484,13 +545,19 @@ func (h *ServiceHandler) MarkDevicesRolloutSelection(ctx context.Context, params
 }
 
 func (h *ServiceHandler) GetDeviceCompletionCounts(ctx context.Context, owner string, templateVersion string, updateTimeout *time.Duration) ([]api.DeviceCompletionCount, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 	result, err := h.store.Device().CompletionCounts(ctx, orgId, owner, templateVersion, updateTimeout)
 	return result, StoreErrorToApiStatus(err, false, api.DeviceKind, nil)
 }
 
 func (h *ServiceHandler) CountDevicesByLabels(ctx context.Context, params api.ListDevicesParams, annotationSelector *selector.AnnotationSelector, groupBy []string) ([]map[string]any, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 	storeParams, status := convertDeviceListParams(params, annotationSelector)
 	if status.Code != http.StatusOK {
 		return nil, status
@@ -500,7 +567,10 @@ func (h *ServiceHandler) CountDevicesByLabels(ctx context.Context, params api.Li
 }
 
 func (h *ServiceHandler) GetDevicesSummary(ctx context.Context, params api.ListDevicesParams, annotationSelector *selector.AnnotationSelector) (*api.DevicesSummary, api.Status) {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 	storeParams, status := convertDeviceListParams(params, annotationSelector)
 	if status.Code != http.StatusOK {
 		return nil, status
@@ -510,12 +580,18 @@ func (h *ServiceHandler) GetDevicesSummary(ctx context.Context, params api.ListD
 }
 
 func (h *ServiceHandler) UpdateDeviceSummaryStatusBatch(ctx context.Context, deviceNames []string, status api.DeviceSummaryStatusType, statusInfo string) api.Status {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 	err := h.store.Device().UpdateSummaryStatusBatch(ctx, orgId, deviceNames, status, statusInfo)
 	return StoreErrorToApiStatus(err, false, api.DeviceKind, nil)
 }
 
 func (h *ServiceHandler) UpdateServiceSideDeviceStatus(ctx context.Context, device api.Device) bool {
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return false
+	}
 	return common.UpdateServiceSideStatus(ctx, orgId, &device, nil, h.store, h.log, nil, nil)
 }

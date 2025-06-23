@@ -6,6 +6,7 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/store"
+	"github.com/flightctl/flightctl/internal/util"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 )
@@ -15,7 +16,7 @@ func verifyRSPatchFailed(require *require.Assertions, status api.Status) {
 }
 
 func testResourceSyncPatch(require *require.Assertions, patch api.PatchRequest) (*api.ResourceSync, api.ResourceSync, api.Status) {
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	resourceSync := api.ResourceSync{
 		ApiVersion: "v1",
 		Kind:       "ResourceSync",
@@ -42,7 +43,7 @@ func testResourceSyncPatch(require *require.Assertions, patch api.PatchRequest) 
 
 func TestResourceSyncCreateWithLongNames(t *testing.T) {
 	require := require.New(t)
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 
 	resourceSync := api.ResourceSync{
 		ApiVersion: "v1",
@@ -193,7 +194,7 @@ func TestResourceSyncPatchLabels(t *testing.T) {
 
 func TestResourceSyncNonExistingResource(t *testing.T) {
 	require := require.New(t)
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	var value interface{} = "labelValue1"
 	pr := api.PatchRequest{
 		{Op: "replace", Path: "/metadata/labels/labelKey", Value: &value},
@@ -202,6 +203,7 @@ func TestResourceSyncNonExistingResource(t *testing.T) {
 	serviceHandler := ServiceHandler{
 		store: &TestStore{},
 	}
+
 	_, err := serviceHandler.store.ResourceSync().Create(ctx, store.NullOrgId, &api.ResourceSync{
 		Metadata: api.ObjectMeta{Name: lo.ToPtr("foo")},
 	})

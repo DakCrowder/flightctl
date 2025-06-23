@@ -30,7 +30,7 @@ func verifyDevicePatchFailed(require *require.Assertions, status api.Status) {
 
 func testDevicePatch(require *require.Assertions, patch api.PatchRequest, expectEvents int) (*api.Device, api.Device, api.Status) {
 	_ = os.Setenv(auth.DisableAuthEnvKey, "true")
-	_ = auth.InitAuth(nil, log.InitLogs())
+	_ = auth.InitAuth(nil, log.InitLogs(), nil)
 	status := api.NewDeviceStatus()
 	device := api.Device{
 		ApiVersion: "v1",
@@ -48,7 +48,7 @@ func testDevicePatch(require *require.Assertions, patch api.PatchRequest, expect
 		store:           &TestStore{},
 		callbackManager: dummyCallbackManager(),
 	}
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err := serviceHandler.store.Device().Create(ctx, store.NullOrgId, &device, nil)
 	require.NoError(err)
 	resp, retStatus := serviceHandler.PatchDevice(ctx, "foo", patch)
@@ -62,12 +62,12 @@ func testDevicePatch(require *require.Assertions, patch api.PatchRequest, expect
 
 func testDeviceStatusPatch(require *require.Assertions, orig api.Device, patch api.PatchRequest, expectEvents bool) (*api.Device, api.Status) {
 	_ = os.Setenv(auth.DisableAuthEnvKey, "true")
-	_ = auth.InitAuth(nil, log.InitLogs())
+	_ = auth.InitAuth(nil, log.InitLogs(), nil)
 	serviceHandler := &ServiceHandler{
 		store:           &TestStore{},
 		callbackManager: dummyCallbackManager(),
 	}
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err := serviceHandler.store.Device().Create(ctx, store.NullOrgId, &orig, nil)
 	require.NoError(err)
 	resp, retStatus := serviceHandler.PatchDeviceStatus(ctx, "foo", patch)
@@ -354,7 +354,7 @@ func TestDeviceNonExistingResource(t *testing.T) {
 		store:           &TestStore{},
 		callbackManager: dummyCallbackManager(),
 	}
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err := serviceHandler.store.Device().Create(ctx, store.NullOrgId, &api.Device{
 		Metadata: api.ObjectMeta{Name: lo.ToPtr("foo")},
 	}, nil)
