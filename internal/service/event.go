@@ -19,7 +19,7 @@ func (h *ServiceHandler) CreateEvent(ctx context.Context, event *api.Event) {
 		return
 	}
 
-	orgId := store.NullOrgId
+	orgId := GetOrgIdFromContext(ctx)
 
 	err := h.store.Event().Create(ctx, orgId, event)
 	if err != nil {
@@ -28,7 +28,7 @@ func (h *ServiceHandler) CreateEvent(ctx context.Context, event *api.Event) {
 }
 
 func (h *ServiceHandler) ListEvents(ctx context.Context, params api.ListEventsParams) (*api.EventList, api.Status) {
-	orgId := store.NullOrgId
+	orgId := GetOrgIdFromContext(ctx)
 
 	listParams, status := prepareListParams(params.Continue, nil, params.FieldSelector, params.Limit)
 	if status != api.StatusOK() {

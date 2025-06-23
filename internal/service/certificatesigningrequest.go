@@ -11,7 +11,6 @@ import (
 	"github.com/flightctl/flightctl/internal/api_server/middleware"
 	"github.com/flightctl/flightctl/internal/crypto"
 	"github.com/flightctl/flightctl/internal/flterrors"
-	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/store/selector"
 	"github.com/google/uuid"
 )
@@ -105,7 +104,7 @@ func signApprovedCertificateSigningRequest(ca *crypto.CAClient, request api.Cert
 }
 
 func (h *ServiceHandler) ListCertificateSigningRequests(ctx context.Context, params api.ListCertificateSigningRequestsParams) (*api.CertificateSigningRequestList, api.Status) {
-	orgId := store.NullOrgId
+	orgId := GetOrgIdFromContext(ctx)
 
 	listParams, status := prepareListParams(params.Continue, params.LabelSelector, params.FieldSelector, params.Limit)
 	if status != api.StatusOK() {
@@ -149,7 +148,7 @@ func (h *ServiceHandler) verifyCSRParameters(ctx context.Context, csr api.Certif
 }
 
 func (h *ServiceHandler) CreateCertificateSigningRequest(ctx context.Context, csr api.CertificateSigningRequest) (*api.CertificateSigningRequest, api.Status) {
-	orgId := store.NullOrgId
+	orgId := GetOrgIdFromContext(ctx)
 
 	// don't set fields that are managed by the service
 	csr.Status = nil
@@ -184,7 +183,7 @@ func (h *ServiceHandler) CreateCertificateSigningRequest(ctx context.Context, cs
 }
 
 func (h *ServiceHandler) DeleteCertificateSigningRequest(ctx context.Context, name string) api.Status {
-	orgId := store.NullOrgId
+	orgId := GetOrgIdFromContext(ctx)
 
 	deleted, err := h.store.CertificateSigningRequest().Delete(ctx, orgId, name)
 	status := StoreErrorToApiStatus(err, false, api.CertificateSigningRequestKind, &name)
@@ -195,14 +194,14 @@ func (h *ServiceHandler) DeleteCertificateSigningRequest(ctx context.Context, na
 }
 
 func (h *ServiceHandler) GetCertificateSigningRequest(ctx context.Context, name string) (*api.CertificateSigningRequest, api.Status) {
-	orgId := store.NullOrgId
+	orgId := GetOrgIdFromContext(ctx)
 
 	result, err := h.store.CertificateSigningRequest().Get(ctx, orgId, name)
 	return result, StoreErrorToApiStatus(err, false, api.CertificateSigningRequestKind, &name)
 }
 
 func (h *ServiceHandler) PatchCertificateSigningRequest(ctx context.Context, name string, patch api.PatchRequest) (*api.CertificateSigningRequest, api.Status) {
-	orgId := store.NullOrgId
+	orgId := GetOrgIdFromContext(ctx)
 
 	currentObj, err := h.store.CertificateSigningRequest().Get(ctx, orgId, name)
 	if err != nil {
@@ -250,7 +249,7 @@ func (h *ServiceHandler) PatchCertificateSigningRequest(ctx context.Context, nam
 }
 
 func (h *ServiceHandler) ReplaceCertificateSigningRequest(ctx context.Context, name string, csr api.CertificateSigningRequest) (*api.CertificateSigningRequest, api.Status) {
-	orgId := store.NullOrgId
+	orgId := GetOrgIdFromContext(ctx)
 
 	// don't overwrite fields that are managed by the service
 	csr.Status = nil
@@ -287,7 +286,7 @@ func (h *ServiceHandler) ReplaceCertificateSigningRequest(ctx context.Context, n
 
 // NOTE: Approval currently also issues a certificate - this will change in the future based on policy
 func (h *ServiceHandler) UpdateCertificateSigningRequestApproval(ctx context.Context, name string, csr api.CertificateSigningRequest) (*api.CertificateSigningRequest, api.Status) {
-	orgId := store.NullOrgId
+	orgId := GetOrgIdFromContext(ctx)
 
 	newCSR := &csr
 	NilOutManagedObjectMetaProperties(&newCSR.Metadata)
