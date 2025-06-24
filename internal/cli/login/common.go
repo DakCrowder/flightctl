@@ -39,6 +39,7 @@ type AuthInfo struct {
 	AccessToken  string
 	RefreshToken string
 	ExpiresIn    *int64
+	Scope        string
 }
 
 type ValidateArgs struct {
