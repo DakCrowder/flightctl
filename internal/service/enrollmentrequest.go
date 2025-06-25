@@ -12,6 +12,7 @@ import (
 	"github.com/flightctl/flightctl/internal/crypto"
 	"github.com/flightctl/flightctl/internal/flterrors"
 	"github.com/flightctl/flightctl/internal/store/selector"
+	"github.com/flightctl/flightctl/internal/util"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 )
@@ -111,7 +112,10 @@ func (h *ServiceHandler) createDeviceFromEnrollmentRequest(ctx context.Context, 
 }
 
 func (h *ServiceHandler) CreateEnrollmentRequest(ctx context.Context, er api.EnrollmentRequest) (*api.EnrollmentRequest, api.Status) {
-	orgId := GetOrgIdFromContext(ctx)
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	// don't set fields that are managed by the service
 	er.Status = nil
@@ -135,7 +139,10 @@ func (h *ServiceHandler) CreateEnrollmentRequest(ctx context.Context, er api.Enr
 }
 
 func (h *ServiceHandler) ListEnrollmentRequests(ctx context.Context, params api.ListEnrollmentRequestsParams) (*api.EnrollmentRequestList, api.Status) {
-	orgId := GetOrgIdFromContext(ctx)
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	listParams, status := prepareListParams(params.Continue, params.LabelSelector, params.FieldSelector, params.Limit)
 	if status != api.StatusOK() {
@@ -158,14 +165,20 @@ func (h *ServiceHandler) ListEnrollmentRequests(ctx context.Context, params api.
 }
 
 func (h *ServiceHandler) GetEnrollmentRequest(ctx context.Context, name string) (*api.EnrollmentRequest, api.Status) {
-	orgId := GetOrgIdFromContext(ctx)
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	result, err := h.store.EnrollmentRequest().Get(ctx, orgId, name)
 	return result, StoreErrorToApiStatus(err, false, api.EnrollmentRequestKind, &name)
 }
 
 func (h *ServiceHandler) ReplaceEnrollmentRequest(ctx context.Context, name string, er api.EnrollmentRequest) (*api.EnrollmentRequest, api.Status) {
-	orgId := GetOrgIdFromContext(ctx)
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	// don't set fields that are managed by the service
 	er.Status = nil
@@ -192,7 +205,10 @@ func (h *ServiceHandler) ReplaceEnrollmentRequest(ctx context.Context, name stri
 
 // Only metadata.labels and spec can be patched. If we try to patch other fields, HTTP 400 Bad Request is returned.
 func (h *ServiceHandler) PatchEnrollmentRequest(ctx context.Context, name string, patch api.PatchRequest) (*api.EnrollmentRequest, api.Status) {
-	orgId := GetOrgIdFromContext(ctx)
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	currentObj, err := h.store.EnrollmentRequest().Get(ctx, orgId, name)
 	if err != nil {
@@ -231,7 +247,10 @@ func (h *ServiceHandler) PatchEnrollmentRequest(ctx context.Context, name string
 }
 
 func (h *ServiceHandler) DeleteEnrollmentRequest(ctx context.Context, name string) api.Status {
-	orgId := GetOrgIdFromContext(ctx)
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	deleted, err := h.store.EnrollmentRequest().Delete(ctx, orgId, name)
 	status := StoreErrorToApiStatus(err, false, api.EnrollmentRequestKind, &name)
@@ -242,14 +261,20 @@ func (h *ServiceHandler) DeleteEnrollmentRequest(ctx context.Context, name strin
 }
 
 func (h *ServiceHandler) GetEnrollmentRequestStatus(ctx context.Context, name string) (*api.EnrollmentRequest, api.Status) {
-	orgId := GetOrgIdFromContext(ctx)
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	result, err := h.store.EnrollmentRequest().Get(ctx, orgId, name)
 	return result, StoreErrorToApiStatus(err, false, api.EnrollmentRequestKind, &name)
 }
 
 func (h *ServiceHandler) ApproveEnrollmentRequest(ctx context.Context, name string, approval api.EnrollmentRequestApproval) (*api.EnrollmentRequestApprovalStatus, api.Status) {
-	orgId := GetOrgIdFromContext(ctx)
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	if errs := approval.Validate(); len(errs) > 0 {
 		return nil, api.StatusBadRequest(errors.Join(errs...).Error())
@@ -299,7 +324,10 @@ func (h *ServiceHandler) ApproveEnrollmentRequest(ctx context.Context, name stri
 }
 
 func (h *ServiceHandler) ReplaceEnrollmentRequestStatus(ctx context.Context, name string, er api.EnrollmentRequest) (*api.EnrollmentRequest, api.Status) {
-	orgId := GetOrgIdFromContext(ctx)
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 
 	AddStatusIfNeeded(&er)
 

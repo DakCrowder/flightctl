@@ -5,14 +5,19 @@ import (
 	"fmt"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
+	"github.com/flightctl/flightctl/internal/flterrors"
 	"github.com/flightctl/flightctl/internal/store/selector"
+	"github.com/flightctl/flightctl/internal/util"
 )
 
 // (GET /api/v1/labels)
 func (h *ServiceHandler) ListLabels(ctx context.Context, params api.ListLabelsParams) (*api.LabelList, api.Status) {
 	var err error
 
-	orgId := GetOrgIdFromContext(ctx)
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+	}
 	kind := params.Kind
 
 	listParams, status := prepareListParams(nil, params.LabelSelector, params.FieldSelector, params.Limit)
