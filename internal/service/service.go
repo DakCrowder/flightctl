@@ -109,4 +109,7 @@ type Service interface {
 	CreateEvent(ctx context.Context, event *api.Event)
 	ListEvents(ctx context.Context, params api.ListEventsParams) (*api.EventList, api.Status)
 	DeleteEventsOlderThan(ctx context.Context, cutoffTime time.Time) (int64, api.Status)
+
+	// Organization
+	ListOrganizations(ctx context.Context) (*api.OrganizationList, api.Status)
 }

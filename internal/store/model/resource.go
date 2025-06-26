@@ -15,6 +15,8 @@ type Resource struct {
 	// Assigned by IAM. Immutable.
 	OrgID uuid.UUID `gorm:"type:uuid;primaryKey;index:,composite:org_name,priority:1"`
 
+	Organization Organization `gorm:"foreignKey:OrgID"`
+
 	// Uniquely identifies the resource within a tenant and schema.
 	// Depending on the schema (kind), assigned by the device management system or the crypto identity of the device (public key). Immutable.
 	// This may become a URN later, so it's important API users treat this as an opaque handle.
