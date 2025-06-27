@@ -6,6 +6,7 @@ import (
 
 	"github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/store"
+	"github.com/flightctl/flightctl/internal/util"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 )
@@ -40,7 +41,7 @@ func TestAlreadyApprovedEnrollmentRequestApprove(t *testing.T) {
 		store:           &TestStore{},
 		callbackManager: dummyCallbackManager(),
 	}
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err := serviceHandler.store.EnrollmentRequest().Create(ctx, store.NullOrgId, &device)
 	require.NoError(err)
 	_, stat := serviceHandler.ApproveEnrollmentRequest(ctx, "foo", approval)

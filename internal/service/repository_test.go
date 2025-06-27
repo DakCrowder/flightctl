@@ -6,6 +6,7 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/store"
+	"github.com/flightctl/flightctl/internal/util"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 )
@@ -34,7 +35,7 @@ func testRepositoryPatch(require *require.Assertions, patch api.PatchRequest) (*
 		store:           &TestStore{},
 		callbackManager: dummyCallbackManager(),
 	}
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err = serviceHandler.store.Repository().Create(ctx, store.NullOrgId, &repository, nil)
 	require.NoError(err)
 	resp, status := serviceHandler.PatchRepository(ctx, "foo", patch)
@@ -163,7 +164,7 @@ func TestRepositoryNonExistingResource(t *testing.T) {
 	serviceHandler := ServiceHandler{
 		store: &TestStore{},
 	}
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err := serviceHandler.store.Repository().Create(ctx, store.NullOrgId, &api.Repository{
 		Metadata: api.ObjectMeta{Name: lo.ToPtr("foo")},
 	}, nil)

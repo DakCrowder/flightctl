@@ -44,7 +44,7 @@ func testDevicePatch(require *require.Assertions, patch api.PatchRequest) (*api.
 		store:           &TestStore{},
 		callbackManager: dummyCallbackManager(),
 	}
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err := serviceHandler.store.Device().Create(ctx, store.NullOrgId, &device, nil)
 	require.NoError(err)
 	resp, retStatus := serviceHandler.PatchDevice(ctx, "foo", patch)
@@ -59,7 +59,7 @@ func testDeviceStatusPatch(require *require.Assertions, orig api.Device, patch a
 		store:           &TestStore{},
 		callbackManager: dummyCallbackManager(),
 	}
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err := serviceHandler.store.Device().Create(ctx, store.NullOrgId, &orig, nil)
 	require.NoError(err)
 	resp, retStatus := serviceHandler.PatchDeviceStatus(ctx, "foo", patch)
@@ -336,7 +336,7 @@ func TestDeviceNonExistingResource(t *testing.T) {
 		store:           &TestStore{},
 		callbackManager: dummyCallbackManager(),
 	}
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err := serviceHandler.store.Device().Create(ctx, store.NullOrgId, &api.Device{
 		Metadata: api.ObjectMeta{Name: lo.ToPtr("foo")},
 	}, nil)

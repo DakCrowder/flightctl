@@ -6,6 +6,7 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/store"
+	"github.com/flightctl/flightctl/internal/util"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 )
@@ -30,7 +31,7 @@ func testResourceSyncPatch(require *require.Assertions, patch api.PatchRequest) 
 	serviceHandler := ServiceHandler{
 		store: &TestStore{},
 	}
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	orig, status := serviceHandler.CreateResourceSync(ctx, resourceSync)
 	require.Equal(statusCreatedCode, status.Code)
 	resp, status := serviceHandler.PatchResourceSync(ctx, "foo", patch)
@@ -58,7 +59,7 @@ func TestResourceSyncCreateWithLongNames(t *testing.T) {
 	serviceHandler := ServiceHandler{
 		store: &TestStore{},
 	}
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err := serviceHandler.store.ResourceSync().Create(ctx, store.NullOrgId, &resourceSync)
 	require.NoError(err)
 	_, status := serviceHandler.ReplaceResourceSync(ctx,
@@ -199,7 +200,7 @@ func TestResourceSyncNonExistingResource(t *testing.T) {
 	serviceHandler := ServiceHandler{
 		store: &TestStore{},
 	}
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err := serviceHandler.store.ResourceSync().Create(ctx, store.NullOrgId, &api.ResourceSync{
 		Metadata: api.ObjectMeta{Name: lo.ToPtr("foo")},
 	})

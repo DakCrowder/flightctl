@@ -6,6 +6,7 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/store"
+	"github.com/flightctl/flightctl/internal/util"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 )
@@ -50,7 +51,7 @@ func testFleetPatch(require *require.Assertions, patch api.PatchRequest) (*api.F
 		store:           &TestStore{},
 		callbackManager: dummyCallbackManager(),
 	}
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err := serviceHandler.store.Fleet().Create(ctx, store.NullOrgId, &fleet, nil)
 	require.NoError(err)
 	resp, status := serviceHandler.PatchFleet(ctx, "foo", patch)
@@ -204,7 +205,7 @@ func TestFleetNonExistingResource(t *testing.T) {
 		store:           &TestStore{},
 		callbackManager: dummyCallbackManager(),
 	}
-	ctx := context.Background()
+	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err := serviceHandler.store.Fleet().Create(ctx, store.NullOrgId, &api.Fleet{
 		Metadata: api.ObjectMeta{Name: lo.ToPtr("foo")},
 	}, nil)
