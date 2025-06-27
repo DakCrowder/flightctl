@@ -14,6 +14,7 @@ import (
 	"github.com/flightctl/flightctl/internal/auth/authz"
 	"github.com/flightctl/flightctl/internal/auth/common"
 	"github.com/flightctl/flightctl/internal/config"
+	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/pkg/k8sclient"
 	"github.com/sirupsen/logrus"
 )
@@ -118,13 +119,13 @@ func initAAPAuth(cfg *config.Config, log logrus.FieldLogger) error {
 	return nil
 }
 
-func InitAuth(cfg *config.Config, log logrus.FieldLogger) error {
+func InitAuth(cfg *config.Config, log logrus.FieldLogger, store store.Store) error {
 	value, exists := os.LookupEnv(DisableAuthEnvKey)
 	if exists && value != "" {
 		log.Warnln("Auth disabled")
 		configuredAuthType = AuthTypeNil
-		authZ = NilAuth{}
-		authN = authZ.(AuthNMiddleware)
+		authZ = authz.NewBasicOrgAuth(store)
+		authN = NilAuth{}
 	} else if cfg.Auth != nil {
 		var err error
 		if cfg.Auth.K8s != nil {

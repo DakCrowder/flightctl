@@ -26,7 +26,7 @@ func verifyDevicePatchFailed(require *require.Assertions, status api.Status) {
 
 func testDevicePatch(require *require.Assertions, patch api.PatchRequest) (*api.Device, api.Device, api.Status) {
 	_ = os.Setenv(auth.DisableAuthEnvKey, "true")
-	_ = auth.InitAuth(nil, log.InitLogs())
+	_ = auth.InitAuth(nil, log.InitLogs(), nil)
 	status := api.NewDeviceStatus()
 	device := api.Device{
 		ApiVersion: "v1",
@@ -54,7 +54,7 @@ func testDevicePatch(require *require.Assertions, patch api.PatchRequest) (*api.
 
 func testDeviceStatusPatch(require *require.Assertions, orig api.Device, patch api.PatchRequest) (*api.Device, api.Status) {
 	_ = os.Setenv(auth.DisableAuthEnvKey, "true")
-	_ = auth.InitAuth(nil, log.InitLogs())
+	_ = auth.InitAuth(nil, log.InitLogs(), nil)
 	serviceHandler := &ServiceHandler{
 		store:           &TestStore{},
 		callbackManager: dummyCallbackManager(),

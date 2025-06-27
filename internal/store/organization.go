@@ -2,9 +2,11 @@ package store
 
 import (
 	"context"
+	"errors"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/store/model"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -13,6 +15,7 @@ type Organization interface {
 	InitialMigration(ctx context.Context) error
 
 	List(ctx context.Context) (*api.OrganizationList, error)
+	Get(ctx context.Context, orgID uuid.UUID) (*api.Organization, error)
 }
 
 type OrganizationStore struct {
@@ -61,4 +64,19 @@ func (s *OrganizationStore) List(ctx context.Context) (*api.OrganizationList, er
 	}
 
 	return apiOrganizationList, nil
+}
+
+func (s *OrganizationStore) Get(ctx context.Context, orgID uuid.UUID) (*api.Organization, error) {
+	var organization model.Organization
+	db := s.getDB(ctx)
+
+	result := db.Where("id = ?", orgID).First(&organization)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, ErrorFromGormError(result.Error)
+		}
+		return nil, ErrorFromGormError(result.Error)
+	}
+
+	return organization.ToApiResource()
 }

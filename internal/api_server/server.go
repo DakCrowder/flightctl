@@ -153,7 +153,7 @@ func (s *Server) Run(ctx context.Context) error {
 		MultiErrorHandler: oapiMultiErrorHandler,
 	}
 
-	err = auth.InitAuth(s.cfg, s.log)
+	err = auth.InitAuth(s.cfg, s.log, s.store)
 	if err != nil {
 		return fmt.Errorf("failed initializing auth: %w", err)
 	}
