@@ -6,17 +6,11 @@ import (
 	"errors"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
-	"github.com/flightctl/flightctl/internal/flterrors"
-	"github.com/flightctl/flightctl/internal/util"
 	"github.com/flightctl/flightctl/internal/util/validation"
+	"github.com/google/uuid"
 )
 
-func (h *ServiceHandler) GetEnrollmentConfig(ctx context.Context, params api.GetEnrollmentConfigParams) (*api.EnrollmentConfig, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) GetEnrollmentConfig(ctx context.Context, orgId uuid.UUID, params api.GetEnrollmentConfigParams) (*api.EnrollmentConfig, api.Status) {
 	caCert, err := h.ca.GetCABundle()
 	if err != nil {
 		return nil, api.StatusInternalServerError("failed to get CA certificate")

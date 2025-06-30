@@ -47,7 +47,7 @@ func testDevicePatch(require *require.Assertions, patch api.PatchRequest) (*api.
 	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err := serviceHandler.store.Device().Create(ctx, store.NullOrgId, &device, nil)
 	require.NoError(err)
-	resp, retStatus := serviceHandler.PatchDevice(ctx, "foo", patch)
+	resp, retStatus := serviceHandler.PatchDevice(ctx, store.NullOrgId, "foo", patch)
 	require.NotEqual(statusFailedCode, retStatus.Code)
 	return resp, device, retStatus
 }
@@ -62,7 +62,7 @@ func testDeviceStatusPatch(require *require.Assertions, orig api.Device, patch a
 	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err := serviceHandler.store.Device().Create(ctx, store.NullOrgId, &orig, nil)
 	require.NoError(err)
-	resp, retStatus := serviceHandler.PatchDeviceStatus(ctx, "foo", patch)
+	resp, retStatus := serviceHandler.PatchDeviceStatus(ctx, store.NullOrgId, "foo", patch)
 	require.NotEqual(statusFailedCode, retStatus.Code)
 	return resp, retStatus
 }
@@ -341,7 +341,7 @@ func TestDeviceNonExistingResource(t *testing.T) {
 		Metadata: api.ObjectMeta{Name: lo.ToPtr("foo")},
 	}, nil)
 	require.NoError(err)
-	_, retStatus := serviceHandler.PatchDevice(ctx, "bar", pr)
+	_, retStatus := serviceHandler.PatchDevice(ctx, store.NullOrgId, "bar", pr)
 	require.Equal(statusNotFoundCode, retStatus.Code)
 	require.Equal(api.StatusResourceNotFound("Device", "bar"), retStatus)
 }

@@ -10,6 +10,7 @@ import (
 	. "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/go-chi/chi/v5"
 	"github.com/oapi-codegen/runtime"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 // ServerInterface represents all server handlers.
@@ -20,135 +21,6 @@ type ServerInterface interface {
 
 	// (GET /api/v1/auth/validate)
 	AuthValidate(w http.ResponseWriter, r *http.Request, params AuthValidateParams)
-
-	// (GET /api/v1/certificatesigningrequests)
-	ListCertificateSigningRequests(w http.ResponseWriter, r *http.Request, params ListCertificateSigningRequestsParams)
-
-	// (POST /api/v1/certificatesigningrequests)
-	CreateCertificateSigningRequest(w http.ResponseWriter, r *http.Request)
-
-	// (DELETE /api/v1/certificatesigningrequests/{name})
-	DeleteCertificateSigningRequest(w http.ResponseWriter, r *http.Request, name string)
-
-	// (GET /api/v1/certificatesigningrequests/{name})
-	GetCertificateSigningRequest(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PATCH /api/v1/certificatesigningrequests/{name})
-	PatchCertificateSigningRequest(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PUT /api/v1/certificatesigningrequests/{name})
-	ReplaceCertificateSigningRequest(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PUT /api/v1/certificatesigningrequests/{name}/approval)
-	UpdateCertificateSigningRequestApproval(w http.ResponseWriter, r *http.Request, name string)
-
-	// (GET /api/v1/devices)
-	ListDevices(w http.ResponseWriter, r *http.Request, params ListDevicesParams)
-
-	// (POST /api/v1/devices)
-	CreateDevice(w http.ResponseWriter, r *http.Request)
-
-	// (DELETE /api/v1/devices/{name})
-	DeleteDevice(w http.ResponseWriter, r *http.Request, name string)
-
-	// (GET /api/v1/devices/{name})
-	GetDevice(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PATCH /api/v1/devices/{name})
-	PatchDevice(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PUT /api/v1/devices/{name})
-	ReplaceDevice(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PUT /api/v1/devices/{name}/decommission)
-	DecommissionDevice(w http.ResponseWriter, r *http.Request, name string)
-
-	// (GET /api/v1/devices/{name}/rendered)
-	GetRenderedDevice(w http.ResponseWriter, r *http.Request, name string, params GetRenderedDeviceParams)
-
-	// (GET /api/v1/devices/{name}/status)
-	GetDeviceStatus(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PATCH /api/v1/devices/{name}/status)
-	PatchDeviceStatus(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PUT /api/v1/devices/{name}/status)
-	ReplaceDeviceStatus(w http.ResponseWriter, r *http.Request, name string)
-
-	// (GET /api/v1/enrollmentconfig)
-	GetEnrollmentConfig(w http.ResponseWriter, r *http.Request, params GetEnrollmentConfigParams)
-
-	// (GET /api/v1/enrollmentrequests)
-	ListEnrollmentRequests(w http.ResponseWriter, r *http.Request, params ListEnrollmentRequestsParams)
-
-	// (POST /api/v1/enrollmentrequests)
-	CreateEnrollmentRequest(w http.ResponseWriter, r *http.Request)
-
-	// (DELETE /api/v1/enrollmentrequests/{name})
-	DeleteEnrollmentRequest(w http.ResponseWriter, r *http.Request, name string)
-
-	// (GET /api/v1/enrollmentrequests/{name})
-	GetEnrollmentRequest(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PATCH /api/v1/enrollmentrequests/{name})
-	PatchEnrollmentRequest(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PUT /api/v1/enrollmentrequests/{name})
-	ReplaceEnrollmentRequest(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PUT /api/v1/enrollmentrequests/{name}/approval)
-	ApproveEnrollmentRequest(w http.ResponseWriter, r *http.Request, name string)
-
-	// (GET /api/v1/enrollmentrequests/{name}/status)
-	GetEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PATCH /api/v1/enrollmentrequests/{name}/status)
-	PatchEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PUT /api/v1/enrollmentrequests/{name}/status)
-	ReplaceEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request, name string)
-
-	// (GET /api/v1/events)
-	ListEvents(w http.ResponseWriter, r *http.Request, params ListEventsParams)
-
-	// (GET /api/v1/fleets)
-	ListFleets(w http.ResponseWriter, r *http.Request, params ListFleetsParams)
-
-	// (POST /api/v1/fleets)
-	CreateFleet(w http.ResponseWriter, r *http.Request)
-
-	// (GET /api/v1/fleets/{fleet}/templateversions)
-	ListTemplateVersions(w http.ResponseWriter, r *http.Request, fleet string, params ListTemplateVersionsParams)
-
-	// (DELETE /api/v1/fleets/{fleet}/templateversions/{name})
-	DeleteTemplateVersion(w http.ResponseWriter, r *http.Request, fleet string, name string)
-
-	// (GET /api/v1/fleets/{fleet}/templateversions/{name})
-	GetTemplateVersion(w http.ResponseWriter, r *http.Request, fleet string, name string)
-
-	// (DELETE /api/v1/fleets/{name})
-	DeleteFleet(w http.ResponseWriter, r *http.Request, name string)
-
-	// (GET /api/v1/fleets/{name})
-	GetFleet(w http.ResponseWriter, r *http.Request, name string, params GetFleetParams)
-
-	// (PATCH /api/v1/fleets/{name})
-	PatchFleet(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PUT /api/v1/fleets/{name})
-	ReplaceFleet(w http.ResponseWriter, r *http.Request, name string)
-
-	// (GET /api/v1/fleets/{name}/status)
-	GetFleetStatus(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PATCH /api/v1/fleets/{name}/status)
-	PatchFleetStatus(w http.ResponseWriter, r *http.Request, name string)
-
-	// (PUT /api/v1/fleets/{name}/status)
-	ReplaceFleetStatus(w http.ResponseWriter, r *http.Request, name string)
-
-	// (GET /api/v1/labels)
-	ListLabels(w http.ResponseWriter, r *http.Request, params ListLabelsParams)
 	// List organizations
 	// (GET /api/v1/organizations)
 	ListOrganizations(w http.ResponseWriter, r *http.Request)
@@ -159,41 +31,170 @@ type ServerInterface interface {
 	// (PUT /api/v1/organizations/{orgID})
 	ReplaceOrganization(w http.ResponseWriter, r *http.Request, orgID string)
 
-	// (GET /api/v1/repositories)
-	ListRepositories(w http.ResponseWriter, r *http.Request, params ListRepositoriesParams)
+	// (GET /api/v1/organizations/{orgID}/certificatesigningrequests)
+	ListCertificateSigningRequests(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListCertificateSigningRequestsParams)
 
-	// (POST /api/v1/repositories)
-	CreateRepository(w http.ResponseWriter, r *http.Request)
+	// (POST /api/v1/organizations/{orgID}/certificatesigningrequests)
+	CreateCertificateSigningRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID)
 
-	// (DELETE /api/v1/repositories/{name})
-	DeleteRepository(w http.ResponseWriter, r *http.Request, name string)
+	// (DELETE /api/v1/organizations/{orgID}/certificatesigningrequests/{name})
+	DeleteCertificateSigningRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
 
-	// (GET /api/v1/repositories/{name})
-	GetRepository(w http.ResponseWriter, r *http.Request, name string)
+	// (GET /api/v1/organizations/{orgID}/certificatesigningrequests/{name})
+	GetCertificateSigningRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
 
-	// (PATCH /api/v1/repositories/{name})
-	PatchRepository(w http.ResponseWriter, r *http.Request, name string)
+	// (PATCH /api/v1/organizations/{orgID}/certificatesigningrequests/{name})
+	PatchCertificateSigningRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
 
-	// (PUT /api/v1/repositories/{name})
-	ReplaceRepository(w http.ResponseWriter, r *http.Request, name string)
+	// (PUT /api/v1/organizations/{orgID}/certificatesigningrequests/{name})
+	ReplaceCertificateSigningRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
 
-	// (GET /api/v1/resourcesyncs)
-	ListResourceSyncs(w http.ResponseWriter, r *http.Request, params ListResourceSyncsParams)
+	// (PUT /api/v1/organizations/{orgID}/certificatesigningrequests/{name}/approval)
+	UpdateCertificateSigningRequestApproval(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
 
-	// (POST /api/v1/resourcesyncs)
-	CreateResourceSync(w http.ResponseWriter, r *http.Request)
+	// (GET /api/v1/organizations/{orgID}/devices)
+	ListDevices(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListDevicesParams)
 
-	// (DELETE /api/v1/resourcesyncs/{name})
-	DeleteResourceSync(w http.ResponseWriter, r *http.Request, name string)
+	// (POST /api/v1/organizations/{orgID}/devices)
+	CreateDevice(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID)
 
-	// (GET /api/v1/resourcesyncs/{name})
-	GetResourceSync(w http.ResponseWriter, r *http.Request, name string)
+	// (DELETE /api/v1/organizations/{orgID}/devices/{name})
+	DeleteDevice(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
 
-	// (PATCH /api/v1/resourcesyncs/{name})
-	PatchResourceSync(w http.ResponseWriter, r *http.Request, name string)
+	// (GET /api/v1/organizations/{orgID}/devices/{name})
+	GetDevice(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
 
-	// (PUT /api/v1/resourcesyncs/{name})
-	ReplaceResourceSync(w http.ResponseWriter, r *http.Request, name string)
+	// (PATCH /api/v1/organizations/{orgID}/devices/{name})
+	PatchDevice(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PUT /api/v1/organizations/{orgID}/devices/{name})
+	ReplaceDevice(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PUT /api/v1/organizations/{orgID}/devices/{name}/decommission)
+	DecommissionDevice(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (GET /api/v1/organizations/{orgID}/devices/{name}/rendered)
+	GetRenderedDevice(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string, params GetRenderedDeviceParams)
+
+	// (GET /api/v1/organizations/{orgID}/devices/{name}/status)
+	GetDeviceStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PATCH /api/v1/organizations/{orgID}/devices/{name}/status)
+	PatchDeviceStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PUT /api/v1/organizations/{orgID}/devices/{name}/status)
+	ReplaceDeviceStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (GET /api/v1/organizations/{orgID}/enrollmentconfig)
+	GetEnrollmentConfig(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params GetEnrollmentConfigParams)
+
+	// (GET /api/v1/organizations/{orgID}/enrollmentrequests)
+	ListEnrollmentRequests(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListEnrollmentRequestsParams)
+
+	// (POST /api/v1/organizations/{orgID}/enrollmentrequests)
+	CreateEnrollmentRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID)
+
+	// (DELETE /api/v1/organizations/{orgID}/enrollmentrequests/{name})
+	DeleteEnrollmentRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (GET /api/v1/organizations/{orgID}/enrollmentrequests/{name})
+	GetEnrollmentRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PATCH /api/v1/organizations/{orgID}/enrollmentrequests/{name})
+	PatchEnrollmentRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PUT /api/v1/organizations/{orgID}/enrollmentrequests/{name})
+	ReplaceEnrollmentRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PUT /api/v1/organizations/{orgID}/enrollmentrequests/{name}/approval)
+	ApproveEnrollmentRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (GET /api/v1/organizations/{orgID}/enrollmentrequests/{name}/status)
+	GetEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PATCH /api/v1/organizations/{orgID}/enrollmentrequests/{name}/status)
+	PatchEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PUT /api/v1/organizations/{orgID}/enrollmentrequests/{name}/status)
+	ReplaceEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (GET /api/v1/organizations/{orgID}/events)
+	ListEvents(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListEventsParams)
+
+	// (GET /api/v1/organizations/{orgID}/fleets)
+	ListFleets(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListFleetsParams)
+
+	// (POST /api/v1/organizations/{orgID}/fleets)
+	CreateFleet(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID)
+
+	// (GET /api/v1/organizations/{orgID}/fleets/{fleet}/templateversions)
+	ListTemplateVersions(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, fleet string, params ListTemplateVersionsParams)
+
+	// (DELETE /api/v1/organizations/{orgID}/fleets/{fleet}/templateversions/{name})
+	DeleteTemplateVersion(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, fleet string, name string)
+
+	// (GET /api/v1/organizations/{orgID}/fleets/{fleet}/templateversions/{name})
+	GetTemplateVersion(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, fleet string, name string)
+
+	// (DELETE /api/v1/organizations/{orgID}/fleets/{name})
+	DeleteFleet(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (GET /api/v1/organizations/{orgID}/fleets/{name})
+	GetFleet(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string, params GetFleetParams)
+
+	// (PATCH /api/v1/organizations/{orgID}/fleets/{name})
+	PatchFleet(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PUT /api/v1/organizations/{orgID}/fleets/{name})
+	ReplaceFleet(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (GET /api/v1/organizations/{orgID}/fleets/{name}/status)
+	GetFleetStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PATCH /api/v1/organizations/{orgID}/fleets/{name}/status)
+	PatchFleetStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PUT /api/v1/organizations/{orgID}/fleets/{name}/status)
+	ReplaceFleetStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (GET /api/v1/organizations/{orgID}/labels)
+	ListLabels(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListLabelsParams)
+
+	// (GET /api/v1/organizations/{orgID}/repositories)
+	ListRepositories(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListRepositoriesParams)
+
+	// (POST /api/v1/organizations/{orgID}/repositories)
+	CreateRepository(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID)
+
+	// (DELETE /api/v1/organizations/{orgID}/repositories/{name})
+	DeleteRepository(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (GET /api/v1/organizations/{orgID}/repositories/{name})
+	GetRepository(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PATCH /api/v1/organizations/{orgID}/repositories/{name})
+	PatchRepository(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PUT /api/v1/organizations/{orgID}/repositories/{name})
+	ReplaceRepository(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (GET /api/v1/organizations/{orgID}/resourcesyncs)
+	ListResourceSyncs(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListResourceSyncsParams)
+
+	// (POST /api/v1/organizations/{orgID}/resourcesyncs)
+	CreateResourceSync(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID)
+
+	// (DELETE /api/v1/organizations/{orgID}/resourcesyncs/{name})
+	DeleteResourceSync(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (GET /api/v1/organizations/{orgID}/resourcesyncs/{name})
+	GetResourceSync(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PATCH /api/v1/organizations/{orgID}/resourcesyncs/{name})
+	PatchResourceSync(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
+
+	// (PUT /api/v1/organizations/{orgID}/resourcesyncs/{name})
+	ReplaceResourceSync(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string)
 	// List organizations
 	// (GET /api/v1/users/me/organizations)
 	ListUserOrganizations(w http.ResponseWriter, r *http.Request)
@@ -216,221 +217,6 @@ func (_ Unimplemented) AuthValidate(w http.ResponseWriter, r *http.Request, para
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// (GET /api/v1/certificatesigningrequests)
-func (_ Unimplemented) ListCertificateSigningRequests(w http.ResponseWriter, r *http.Request, params ListCertificateSigningRequestsParams) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (POST /api/v1/certificatesigningrequests)
-func (_ Unimplemented) CreateCertificateSigningRequest(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (DELETE /api/v1/certificatesigningrequests/{name})
-func (_ Unimplemented) DeleteCertificateSigningRequest(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/certificatesigningrequests/{name})
-func (_ Unimplemented) GetCertificateSigningRequest(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PATCH /api/v1/certificatesigningrequests/{name})
-func (_ Unimplemented) PatchCertificateSigningRequest(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PUT /api/v1/certificatesigningrequests/{name})
-func (_ Unimplemented) ReplaceCertificateSigningRequest(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PUT /api/v1/certificatesigningrequests/{name}/approval)
-func (_ Unimplemented) UpdateCertificateSigningRequestApproval(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/devices)
-func (_ Unimplemented) ListDevices(w http.ResponseWriter, r *http.Request, params ListDevicesParams) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (POST /api/v1/devices)
-func (_ Unimplemented) CreateDevice(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (DELETE /api/v1/devices/{name})
-func (_ Unimplemented) DeleteDevice(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/devices/{name})
-func (_ Unimplemented) GetDevice(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PATCH /api/v1/devices/{name})
-func (_ Unimplemented) PatchDevice(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PUT /api/v1/devices/{name})
-func (_ Unimplemented) ReplaceDevice(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PUT /api/v1/devices/{name}/decommission)
-func (_ Unimplemented) DecommissionDevice(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/devices/{name}/rendered)
-func (_ Unimplemented) GetRenderedDevice(w http.ResponseWriter, r *http.Request, name string, params GetRenderedDeviceParams) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/devices/{name}/status)
-func (_ Unimplemented) GetDeviceStatus(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PATCH /api/v1/devices/{name}/status)
-func (_ Unimplemented) PatchDeviceStatus(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PUT /api/v1/devices/{name}/status)
-func (_ Unimplemented) ReplaceDeviceStatus(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/enrollmentconfig)
-func (_ Unimplemented) GetEnrollmentConfig(w http.ResponseWriter, r *http.Request, params GetEnrollmentConfigParams) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/enrollmentrequests)
-func (_ Unimplemented) ListEnrollmentRequests(w http.ResponseWriter, r *http.Request, params ListEnrollmentRequestsParams) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (POST /api/v1/enrollmentrequests)
-func (_ Unimplemented) CreateEnrollmentRequest(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (DELETE /api/v1/enrollmentrequests/{name})
-func (_ Unimplemented) DeleteEnrollmentRequest(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/enrollmentrequests/{name})
-func (_ Unimplemented) GetEnrollmentRequest(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PATCH /api/v1/enrollmentrequests/{name})
-func (_ Unimplemented) PatchEnrollmentRequest(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PUT /api/v1/enrollmentrequests/{name})
-func (_ Unimplemented) ReplaceEnrollmentRequest(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PUT /api/v1/enrollmentrequests/{name}/approval)
-func (_ Unimplemented) ApproveEnrollmentRequest(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/enrollmentrequests/{name}/status)
-func (_ Unimplemented) GetEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PATCH /api/v1/enrollmentrequests/{name}/status)
-func (_ Unimplemented) PatchEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PUT /api/v1/enrollmentrequests/{name}/status)
-func (_ Unimplemented) ReplaceEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/events)
-func (_ Unimplemented) ListEvents(w http.ResponseWriter, r *http.Request, params ListEventsParams) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/fleets)
-func (_ Unimplemented) ListFleets(w http.ResponseWriter, r *http.Request, params ListFleetsParams) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (POST /api/v1/fleets)
-func (_ Unimplemented) CreateFleet(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/fleets/{fleet}/templateversions)
-func (_ Unimplemented) ListTemplateVersions(w http.ResponseWriter, r *http.Request, fleet string, params ListTemplateVersionsParams) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (DELETE /api/v1/fleets/{fleet}/templateversions/{name})
-func (_ Unimplemented) DeleteTemplateVersion(w http.ResponseWriter, r *http.Request, fleet string, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/fleets/{fleet}/templateversions/{name})
-func (_ Unimplemented) GetTemplateVersion(w http.ResponseWriter, r *http.Request, fleet string, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (DELETE /api/v1/fleets/{name})
-func (_ Unimplemented) DeleteFleet(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/fleets/{name})
-func (_ Unimplemented) GetFleet(w http.ResponseWriter, r *http.Request, name string, params GetFleetParams) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PATCH /api/v1/fleets/{name})
-func (_ Unimplemented) PatchFleet(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PUT /api/v1/fleets/{name})
-func (_ Unimplemented) ReplaceFleet(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/fleets/{name}/status)
-func (_ Unimplemented) GetFleetStatus(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PATCH /api/v1/fleets/{name}/status)
-func (_ Unimplemented) PatchFleetStatus(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (PUT /api/v1/fleets/{name}/status)
-func (_ Unimplemented) ReplaceFleetStatus(w http.ResponseWriter, r *http.Request, name string) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (GET /api/v1/labels)
-func (_ Unimplemented) ListLabels(w http.ResponseWriter, r *http.Request, params ListLabelsParams) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
 // List organizations
 // (GET /api/v1/organizations)
 func (_ Unimplemented) ListOrganizations(w http.ResponseWriter, r *http.Request) {
@@ -449,63 +235,278 @@ func (_ Unimplemented) ReplaceOrganization(w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// (GET /api/v1/repositories)
-func (_ Unimplemented) ListRepositories(w http.ResponseWriter, r *http.Request, params ListRepositoriesParams) {
+// (GET /api/v1/organizations/{orgID}/certificatesigningrequests)
+func (_ Unimplemented) ListCertificateSigningRequests(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListCertificateSigningRequestsParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// (POST /api/v1/repositories)
-func (_ Unimplemented) CreateRepository(w http.ResponseWriter, r *http.Request) {
+// (POST /api/v1/organizations/{orgID}/certificatesigningrequests)
+func (_ Unimplemented) CreateCertificateSigningRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// (DELETE /api/v1/repositories/{name})
-func (_ Unimplemented) DeleteRepository(w http.ResponseWriter, r *http.Request, name string) {
+// (DELETE /api/v1/organizations/{orgID}/certificatesigningrequests/{name})
+func (_ Unimplemented) DeleteCertificateSigningRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// (GET /api/v1/repositories/{name})
-func (_ Unimplemented) GetRepository(w http.ResponseWriter, r *http.Request, name string) {
+// (GET /api/v1/organizations/{orgID}/certificatesigningrequests/{name})
+func (_ Unimplemented) GetCertificateSigningRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// (PATCH /api/v1/repositories/{name})
-func (_ Unimplemented) PatchRepository(w http.ResponseWriter, r *http.Request, name string) {
+// (PATCH /api/v1/organizations/{orgID}/certificatesigningrequests/{name})
+func (_ Unimplemented) PatchCertificateSigningRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// (PUT /api/v1/repositories/{name})
-func (_ Unimplemented) ReplaceRepository(w http.ResponseWriter, r *http.Request, name string) {
+// (PUT /api/v1/organizations/{orgID}/certificatesigningrequests/{name})
+func (_ Unimplemented) ReplaceCertificateSigningRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// (GET /api/v1/resourcesyncs)
-func (_ Unimplemented) ListResourceSyncs(w http.ResponseWriter, r *http.Request, params ListResourceSyncsParams) {
+// (PUT /api/v1/organizations/{orgID}/certificatesigningrequests/{name}/approval)
+func (_ Unimplemented) UpdateCertificateSigningRequestApproval(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// (POST /api/v1/resourcesyncs)
-func (_ Unimplemented) CreateResourceSync(w http.ResponseWriter, r *http.Request) {
+// (GET /api/v1/organizations/{orgID}/devices)
+func (_ Unimplemented) ListDevices(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListDevicesParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// (DELETE /api/v1/resourcesyncs/{name})
-func (_ Unimplemented) DeleteResourceSync(w http.ResponseWriter, r *http.Request, name string) {
+// (POST /api/v1/organizations/{orgID}/devices)
+func (_ Unimplemented) CreateDevice(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// (GET /api/v1/resourcesyncs/{name})
-func (_ Unimplemented) GetResourceSync(w http.ResponseWriter, r *http.Request, name string) {
+// (DELETE /api/v1/organizations/{orgID}/devices/{name})
+func (_ Unimplemented) DeleteDevice(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// (PATCH /api/v1/resourcesyncs/{name})
-func (_ Unimplemented) PatchResourceSync(w http.ResponseWriter, r *http.Request, name string) {
+// (GET /api/v1/organizations/{orgID}/devices/{name})
+func (_ Unimplemented) GetDevice(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// (PUT /api/v1/resourcesyncs/{name})
-func (_ Unimplemented) ReplaceResourceSync(w http.ResponseWriter, r *http.Request, name string) {
+// (PATCH /api/v1/organizations/{orgID}/devices/{name})
+func (_ Unimplemented) PatchDevice(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PUT /api/v1/organizations/{orgID}/devices/{name})
+func (_ Unimplemented) ReplaceDevice(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PUT /api/v1/organizations/{orgID}/devices/{name}/decommission)
+func (_ Unimplemented) DecommissionDevice(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/devices/{name}/rendered)
+func (_ Unimplemented) GetRenderedDevice(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string, params GetRenderedDeviceParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/devices/{name}/status)
+func (_ Unimplemented) GetDeviceStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PATCH /api/v1/organizations/{orgID}/devices/{name}/status)
+func (_ Unimplemented) PatchDeviceStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PUT /api/v1/organizations/{orgID}/devices/{name}/status)
+func (_ Unimplemented) ReplaceDeviceStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/enrollmentconfig)
+func (_ Unimplemented) GetEnrollmentConfig(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params GetEnrollmentConfigParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/enrollmentrequests)
+func (_ Unimplemented) ListEnrollmentRequests(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListEnrollmentRequestsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (POST /api/v1/organizations/{orgID}/enrollmentrequests)
+func (_ Unimplemented) CreateEnrollmentRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (DELETE /api/v1/organizations/{orgID}/enrollmentrequests/{name})
+func (_ Unimplemented) DeleteEnrollmentRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/enrollmentrequests/{name})
+func (_ Unimplemented) GetEnrollmentRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PATCH /api/v1/organizations/{orgID}/enrollmentrequests/{name})
+func (_ Unimplemented) PatchEnrollmentRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PUT /api/v1/organizations/{orgID}/enrollmentrequests/{name})
+func (_ Unimplemented) ReplaceEnrollmentRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PUT /api/v1/organizations/{orgID}/enrollmentrequests/{name}/approval)
+func (_ Unimplemented) ApproveEnrollmentRequest(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/enrollmentrequests/{name}/status)
+func (_ Unimplemented) GetEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PATCH /api/v1/organizations/{orgID}/enrollmentrequests/{name}/status)
+func (_ Unimplemented) PatchEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PUT /api/v1/organizations/{orgID}/enrollmentrequests/{name}/status)
+func (_ Unimplemented) ReplaceEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/events)
+func (_ Unimplemented) ListEvents(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListEventsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/fleets)
+func (_ Unimplemented) ListFleets(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListFleetsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (POST /api/v1/organizations/{orgID}/fleets)
+func (_ Unimplemented) CreateFleet(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/fleets/{fleet}/templateversions)
+func (_ Unimplemented) ListTemplateVersions(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, fleet string, params ListTemplateVersionsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (DELETE /api/v1/organizations/{orgID}/fleets/{fleet}/templateversions/{name})
+func (_ Unimplemented) DeleteTemplateVersion(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, fleet string, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/fleets/{fleet}/templateversions/{name})
+func (_ Unimplemented) GetTemplateVersion(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, fleet string, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (DELETE /api/v1/organizations/{orgID}/fleets/{name})
+func (_ Unimplemented) DeleteFleet(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/fleets/{name})
+func (_ Unimplemented) GetFleet(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string, params GetFleetParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PATCH /api/v1/organizations/{orgID}/fleets/{name})
+func (_ Unimplemented) PatchFleet(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PUT /api/v1/organizations/{orgID}/fleets/{name})
+func (_ Unimplemented) ReplaceFleet(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/fleets/{name}/status)
+func (_ Unimplemented) GetFleetStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PATCH /api/v1/organizations/{orgID}/fleets/{name}/status)
+func (_ Unimplemented) PatchFleetStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PUT /api/v1/organizations/{orgID}/fleets/{name}/status)
+func (_ Unimplemented) ReplaceFleetStatus(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/labels)
+func (_ Unimplemented) ListLabels(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListLabelsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/repositories)
+func (_ Unimplemented) ListRepositories(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListRepositoriesParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (POST /api/v1/organizations/{orgID}/repositories)
+func (_ Unimplemented) CreateRepository(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (DELETE /api/v1/organizations/{orgID}/repositories/{name})
+func (_ Unimplemented) DeleteRepository(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/repositories/{name})
+func (_ Unimplemented) GetRepository(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PATCH /api/v1/organizations/{orgID}/repositories/{name})
+func (_ Unimplemented) PatchRepository(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PUT /api/v1/organizations/{orgID}/repositories/{name})
+func (_ Unimplemented) ReplaceRepository(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/resourcesyncs)
+func (_ Unimplemented) ListResourceSyncs(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, params ListResourceSyncsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (POST /api/v1/organizations/{orgID}/resourcesyncs)
+func (_ Unimplemented) CreateResourceSync(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (DELETE /api/v1/organizations/{orgID}/resourcesyncs/{name})
+func (_ Unimplemented) DeleteResourceSync(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/v1/organizations/{orgID}/resourcesyncs/{name})
+func (_ Unimplemented) GetResourceSync(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PATCH /api/v1/organizations/{orgID}/resourcesyncs/{name})
+func (_ Unimplemented) PatchResourceSync(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PUT /api/v1/organizations/{orgID}/resourcesyncs/{name})
+func (_ Unimplemented) ReplaceResourceSync(w http.ResponseWriter, r *http.Request, orgID openapi_types.UUID, name string) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -585,1336 +586,6 @@ func (siw *ServerInterfaceWrapper) AuthValidate(w http.ResponseWriter, r *http.R
 	handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
-// ListCertificateSigningRequests operation middleware
-func (siw *ServerInterfaceWrapper) ListCertificateSigningRequests(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params ListCertificateSigningRequestsParams
-
-	// ------------- Optional query parameter "continue" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "continue", r.URL.Query(), &params.Continue)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "continue", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "labelSelector" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "labelSelector", r.URL.Query(), &params.LabelSelector)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "labelSelector", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "fieldSelector" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "fieldSelector", r.URL.Query(), &params.FieldSelector)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fieldSelector", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "limit" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ListCertificateSigningRequests(w, r, params)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// CreateCertificateSigningRequest operation middleware
-func (siw *ServerInterfaceWrapper) CreateCertificateSigningRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.CreateCertificateSigningRequest(w, r)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// DeleteCertificateSigningRequest operation middleware
-func (siw *ServerInterfaceWrapper) DeleteCertificateSigningRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DeleteCertificateSigningRequest(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// GetCertificateSigningRequest operation middleware
-func (siw *ServerInterfaceWrapper) GetCertificateSigningRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetCertificateSigningRequest(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// PatchCertificateSigningRequest operation middleware
-func (siw *ServerInterfaceWrapper) PatchCertificateSigningRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PatchCertificateSigningRequest(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// ReplaceCertificateSigningRequest operation middleware
-func (siw *ServerInterfaceWrapper) ReplaceCertificateSigningRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ReplaceCertificateSigningRequest(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// UpdateCertificateSigningRequestApproval operation middleware
-func (siw *ServerInterfaceWrapper) UpdateCertificateSigningRequestApproval(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.UpdateCertificateSigningRequestApproval(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// ListDevices operation middleware
-func (siw *ServerInterfaceWrapper) ListDevices(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params ListDevicesParams
-
-	// ------------- Optional query parameter "continue" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "continue", r.URL.Query(), &params.Continue)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "continue", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "labelSelector" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "labelSelector", r.URL.Query(), &params.LabelSelector)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "labelSelector", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "fieldSelector" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "fieldSelector", r.URL.Query(), &params.FieldSelector)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fieldSelector", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "limit" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "summaryOnly" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "summaryOnly", r.URL.Query(), &params.SummaryOnly)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "summaryOnly", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ListDevices(w, r, params)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// CreateDevice operation middleware
-func (siw *ServerInterfaceWrapper) CreateDevice(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.CreateDevice(w, r)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// DeleteDevice operation middleware
-func (siw *ServerInterfaceWrapper) DeleteDevice(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DeleteDevice(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// GetDevice operation middleware
-func (siw *ServerInterfaceWrapper) GetDevice(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetDevice(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// PatchDevice operation middleware
-func (siw *ServerInterfaceWrapper) PatchDevice(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PatchDevice(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// ReplaceDevice operation middleware
-func (siw *ServerInterfaceWrapper) ReplaceDevice(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ReplaceDevice(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// DecommissionDevice operation middleware
-func (siw *ServerInterfaceWrapper) DecommissionDevice(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DecommissionDevice(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// GetRenderedDevice operation middleware
-func (siw *ServerInterfaceWrapper) GetRenderedDevice(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params GetRenderedDeviceParams
-
-	// ------------- Optional query parameter "knownRenderedVersion" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "knownRenderedVersion", r.URL.Query(), &params.KnownRenderedVersion)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "knownRenderedVersion", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetRenderedDevice(w, r, name, params)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// GetDeviceStatus operation middleware
-func (siw *ServerInterfaceWrapper) GetDeviceStatus(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetDeviceStatus(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// PatchDeviceStatus operation middleware
-func (siw *ServerInterfaceWrapper) PatchDeviceStatus(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PatchDeviceStatus(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// ReplaceDeviceStatus operation middleware
-func (siw *ServerInterfaceWrapper) ReplaceDeviceStatus(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ReplaceDeviceStatus(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// GetEnrollmentConfig operation middleware
-func (siw *ServerInterfaceWrapper) GetEnrollmentConfig(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params GetEnrollmentConfigParams
-
-	// ------------- Optional query parameter "csr" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "csr", r.URL.Query(), &params.Csr)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "csr", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetEnrollmentConfig(w, r, params)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// ListEnrollmentRequests operation middleware
-func (siw *ServerInterfaceWrapper) ListEnrollmentRequests(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params ListEnrollmentRequestsParams
-
-	// ------------- Optional query parameter "continue" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "continue", r.URL.Query(), &params.Continue)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "continue", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "labelSelector" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "labelSelector", r.URL.Query(), &params.LabelSelector)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "labelSelector", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "fieldSelector" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "fieldSelector", r.URL.Query(), &params.FieldSelector)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fieldSelector", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "limit" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ListEnrollmentRequests(w, r, params)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// CreateEnrollmentRequest operation middleware
-func (siw *ServerInterfaceWrapper) CreateEnrollmentRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.CreateEnrollmentRequest(w, r)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// DeleteEnrollmentRequest operation middleware
-func (siw *ServerInterfaceWrapper) DeleteEnrollmentRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DeleteEnrollmentRequest(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// GetEnrollmentRequest operation middleware
-func (siw *ServerInterfaceWrapper) GetEnrollmentRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetEnrollmentRequest(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// PatchEnrollmentRequest operation middleware
-func (siw *ServerInterfaceWrapper) PatchEnrollmentRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PatchEnrollmentRequest(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// ReplaceEnrollmentRequest operation middleware
-func (siw *ServerInterfaceWrapper) ReplaceEnrollmentRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ReplaceEnrollmentRequest(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// ApproveEnrollmentRequest operation middleware
-func (siw *ServerInterfaceWrapper) ApproveEnrollmentRequest(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ApproveEnrollmentRequest(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// GetEnrollmentRequestStatus operation middleware
-func (siw *ServerInterfaceWrapper) GetEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetEnrollmentRequestStatus(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// PatchEnrollmentRequestStatus operation middleware
-func (siw *ServerInterfaceWrapper) PatchEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PatchEnrollmentRequestStatus(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// ReplaceEnrollmentRequestStatus operation middleware
-func (siw *ServerInterfaceWrapper) ReplaceEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ReplaceEnrollmentRequestStatus(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// ListEvents operation middleware
-func (siw *ServerInterfaceWrapper) ListEvents(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params ListEventsParams
-
-	// ------------- Optional query parameter "fieldSelector" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "fieldSelector", r.URL.Query(), &params.FieldSelector)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fieldSelector", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "order" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "order", r.URL.Query(), &params.Order)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "order", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "limit" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "continue" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "continue", r.URL.Query(), &params.Continue)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "continue", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ListEvents(w, r, params)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// ListFleets operation middleware
-func (siw *ServerInterfaceWrapper) ListFleets(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params ListFleetsParams
-
-	// ------------- Optional query parameter "continue" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "continue", r.URL.Query(), &params.Continue)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "continue", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "labelSelector" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "labelSelector", r.URL.Query(), &params.LabelSelector)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "labelSelector", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "fieldSelector" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "fieldSelector", r.URL.Query(), &params.FieldSelector)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fieldSelector", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "limit" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "addDevicesSummary" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "addDevicesSummary", r.URL.Query(), &params.AddDevicesSummary)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "addDevicesSummary", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ListFleets(w, r, params)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// CreateFleet operation middleware
-func (siw *ServerInterfaceWrapper) CreateFleet(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.CreateFleet(w, r)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// ListTemplateVersions operation middleware
-func (siw *ServerInterfaceWrapper) ListTemplateVersions(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "fleet" -------------
-	var fleet string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "fleet", chi.URLParam(r, "fleet"), &fleet, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fleet", Err: err})
-		return
-	}
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params ListTemplateVersionsParams
-
-	// ------------- Optional query parameter "continue" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "continue", r.URL.Query(), &params.Continue)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "continue", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "labelSelector" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "labelSelector", r.URL.Query(), &params.LabelSelector)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "labelSelector", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "fieldSelector" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "fieldSelector", r.URL.Query(), &params.FieldSelector)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fieldSelector", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "limit" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ListTemplateVersions(w, r, fleet, params)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// DeleteTemplateVersion operation middleware
-func (siw *ServerInterfaceWrapper) DeleteTemplateVersion(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "fleet" -------------
-	var fleet string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "fleet", chi.URLParam(r, "fleet"), &fleet, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fleet", Err: err})
-		return
-	}
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DeleteTemplateVersion(w, r, fleet, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// GetTemplateVersion operation middleware
-func (siw *ServerInterfaceWrapper) GetTemplateVersion(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "fleet" -------------
-	var fleet string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "fleet", chi.URLParam(r, "fleet"), &fleet, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fleet", Err: err})
-		return
-	}
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetTemplateVersion(w, r, fleet, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// DeleteFleet operation middleware
-func (siw *ServerInterfaceWrapper) DeleteFleet(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DeleteFleet(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// GetFleet operation middleware
-func (siw *ServerInterfaceWrapper) GetFleet(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params GetFleetParams
-
-	// ------------- Optional query parameter "addDevicesSummary" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "addDevicesSummary", r.URL.Query(), &params.AddDevicesSummary)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "addDevicesSummary", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetFleet(w, r, name, params)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// PatchFleet operation middleware
-func (siw *ServerInterfaceWrapper) PatchFleet(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PatchFleet(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// ReplaceFleet operation middleware
-func (siw *ServerInterfaceWrapper) ReplaceFleet(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ReplaceFleet(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// GetFleetStatus operation middleware
-func (siw *ServerInterfaceWrapper) GetFleetStatus(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetFleetStatus(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// PatchFleetStatus operation middleware
-func (siw *ServerInterfaceWrapper) PatchFleetStatus(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PatchFleetStatus(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// ReplaceFleetStatus operation middleware
-func (siw *ServerInterfaceWrapper) ReplaceFleetStatus(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// ------------- Path parameter "name" -------------
-	var name string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ReplaceFleetStatus(w, r, name)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
-// ListLabels operation middleware
-func (siw *ServerInterfaceWrapper) ListLabels(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var err error
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params ListLabelsParams
-
-	// ------------- Required query parameter "kind" -------------
-
-	if paramValue := r.URL.Query().Get("kind"); paramValue != "" {
-
-	} else {
-		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "kind"})
-		return
-	}
-
-	err = runtime.BindQueryParameter("form", true, true, "kind", r.URL.Query(), &params.Kind)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "kind", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "labelSelector" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "labelSelector", r.URL.Query(), &params.LabelSelector)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "labelSelector", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "fieldSelector" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "fieldSelector", r.URL.Query(), &params.FieldSelector)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fieldSelector", Err: err})
-		return
-	}
-
-	// ------------- Optional query parameter "limit" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
-	if err != nil {
-		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
-		return
-	}
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ListLabels(w, r, params)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r.WithContext(ctx))
-}
-
 // ListOrganizations operation middleware
 func (siw *ServerInterfaceWrapper) ListOrganizations(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -1971,11 +642,1745 @@ func (siw *ServerInterfaceWrapper) ReplaceOrganization(w http.ResponseWriter, r 
 	handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
+// ListCertificateSigningRequests operation middleware
+func (siw *ServerInterfaceWrapper) ListCertificateSigningRequests(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListCertificateSigningRequestsParams
+
+	// ------------- Optional query parameter "continue" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "continue", r.URL.Query(), &params.Continue)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "continue", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "labelSelector" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "labelSelector", r.URL.Query(), &params.LabelSelector)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "labelSelector", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "fieldSelector" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "fieldSelector", r.URL.Query(), &params.FieldSelector)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fieldSelector", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListCertificateSigningRequests(w, r, orgID, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// CreateCertificateSigningRequest operation middleware
+func (siw *ServerInterfaceWrapper) CreateCertificateSigningRequest(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateCertificateSigningRequest(w, r, orgID)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// DeleteCertificateSigningRequest operation middleware
+func (siw *ServerInterfaceWrapper) DeleteCertificateSigningRequest(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteCertificateSigningRequest(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetCertificateSigningRequest operation middleware
+func (siw *ServerInterfaceWrapper) GetCertificateSigningRequest(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCertificateSigningRequest(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PatchCertificateSigningRequest operation middleware
+func (siw *ServerInterfaceWrapper) PatchCertificateSigningRequest(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PatchCertificateSigningRequest(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ReplaceCertificateSigningRequest operation middleware
+func (siw *ServerInterfaceWrapper) ReplaceCertificateSigningRequest(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ReplaceCertificateSigningRequest(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// UpdateCertificateSigningRequestApproval operation middleware
+func (siw *ServerInterfaceWrapper) UpdateCertificateSigningRequestApproval(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateCertificateSigningRequestApproval(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ListDevices operation middleware
+func (siw *ServerInterfaceWrapper) ListDevices(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListDevicesParams
+
+	// ------------- Optional query parameter "continue" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "continue", r.URL.Query(), &params.Continue)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "continue", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "labelSelector" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "labelSelector", r.URL.Query(), &params.LabelSelector)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "labelSelector", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "fieldSelector" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "fieldSelector", r.URL.Query(), &params.FieldSelector)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fieldSelector", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "summaryOnly" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "summaryOnly", r.URL.Query(), &params.SummaryOnly)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "summaryOnly", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListDevices(w, r, orgID, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// CreateDevice operation middleware
+func (siw *ServerInterfaceWrapper) CreateDevice(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateDevice(w, r, orgID)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// DeleteDevice operation middleware
+func (siw *ServerInterfaceWrapper) DeleteDevice(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteDevice(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetDevice operation middleware
+func (siw *ServerInterfaceWrapper) GetDevice(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetDevice(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PatchDevice operation middleware
+func (siw *ServerInterfaceWrapper) PatchDevice(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PatchDevice(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ReplaceDevice operation middleware
+func (siw *ServerInterfaceWrapper) ReplaceDevice(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ReplaceDevice(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// DecommissionDevice operation middleware
+func (siw *ServerInterfaceWrapper) DecommissionDevice(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DecommissionDevice(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetRenderedDevice operation middleware
+func (siw *ServerInterfaceWrapper) GetRenderedDevice(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetRenderedDeviceParams
+
+	// ------------- Optional query parameter "knownRenderedVersion" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "knownRenderedVersion", r.URL.Query(), &params.KnownRenderedVersion)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "knownRenderedVersion", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetRenderedDevice(w, r, orgID, name, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetDeviceStatus operation middleware
+func (siw *ServerInterfaceWrapper) GetDeviceStatus(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetDeviceStatus(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PatchDeviceStatus operation middleware
+func (siw *ServerInterfaceWrapper) PatchDeviceStatus(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PatchDeviceStatus(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ReplaceDeviceStatus operation middleware
+func (siw *ServerInterfaceWrapper) ReplaceDeviceStatus(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ReplaceDeviceStatus(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetEnrollmentConfig operation middleware
+func (siw *ServerInterfaceWrapper) GetEnrollmentConfig(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetEnrollmentConfigParams
+
+	// ------------- Optional query parameter "csr" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "csr", r.URL.Query(), &params.Csr)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "csr", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetEnrollmentConfig(w, r, orgID, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ListEnrollmentRequests operation middleware
+func (siw *ServerInterfaceWrapper) ListEnrollmentRequests(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListEnrollmentRequestsParams
+
+	// ------------- Optional query parameter "continue" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "continue", r.URL.Query(), &params.Continue)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "continue", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "labelSelector" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "labelSelector", r.URL.Query(), &params.LabelSelector)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "labelSelector", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "fieldSelector" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "fieldSelector", r.URL.Query(), &params.FieldSelector)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fieldSelector", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListEnrollmentRequests(w, r, orgID, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// CreateEnrollmentRequest operation middleware
+func (siw *ServerInterfaceWrapper) CreateEnrollmentRequest(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateEnrollmentRequest(w, r, orgID)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// DeleteEnrollmentRequest operation middleware
+func (siw *ServerInterfaceWrapper) DeleteEnrollmentRequest(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteEnrollmentRequest(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetEnrollmentRequest operation middleware
+func (siw *ServerInterfaceWrapper) GetEnrollmentRequest(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetEnrollmentRequest(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PatchEnrollmentRequest operation middleware
+func (siw *ServerInterfaceWrapper) PatchEnrollmentRequest(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PatchEnrollmentRequest(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ReplaceEnrollmentRequest operation middleware
+func (siw *ServerInterfaceWrapper) ReplaceEnrollmentRequest(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ReplaceEnrollmentRequest(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ApproveEnrollmentRequest operation middleware
+func (siw *ServerInterfaceWrapper) ApproveEnrollmentRequest(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ApproveEnrollmentRequest(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetEnrollmentRequestStatus operation middleware
+func (siw *ServerInterfaceWrapper) GetEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetEnrollmentRequestStatus(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PatchEnrollmentRequestStatus operation middleware
+func (siw *ServerInterfaceWrapper) PatchEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PatchEnrollmentRequestStatus(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ReplaceEnrollmentRequestStatus operation middleware
+func (siw *ServerInterfaceWrapper) ReplaceEnrollmentRequestStatus(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ReplaceEnrollmentRequestStatus(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ListEvents operation middleware
+func (siw *ServerInterfaceWrapper) ListEvents(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListEventsParams
+
+	// ------------- Optional query parameter "fieldSelector" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "fieldSelector", r.URL.Query(), &params.FieldSelector)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fieldSelector", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "order" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "order", r.URL.Query(), &params.Order)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "order", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "continue" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "continue", r.URL.Query(), &params.Continue)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "continue", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListEvents(w, r, orgID, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ListFleets operation middleware
+func (siw *ServerInterfaceWrapper) ListFleets(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListFleetsParams
+
+	// ------------- Optional query parameter "continue" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "continue", r.URL.Query(), &params.Continue)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "continue", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "labelSelector" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "labelSelector", r.URL.Query(), &params.LabelSelector)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "labelSelector", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "fieldSelector" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "fieldSelector", r.URL.Query(), &params.FieldSelector)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fieldSelector", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "addDevicesSummary" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "addDevicesSummary", r.URL.Query(), &params.AddDevicesSummary)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "addDevicesSummary", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListFleets(w, r, orgID, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// CreateFleet operation middleware
+func (siw *ServerInterfaceWrapper) CreateFleet(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateFleet(w, r, orgID)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ListTemplateVersions operation middleware
+func (siw *ServerInterfaceWrapper) ListTemplateVersions(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "fleet" -------------
+	var fleet string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "fleet", chi.URLParam(r, "fleet"), &fleet, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fleet", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListTemplateVersionsParams
+
+	// ------------- Optional query parameter "continue" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "continue", r.URL.Query(), &params.Continue)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "continue", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "labelSelector" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "labelSelector", r.URL.Query(), &params.LabelSelector)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "labelSelector", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "fieldSelector" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "fieldSelector", r.URL.Query(), &params.FieldSelector)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fieldSelector", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListTemplateVersions(w, r, orgID, fleet, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// DeleteTemplateVersion operation middleware
+func (siw *ServerInterfaceWrapper) DeleteTemplateVersion(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "fleet" -------------
+	var fleet string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "fleet", chi.URLParam(r, "fleet"), &fleet, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fleet", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteTemplateVersion(w, r, orgID, fleet, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetTemplateVersion operation middleware
+func (siw *ServerInterfaceWrapper) GetTemplateVersion(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "fleet" -------------
+	var fleet string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "fleet", chi.URLParam(r, "fleet"), &fleet, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fleet", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetTemplateVersion(w, r, orgID, fleet, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// DeleteFleet operation middleware
+func (siw *ServerInterfaceWrapper) DeleteFleet(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteFleet(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetFleet operation middleware
+func (siw *ServerInterfaceWrapper) GetFleet(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetFleetParams
+
+	// ------------- Optional query parameter "addDevicesSummary" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "addDevicesSummary", r.URL.Query(), &params.AddDevicesSummary)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "addDevicesSummary", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetFleet(w, r, orgID, name, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PatchFleet operation middleware
+func (siw *ServerInterfaceWrapper) PatchFleet(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PatchFleet(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ReplaceFleet operation middleware
+func (siw *ServerInterfaceWrapper) ReplaceFleet(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ReplaceFleet(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetFleetStatus operation middleware
+func (siw *ServerInterfaceWrapper) GetFleetStatus(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetFleetStatus(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// PatchFleetStatus operation middleware
+func (siw *ServerInterfaceWrapper) PatchFleetStatus(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PatchFleetStatus(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ReplaceFleetStatus operation middleware
+func (siw *ServerInterfaceWrapper) ReplaceFleetStatus(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", chi.URLParam(r, "name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ReplaceFleetStatus(w, r, orgID, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ListLabels operation middleware
+func (siw *ServerInterfaceWrapper) ListLabels(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListLabelsParams
+
+	// ------------- Required query parameter "kind" -------------
+
+	if paramValue := r.URL.Query().Get("kind"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "kind"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "kind", r.URL.Query(), &params.Kind)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "kind", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "labelSelector" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "labelSelector", r.URL.Query(), &params.LabelSelector)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "labelSelector", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "fieldSelector" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "fieldSelector", r.URL.Query(), &params.FieldSelector)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "fieldSelector", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "limit", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListLabels(w, r, orgID, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
 // ListRepositories operation middleware
 func (siw *ServerInterfaceWrapper) ListRepositories(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListRepositoriesParams
@@ -2013,7 +2418,7 @@ func (siw *ServerInterfaceWrapper) ListRepositories(w http.ResponseWriter, r *ht
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ListRepositories(w, r, params)
+		siw.Handler.ListRepositories(w, r, orgID, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2027,8 +2432,19 @@ func (siw *ServerInterfaceWrapper) ListRepositories(w http.ResponseWriter, r *ht
 func (siw *ServerInterfaceWrapper) CreateRepository(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.CreateRepository(w, r)
+		siw.Handler.CreateRepository(w, r, orgID)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2044,6 +2460,15 @@ func (siw *ServerInterfaceWrapper) DeleteRepository(w http.ResponseWriter, r *ht
 
 	var err error
 
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
 	// ------------- Path parameter "name" -------------
 	var name string
 
@@ -2054,7 +2479,7 @@ func (siw *ServerInterfaceWrapper) DeleteRepository(w http.ResponseWriter, r *ht
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DeleteRepository(w, r, name)
+		siw.Handler.DeleteRepository(w, r, orgID, name)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2070,6 +2495,15 @@ func (siw *ServerInterfaceWrapper) GetRepository(w http.ResponseWriter, r *http.
 
 	var err error
 
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
 	// ------------- Path parameter "name" -------------
 	var name string
 
@@ -2080,7 +2514,7 @@ func (siw *ServerInterfaceWrapper) GetRepository(w http.ResponseWriter, r *http.
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetRepository(w, r, name)
+		siw.Handler.GetRepository(w, r, orgID, name)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2096,6 +2530,15 @@ func (siw *ServerInterfaceWrapper) PatchRepository(w http.ResponseWriter, r *htt
 
 	var err error
 
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
 	// ------------- Path parameter "name" -------------
 	var name string
 
@@ -2106,7 +2549,7 @@ func (siw *ServerInterfaceWrapper) PatchRepository(w http.ResponseWriter, r *htt
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PatchRepository(w, r, name)
+		siw.Handler.PatchRepository(w, r, orgID, name)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2122,6 +2565,15 @@ func (siw *ServerInterfaceWrapper) ReplaceRepository(w http.ResponseWriter, r *h
 
 	var err error
 
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
 	// ------------- Path parameter "name" -------------
 	var name string
 
@@ -2132,7 +2584,7 @@ func (siw *ServerInterfaceWrapper) ReplaceRepository(w http.ResponseWriter, r *h
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ReplaceRepository(w, r, name)
+		siw.Handler.ReplaceRepository(w, r, orgID, name)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2147,6 +2599,15 @@ func (siw *ServerInterfaceWrapper) ListResourceSyncs(w http.ResponseWriter, r *h
 	ctx := r.Context()
 
 	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListResourceSyncsParams
@@ -2184,7 +2645,7 @@ func (siw *ServerInterfaceWrapper) ListResourceSyncs(w http.ResponseWriter, r *h
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ListResourceSyncs(w, r, params)
+		siw.Handler.ListResourceSyncs(w, r, orgID, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2198,8 +2659,19 @@ func (siw *ServerInterfaceWrapper) ListResourceSyncs(w http.ResponseWriter, r *h
 func (siw *ServerInterfaceWrapper) CreateResourceSync(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	var err error
+
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.CreateResourceSync(w, r)
+		siw.Handler.CreateResourceSync(w, r, orgID)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2215,6 +2687,15 @@ func (siw *ServerInterfaceWrapper) DeleteResourceSync(w http.ResponseWriter, r *
 
 	var err error
 
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
 	// ------------- Path parameter "name" -------------
 	var name string
 
@@ -2225,7 +2706,7 @@ func (siw *ServerInterfaceWrapper) DeleteResourceSync(w http.ResponseWriter, r *
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DeleteResourceSync(w, r, name)
+		siw.Handler.DeleteResourceSync(w, r, orgID, name)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2241,6 +2722,15 @@ func (siw *ServerInterfaceWrapper) GetResourceSync(w http.ResponseWriter, r *htt
 
 	var err error
 
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
 	// ------------- Path parameter "name" -------------
 	var name string
 
@@ -2251,7 +2741,7 @@ func (siw *ServerInterfaceWrapper) GetResourceSync(w http.ResponseWriter, r *htt
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetResourceSync(w, r, name)
+		siw.Handler.GetResourceSync(w, r, orgID, name)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2267,6 +2757,15 @@ func (siw *ServerInterfaceWrapper) PatchResourceSync(w http.ResponseWriter, r *h
 
 	var err error
 
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
 	// ------------- Path parameter "name" -------------
 	var name string
 
@@ -2277,7 +2776,7 @@ func (siw *ServerInterfaceWrapper) PatchResourceSync(w http.ResponseWriter, r *h
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.PatchResourceSync(w, r, name)
+		siw.Handler.PatchResourceSync(w, r, orgID, name)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2293,6 +2792,15 @@ func (siw *ServerInterfaceWrapper) ReplaceResourceSync(w http.ResponseWriter, r 
 
 	var err error
 
+	// ------------- Path parameter "orgID" -------------
+	var orgID openapi_types.UUID
+
+	err = runtime.BindStyledParameterWithOptions("simple", "orgID", chi.URLParam(r, "orgID"), &orgID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "orgID", Err: err})
+		return
+	}
+
 	// ------------- Path parameter "name" -------------
 	var name string
 
@@ -2303,7 +2811,7 @@ func (siw *ServerInterfaceWrapper) ReplaceResourceSync(w http.ResponseWriter, r 
 	}
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ReplaceResourceSync(w, r, name)
+		siw.Handler.ReplaceResourceSync(w, r, orgID, name)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2463,135 +2971,6 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Get(options.BaseURL+"/api/v1/auth/validate", wrapper.AuthValidate)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/certificatesigningrequests", wrapper.ListCertificateSigningRequests)
-	})
-	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/api/v1/certificatesigningrequests", wrapper.CreateCertificateSigningRequest)
-	})
-	r.Group(func(r chi.Router) {
-		r.Delete(options.BaseURL+"/api/v1/certificatesigningrequests/{name}", wrapper.DeleteCertificateSigningRequest)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/certificatesigningrequests/{name}", wrapper.GetCertificateSigningRequest)
-	})
-	r.Group(func(r chi.Router) {
-		r.Patch(options.BaseURL+"/api/v1/certificatesigningrequests/{name}", wrapper.PatchCertificateSigningRequest)
-	})
-	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/api/v1/certificatesigningrequests/{name}", wrapper.ReplaceCertificateSigningRequest)
-	})
-	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/api/v1/certificatesigningrequests/{name}/approval", wrapper.UpdateCertificateSigningRequestApproval)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/devices", wrapper.ListDevices)
-	})
-	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/api/v1/devices", wrapper.CreateDevice)
-	})
-	r.Group(func(r chi.Router) {
-		r.Delete(options.BaseURL+"/api/v1/devices/{name}", wrapper.DeleteDevice)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/devices/{name}", wrapper.GetDevice)
-	})
-	r.Group(func(r chi.Router) {
-		r.Patch(options.BaseURL+"/api/v1/devices/{name}", wrapper.PatchDevice)
-	})
-	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/api/v1/devices/{name}", wrapper.ReplaceDevice)
-	})
-	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/api/v1/devices/{name}/decommission", wrapper.DecommissionDevice)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/devices/{name}/rendered", wrapper.GetRenderedDevice)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/devices/{name}/status", wrapper.GetDeviceStatus)
-	})
-	r.Group(func(r chi.Router) {
-		r.Patch(options.BaseURL+"/api/v1/devices/{name}/status", wrapper.PatchDeviceStatus)
-	})
-	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/api/v1/devices/{name}/status", wrapper.ReplaceDeviceStatus)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/enrollmentconfig", wrapper.GetEnrollmentConfig)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/enrollmentrequests", wrapper.ListEnrollmentRequests)
-	})
-	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/api/v1/enrollmentrequests", wrapper.CreateEnrollmentRequest)
-	})
-	r.Group(func(r chi.Router) {
-		r.Delete(options.BaseURL+"/api/v1/enrollmentrequests/{name}", wrapper.DeleteEnrollmentRequest)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/enrollmentrequests/{name}", wrapper.GetEnrollmentRequest)
-	})
-	r.Group(func(r chi.Router) {
-		r.Patch(options.BaseURL+"/api/v1/enrollmentrequests/{name}", wrapper.PatchEnrollmentRequest)
-	})
-	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/api/v1/enrollmentrequests/{name}", wrapper.ReplaceEnrollmentRequest)
-	})
-	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/api/v1/enrollmentrequests/{name}/approval", wrapper.ApproveEnrollmentRequest)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/enrollmentrequests/{name}/status", wrapper.GetEnrollmentRequestStatus)
-	})
-	r.Group(func(r chi.Router) {
-		r.Patch(options.BaseURL+"/api/v1/enrollmentrequests/{name}/status", wrapper.PatchEnrollmentRequestStatus)
-	})
-	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/api/v1/enrollmentrequests/{name}/status", wrapper.ReplaceEnrollmentRequestStatus)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/events", wrapper.ListEvents)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/fleets", wrapper.ListFleets)
-	})
-	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/api/v1/fleets", wrapper.CreateFleet)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/fleets/{fleet}/templateversions", wrapper.ListTemplateVersions)
-	})
-	r.Group(func(r chi.Router) {
-		r.Delete(options.BaseURL+"/api/v1/fleets/{fleet}/templateversions/{name}", wrapper.DeleteTemplateVersion)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/fleets/{fleet}/templateversions/{name}", wrapper.GetTemplateVersion)
-	})
-	r.Group(func(r chi.Router) {
-		r.Delete(options.BaseURL+"/api/v1/fleets/{name}", wrapper.DeleteFleet)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/fleets/{name}", wrapper.GetFleet)
-	})
-	r.Group(func(r chi.Router) {
-		r.Patch(options.BaseURL+"/api/v1/fleets/{name}", wrapper.PatchFleet)
-	})
-	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/api/v1/fleets/{name}", wrapper.ReplaceFleet)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/fleets/{name}/status", wrapper.GetFleetStatus)
-	})
-	r.Group(func(r chi.Router) {
-		r.Patch(options.BaseURL+"/api/v1/fleets/{name}/status", wrapper.PatchFleetStatus)
-	})
-	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/api/v1/fleets/{name}/status", wrapper.ReplaceFleetStatus)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/labels", wrapper.ListLabels)
-	})
-	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/v1/organizations", wrapper.ListOrganizations)
 	})
 	r.Group(func(r chi.Router) {
@@ -2601,40 +2980,169 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Put(options.BaseURL+"/api/v1/organizations/{orgID}", wrapper.ReplaceOrganization)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/repositories", wrapper.ListRepositories)
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/certificatesigningrequests", wrapper.ListCertificateSigningRequests)
 	})
 	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/api/v1/repositories", wrapper.CreateRepository)
+		r.Post(options.BaseURL+"/api/v1/organizations/{orgID}/certificatesigningrequests", wrapper.CreateCertificateSigningRequest)
 	})
 	r.Group(func(r chi.Router) {
-		r.Delete(options.BaseURL+"/api/v1/repositories/{name}", wrapper.DeleteRepository)
+		r.Delete(options.BaseURL+"/api/v1/organizations/{orgID}/certificatesigningrequests/{name}", wrapper.DeleteCertificateSigningRequest)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/repositories/{name}", wrapper.GetRepository)
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/certificatesigningrequests/{name}", wrapper.GetCertificateSigningRequest)
 	})
 	r.Group(func(r chi.Router) {
-		r.Patch(options.BaseURL+"/api/v1/repositories/{name}", wrapper.PatchRepository)
+		r.Patch(options.BaseURL+"/api/v1/organizations/{orgID}/certificatesigningrequests/{name}", wrapper.PatchCertificateSigningRequest)
 	})
 	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/api/v1/repositories/{name}", wrapper.ReplaceRepository)
+		r.Put(options.BaseURL+"/api/v1/organizations/{orgID}/certificatesigningrequests/{name}", wrapper.ReplaceCertificateSigningRequest)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/resourcesyncs", wrapper.ListResourceSyncs)
+		r.Put(options.BaseURL+"/api/v1/organizations/{orgID}/certificatesigningrequests/{name}/approval", wrapper.UpdateCertificateSigningRequestApproval)
 	})
 	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/api/v1/resourcesyncs", wrapper.CreateResourceSync)
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/devices", wrapper.ListDevices)
 	})
 	r.Group(func(r chi.Router) {
-		r.Delete(options.BaseURL+"/api/v1/resourcesyncs/{name}", wrapper.DeleteResourceSync)
+		r.Post(options.BaseURL+"/api/v1/organizations/{orgID}/devices", wrapper.CreateDevice)
 	})
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/api/v1/resourcesyncs/{name}", wrapper.GetResourceSync)
+		r.Delete(options.BaseURL+"/api/v1/organizations/{orgID}/devices/{name}", wrapper.DeleteDevice)
 	})
 	r.Group(func(r chi.Router) {
-		r.Patch(options.BaseURL+"/api/v1/resourcesyncs/{name}", wrapper.PatchResourceSync)
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/devices/{name}", wrapper.GetDevice)
 	})
 	r.Group(func(r chi.Router) {
-		r.Put(options.BaseURL+"/api/v1/resourcesyncs/{name}", wrapper.ReplaceResourceSync)
+		r.Patch(options.BaseURL+"/api/v1/organizations/{orgID}/devices/{name}", wrapper.PatchDevice)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/organizations/{orgID}/devices/{name}", wrapper.ReplaceDevice)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/organizations/{orgID}/devices/{name}/decommission", wrapper.DecommissionDevice)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/devices/{name}/rendered", wrapper.GetRenderedDevice)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/devices/{name}/status", wrapper.GetDeviceStatus)
+	})
+	r.Group(func(r chi.Router) {
+		r.Patch(options.BaseURL+"/api/v1/organizations/{orgID}/devices/{name}/status", wrapper.PatchDeviceStatus)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/organizations/{orgID}/devices/{name}/status", wrapper.ReplaceDeviceStatus)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/enrollmentconfig", wrapper.GetEnrollmentConfig)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/enrollmentrequests", wrapper.ListEnrollmentRequests)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/organizations/{orgID}/enrollmentrequests", wrapper.CreateEnrollmentRequest)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/api/v1/organizations/{orgID}/enrollmentrequests/{name}", wrapper.DeleteEnrollmentRequest)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/enrollmentrequests/{name}", wrapper.GetEnrollmentRequest)
+	})
+	r.Group(func(r chi.Router) {
+		r.Patch(options.BaseURL+"/api/v1/organizations/{orgID}/enrollmentrequests/{name}", wrapper.PatchEnrollmentRequest)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/organizations/{orgID}/enrollmentrequests/{name}", wrapper.ReplaceEnrollmentRequest)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/organizations/{orgID}/enrollmentrequests/{name}/approval", wrapper.ApproveEnrollmentRequest)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/enrollmentrequests/{name}/status", wrapper.GetEnrollmentRequestStatus)
+	})
+	r.Group(func(r chi.Router) {
+		r.Patch(options.BaseURL+"/api/v1/organizations/{orgID}/enrollmentrequests/{name}/status", wrapper.PatchEnrollmentRequestStatus)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/organizations/{orgID}/enrollmentrequests/{name}/status", wrapper.ReplaceEnrollmentRequestStatus)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/events", wrapper.ListEvents)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/fleets", wrapper.ListFleets)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/organizations/{orgID}/fleets", wrapper.CreateFleet)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/fleets/{fleet}/templateversions", wrapper.ListTemplateVersions)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/api/v1/organizations/{orgID}/fleets/{fleet}/templateversions/{name}", wrapper.DeleteTemplateVersion)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/fleets/{fleet}/templateversions/{name}", wrapper.GetTemplateVersion)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/api/v1/organizations/{orgID}/fleets/{name}", wrapper.DeleteFleet)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/fleets/{name}", wrapper.GetFleet)
+	})
+	r.Group(func(r chi.Router) {
+		r.Patch(options.BaseURL+"/api/v1/organizations/{orgID}/fleets/{name}", wrapper.PatchFleet)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/organizations/{orgID}/fleets/{name}", wrapper.ReplaceFleet)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/fleets/{name}/status", wrapper.GetFleetStatus)
+	})
+	r.Group(func(r chi.Router) {
+		r.Patch(options.BaseURL+"/api/v1/organizations/{orgID}/fleets/{name}/status", wrapper.PatchFleetStatus)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/organizations/{orgID}/fleets/{name}/status", wrapper.ReplaceFleetStatus)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/labels", wrapper.ListLabels)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/repositories", wrapper.ListRepositories)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/organizations/{orgID}/repositories", wrapper.CreateRepository)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/api/v1/organizations/{orgID}/repositories/{name}", wrapper.DeleteRepository)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/repositories/{name}", wrapper.GetRepository)
+	})
+	r.Group(func(r chi.Router) {
+		r.Patch(options.BaseURL+"/api/v1/organizations/{orgID}/repositories/{name}", wrapper.PatchRepository)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/organizations/{orgID}/repositories/{name}", wrapper.ReplaceRepository)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/resourcesyncs", wrapper.ListResourceSyncs)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/v1/organizations/{orgID}/resourcesyncs", wrapper.CreateResourceSync)
+	})
+	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/api/v1/organizations/{orgID}/resourcesyncs/{name}", wrapper.DeleteResourceSync)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/v1/organizations/{orgID}/resourcesyncs/{name}", wrapper.GetResourceSync)
+	})
+	r.Group(func(r chi.Router) {
+		r.Patch(options.BaseURL+"/api/v1/organizations/{orgID}/resourcesyncs/{name}", wrapper.PatchResourceSync)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/v1/organizations/{orgID}/resourcesyncs/{name}", wrapper.ReplaceResourceSync)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/v1/users/me/organizations", wrapper.ListUserOrganizations)

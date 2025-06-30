@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
+	"github.com/google/uuid"
+	"github.com/oapi-codegen/runtime/types"
 )
 
 const (
@@ -40,4 +42,8 @@ func SetResponse(w http.ResponseWriter, body any, status api.Status) {
 
 func SetParseFailureResponse(w http.ResponseWriter, err error) {
 	SetResponse(w, nil, api.StatusInternalServerError(fmt.Sprintf("can't decode JSON body: %v", err)))
+}
+
+func convertOrgID(orgID types.UUID) (uuid.UUID, error) {
+	return uuid.Parse(orgID.String())
 }

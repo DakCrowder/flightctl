@@ -6,18 +6,11 @@ import (
 	"reflect"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
-	"github.com/flightctl/flightctl/internal/flterrors"
 	"github.com/flightctl/flightctl/internal/store/selector"
-	"github.com/flightctl/flightctl/internal/util"
 	"github.com/google/uuid"
 )
 
-func (h *ServiceHandler) CreateRepository(ctx context.Context, repo api.Repository) (*api.Repository, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) CreateRepository(ctx context.Context, orgId uuid.UUID, repo api.Repository) (*api.Repository, api.Status) {
 	// don't set fields that are managed by the service
 	repo.Status = nil
 	NilOutManagedObjectMetaProperties(&repo.Metadata)
@@ -28,16 +21,11 @@ func (h *ServiceHandler) CreateRepository(ctx context.Context, repo api.Reposito
 
 	result, err := h.store.Repository().Create(ctx, orgId, &repo, h.callbackManager.RepositoryUpdatedCallback)
 	status := StoreErrorToApiStatus(err, true, api.RepositoryKind, repo.Metadata.Name)
-	h.CreateEvent(ctx, GetResourceCreatedOrUpdatedEvent(ctx, true, api.RepositoryKind, *repo.Metadata.Name, status, nil))
+	h.CreateEvent(ctx, orgId, GetResourceCreatedOrUpdatedEvent(ctx, true, api.RepositoryKind, *repo.Metadata.Name, status, nil))
 	return result, status
 }
 
-func (h *ServiceHandler) ListRepositories(ctx context.Context, params api.ListRepositoriesParams) (*api.RepositoryList, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) ListRepositories(ctx context.Context, orgId uuid.UUID, params api.ListRepositoriesParams) (*api.RepositoryList, api.Status) {
 	listParams, status := prepareListParams(params.Continue, params.LabelSelector, params.FieldSelector, params.Limit)
 	if status != api.StatusOK() {
 		return nil, status
@@ -58,22 +46,12 @@ func (h *ServiceHandler) ListRepositories(ctx context.Context, params api.ListRe
 	}
 }
 
-func (h *ServiceHandler) GetRepository(ctx context.Context, name string) (*api.Repository, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) GetRepository(ctx context.Context, orgId uuid.UUID, name string) (*api.Repository, api.Status) {
 	result, err := h.store.Repository().Get(ctx, orgId, name)
 	return result, StoreErrorToApiStatus(err, false, api.RepositoryKind, &name)
 }
 
-func (h *ServiceHandler) ReplaceRepository(ctx context.Context, name string, repo api.Repository) (*api.Repository, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) ReplaceRepository(ctx context.Context, orgId uuid.UUID, name string, repo api.Repository) (*api.Repository, api.Status) {
 	// don't overwrite fields that are managed by the service
 	repo.Status = nil
 	NilOutManagedObjectMetaProperties(&repo.Metadata)
@@ -87,31 +65,21 @@ func (h *ServiceHandler) ReplaceRepository(ctx context.Context, name string, rep
 
 	result, created, updateDesc, err := h.store.Repository().CreateOrUpdate(ctx, orgId, &repo, h.callbackManager.RepositoryUpdatedCallback)
 	status := StoreErrorToApiStatus(err, created, api.RepositoryKind, &name)
-	h.CreateEvent(ctx, GetResourceCreatedOrUpdatedEvent(ctx, created, api.RepositoryKind, name, status, &updateDesc))
+	h.CreateEvent(ctx, orgId, GetResourceCreatedOrUpdatedEvent(ctx, created, api.RepositoryKind, name, status, &updateDesc))
 	return result, status
 }
 
-func (h *ServiceHandler) DeleteRepository(ctx context.Context, name string) api.Status {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) DeleteRepository(ctx context.Context, orgId uuid.UUID, name string) api.Status {
 	deleted, err := h.store.Repository().Delete(ctx, orgId, name, h.callbackManager.RepositoryUpdatedCallback)
 	status := StoreErrorToApiStatus(err, false, api.RepositoryKind, &name)
 	if deleted || err != nil {
-		h.CreateEvent(ctx, GetResourceDeletedEvent(ctx, api.RepositoryKind, name, status))
+		h.CreateEvent(ctx, orgId, GetResourceDeletedEvent(ctx, api.RepositoryKind, name, status))
 	}
 	return status
 }
 
 // Only metadata.labels and spec can be patched. If we try to patch other fields, HTTP 400 Bad Request is returned.
-func (h *ServiceHandler) PatchRepository(ctx context.Context, name string, patch api.PatchRequest) (*api.Repository, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) PatchRepository(ctx context.Context, orgId uuid.UUID, name string, patch api.PatchRequest) (*api.Repository, api.Status) {
 	currentObj, err := h.store.Repository().Get(ctx, orgId, name)
 	if err != nil {
 		return nil, StoreErrorToApiStatus(err, false, api.RepositoryKind, &name)
@@ -149,16 +117,11 @@ func (h *ServiceHandler) PatchRepository(ctx context.Context, name string, patch
 	}
 	result, updateDesc, err := h.store.Repository().Update(ctx, orgId, newObj, updateCallback)
 	status := StoreErrorToApiStatus(err, false, api.RepositoryKind, &name)
-	h.CreateEvent(ctx, GetResourceCreatedOrUpdatedEvent(ctx, false, api.RepositoryKind, name, status, &updateDesc))
+	h.CreateEvent(ctx, orgId, GetResourceCreatedOrUpdatedEvent(ctx, false, api.RepositoryKind, name, status, &updateDesc))
 	return result, status
 }
 
-func (h *ServiceHandler) ReplaceRepositoryStatus(ctx context.Context, name string, repository api.Repository) (*api.Repository, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) ReplaceRepositoryStatus(ctx context.Context, orgId uuid.UUID, name string, repository api.Repository) (*api.Repository, api.Status) {
 	if name != *repository.Metadata.Name {
 		return nil, api.StatusBadRequest("resource name specified in metadata does not match name in path")
 	}
@@ -167,22 +130,12 @@ func (h *ServiceHandler) ReplaceRepositoryStatus(ctx context.Context, name strin
 	return result, StoreErrorToApiStatus(err, false, api.RepositoryKind, &name)
 }
 
-func (h *ServiceHandler) GetRepositoryFleetReferences(ctx context.Context, name string) (*api.FleetList, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) GetRepositoryFleetReferences(ctx context.Context, orgId uuid.UUID, name string) (*api.FleetList, api.Status) {
 	result, err := h.store.Repository().GetFleetRefs(ctx, orgId, name)
 	return result, StoreErrorToApiStatus(err, false, api.RepositoryKind, &name)
 }
 
-func (h *ServiceHandler) GetRepositoryDeviceReferences(ctx context.Context, name string) (*api.DeviceList, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) GetRepositoryDeviceReferences(ctx context.Context, orgId uuid.UUID, name string) (*api.DeviceList, api.Status) {
 	result, err := h.store.Repository().GetDeviceRefs(ctx, orgId, name)
 	return result, StoreErrorToApiStatus(err, false, api.RepositoryKind, &name)
 }

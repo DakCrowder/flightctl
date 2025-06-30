@@ -6,19 +6,12 @@ import (
 	"reflect"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
-	"github.com/flightctl/flightctl/internal/flterrors"
 	"github.com/flightctl/flightctl/internal/store/selector"
-	"github.com/flightctl/flightctl/internal/util"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
-func (h *ServiceHandler) CreateResourceSync(ctx context.Context, rs api.ResourceSync) (*api.ResourceSync, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) CreateResourceSync(ctx context.Context, orgId uuid.UUID, rs api.ResourceSync) (*api.ResourceSync, api.Status) {
 	// don't set fields that are managed by the service
 	rs.Status = nil
 	NilOutManagedObjectMetaProperties(&rs.Metadata)
@@ -29,16 +22,11 @@ func (h *ServiceHandler) CreateResourceSync(ctx context.Context, rs api.Resource
 
 	result, err := h.store.ResourceSync().Create(ctx, orgId, &rs)
 	status := StoreErrorToApiStatus(err, true, api.ResourceSyncKind, rs.Metadata.Name)
-	h.CreateEvent(ctx, GetResourceCreatedOrUpdatedEvent(ctx, true, api.ResourceSyncKind, *rs.Metadata.Name, status, nil))
+	h.CreateEvent(ctx, orgId, GetResourceCreatedOrUpdatedEvent(ctx, true, api.ResourceSyncKind, *rs.Metadata.Name, status, nil))
 	return result, status
 }
 
-func (h *ServiceHandler) ListResourceSyncs(ctx context.Context, params api.ListResourceSyncsParams) (*api.ResourceSyncList, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) ListResourceSyncs(ctx context.Context, orgId uuid.UUID, params api.ListResourceSyncsParams) (*api.ResourceSyncList, api.Status) {
 	listParams, status := prepareListParams(params.Continue, params.LabelSelector, params.FieldSelector, params.Limit)
 	if status != api.StatusOK() {
 		return nil, status
@@ -59,22 +47,12 @@ func (h *ServiceHandler) ListResourceSyncs(ctx context.Context, params api.ListR
 	}
 }
 
-func (h *ServiceHandler) GetResourceSync(ctx context.Context, name string) (*api.ResourceSync, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) GetResourceSync(ctx context.Context, orgId uuid.UUID, name string) (*api.ResourceSync, api.Status) {
 	result, err := h.store.ResourceSync().Get(ctx, orgId, name)
 	return result, StoreErrorToApiStatus(err, false, api.ResourceSyncKind, &name)
 }
 
-func (h *ServiceHandler) ReplaceResourceSync(ctx context.Context, name string, rs api.ResourceSync) (*api.ResourceSync, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) ReplaceResourceSync(ctx context.Context, orgId uuid.UUID, name string, rs api.ResourceSync) (*api.ResourceSync, api.Status) {
 	// don't overwrite fields that are managed by the service
 	rs.Status = nil
 	NilOutManagedObjectMetaProperties(&rs.Metadata)
@@ -87,16 +65,11 @@ func (h *ServiceHandler) ReplaceResourceSync(ctx context.Context, name string, r
 
 	result, created, updateDesc, err := h.store.ResourceSync().CreateOrUpdate(ctx, orgId, &rs)
 	status := StoreErrorToApiStatus(err, created, api.ResourceSyncKind, &name)
-	h.CreateEvent(ctx, GetResourceCreatedOrUpdatedEvent(ctx, created, api.ResourceSyncKind, name, status, &updateDesc))
+	h.CreateEvent(ctx, orgId, GetResourceCreatedOrUpdatedEvent(ctx, created, api.ResourceSyncKind, name, status, &updateDesc))
 	return result, status
 }
 
-func (h *ServiceHandler) DeleteResourceSync(ctx context.Context, name string) api.Status {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) DeleteResourceSync(ctx context.Context, orgId uuid.UUID, name string) api.Status {
 	var deleted bool
 	callback := func(ctx context.Context, tx *gorm.DB, orgId uuid.UUID, owner string) error {
 		deleted = true
@@ -106,18 +79,13 @@ func (h *ServiceHandler) DeleteResourceSync(ctx context.Context, name string) ap
 	err := h.store.ResourceSync().Delete(ctx, orgId, name, callback)
 	status := StoreErrorToApiStatus(err, false, api.ResourceSyncKind, &name)
 	if deleted || err != nil {
-		h.CreateEvent(ctx, GetResourceDeletedEvent(ctx, api.ResourceSyncKind, name, status))
+		h.CreateEvent(ctx, orgId, GetResourceDeletedEvent(ctx, api.ResourceSyncKind, name, status))
 	}
 	return status
 }
 
 // Only metadata.labels and spec can be patched. If we try to patch other fields, HTTP 400 Bad Request is returned.
-func (h *ServiceHandler) PatchResourceSync(ctx context.Context, name string, patch api.PatchRequest) (*api.ResourceSync, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) PatchResourceSync(ctx context.Context, orgId uuid.UUID, name string, patch api.PatchRequest) (*api.ResourceSync, api.Status) {
 	currentObj, err := h.store.ResourceSync().Get(ctx, orgId, name)
 	if err != nil {
 		return nil, StoreErrorToApiStatus(err, false, api.ResourceSyncKind, &name)
@@ -149,16 +117,11 @@ func (h *ServiceHandler) PatchResourceSync(ctx context.Context, name string, pat
 	newObj.Metadata.ResourceVersion = nil
 	result, updateDesc, err := h.store.ResourceSync().Update(ctx, orgId, newObj)
 	status := StoreErrorToApiStatus(err, false, api.ResourceSyncKind, &name)
-	h.CreateEvent(ctx, GetResourceCreatedOrUpdatedEvent(ctx, false, api.ResourceSyncKind, name, status, &updateDesc))
+	h.CreateEvent(ctx, orgId, GetResourceCreatedOrUpdatedEvent(ctx, false, api.ResourceSyncKind, name, status, &updateDesc))
 	return result, status
 }
 
-func (h *ServiceHandler) ReplaceResourceSyncStatus(ctx context.Context, name string, resourceSync api.ResourceSync) (*api.ResourceSync, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) ReplaceResourceSyncStatus(ctx context.Context, orgId uuid.UUID, name string, resourceSync api.ResourceSync) (*api.ResourceSync, api.Status) {
 	if name != *resourceSync.Metadata.Name {
 		return nil, api.StatusBadRequest("resource name specified in metadata does not match name in path")
 	}

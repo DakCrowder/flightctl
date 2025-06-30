@@ -1892,6 +1892,12 @@ type ListResourceSyncsParams struct {
 	Limit *int32 `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
+// CreateOrganizationJSONRequestBody defines body for CreateOrganization for application/json ContentType.
+type CreateOrganizationJSONRequestBody = Organization
+
+// ReplaceOrganizationJSONRequestBody defines body for ReplaceOrganization for application/json ContentType.
+type ReplaceOrganizationJSONRequestBody = Organization
+
 // CreateCertificateSigningRequestJSONRequestBody defines body for CreateCertificateSigningRequest for application/json ContentType.
 type CreateCertificateSigningRequestJSONRequestBody = CertificateSigningRequest
 
@@ -1954,12 +1960,6 @@ type PatchFleetStatusApplicationJSONPatchPlusJSONRequestBody = PatchRequest
 
 // ReplaceFleetStatusJSONRequestBody defines body for ReplaceFleetStatus for application/json ContentType.
 type ReplaceFleetStatusJSONRequestBody = Fleet
-
-// CreateOrganizationJSONRequestBody defines body for CreateOrganization for application/json ContentType.
-type CreateOrganizationJSONRequestBody = Organization
-
-// ReplaceOrganizationJSONRequestBody defines body for ReplaceOrganization for application/json ContentType.
-type ReplaceOrganizationJSONRequestBody = Organization
 
 // CreateRepositoryJSONRequestBody defines body for CreateRepository for application/json ContentType.
 type CreateRepositoryJSONRequestBody = Repository

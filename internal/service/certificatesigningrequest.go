@@ -12,7 +12,6 @@ import (
 	"github.com/flightctl/flightctl/internal/crypto"
 	"github.com/flightctl/flightctl/internal/flterrors"
 	"github.com/flightctl/flightctl/internal/store/selector"
-	"github.com/flightctl/flightctl/internal/util"
 	"github.com/google/uuid"
 )
 
@@ -104,12 +103,7 @@ func signApprovedCertificateSigningRequest(ca *crypto.CAClient, request api.Cert
 	return certData, nil
 }
 
-func (h *ServiceHandler) ListCertificateSigningRequests(ctx context.Context, params api.ListCertificateSigningRequestsParams) (*api.CertificateSigningRequestList, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) ListCertificateSigningRequests(ctx context.Context, orgId uuid.UUID, params api.ListCertificateSigningRequestsParams) (*api.CertificateSigningRequestList, api.Status) {
 	listParams, status := prepareListParams(params.Continue, params.LabelSelector, params.FieldSelector, params.Limit)
 	if status != api.StatusOK() {
 		return nil, status
@@ -151,12 +145,7 @@ func (h *ServiceHandler) verifyCSRParameters(ctx context.Context, csr api.Certif
 	return nil
 }
 
-func (h *ServiceHandler) CreateCertificateSigningRequest(ctx context.Context, csr api.CertificateSigningRequest) (*api.CertificateSigningRequest, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) CreateCertificateSigningRequest(ctx context.Context, orgId uuid.UUID, csr api.CertificateSigningRequest) (*api.CertificateSigningRequest, api.Status) {
 	// don't set fields that are managed by the service
 	csr.Status = nil
 	NilOutManagedObjectMetaProperties(&csr.Metadata)
@@ -173,7 +162,7 @@ func (h *ServiceHandler) CreateCertificateSigningRequest(ctx context.Context, cs
 	result, err := h.store.CertificateSigningRequest().Create(ctx, orgId, &csr)
 	if err != nil {
 		status := StoreErrorToApiStatus(err, true, api.CertificateSigningRequestKind, csr.Metadata.Name)
-		h.CreateEvent(ctx, GetResourceCreatedOrUpdatedEvent(ctx, true, api.CertificateSigningRequestKind, *csr.Metadata.Name, status, nil))
+		h.CreateEvent(ctx, orgId, GetResourceCreatedOrUpdatedEvent(ctx, true, api.CertificateSigningRequestKind, *csr.Metadata.Name, status, nil))
 		return nil, status
 	}
 
@@ -185,40 +174,25 @@ func (h *ServiceHandler) CreateCertificateSigningRequest(ctx context.Context, cs
 		h.signApprovedCertificateSigningRequest(ctx, orgId, result)
 	}
 
-	h.CreateEvent(ctx, GetResourceCreatedOrUpdatedEvent(ctx, true, api.CertificateSigningRequestKind, *csr.Metadata.Name, api.StatusCreated(), nil))
+	h.CreateEvent(ctx, orgId, GetResourceCreatedOrUpdatedEvent(ctx, true, api.CertificateSigningRequestKind, *csr.Metadata.Name, api.StatusCreated(), nil))
 	return result, api.StatusCreated()
 }
 
-func (h *ServiceHandler) DeleteCertificateSigningRequest(ctx context.Context, name string) api.Status {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) DeleteCertificateSigningRequest(ctx context.Context, orgId uuid.UUID, name string) api.Status {
 	deleted, err := h.store.CertificateSigningRequest().Delete(ctx, orgId, name)
 	status := StoreErrorToApiStatus(err, false, api.CertificateSigningRequestKind, &name)
 	if deleted || err != nil {
-		h.CreateEvent(ctx, GetResourceDeletedEvent(ctx, api.CertificateSigningRequestKind, name, status))
+		h.CreateEvent(ctx, orgId, GetResourceDeletedEvent(ctx, api.CertificateSigningRequestKind, name, status))
 	}
 	return status
 }
 
-func (h *ServiceHandler) GetCertificateSigningRequest(ctx context.Context, name string) (*api.CertificateSigningRequest, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) GetCertificateSigningRequest(ctx context.Context, orgId uuid.UUID, name string) (*api.CertificateSigningRequest, api.Status) {
 	result, err := h.store.CertificateSigningRequest().Get(ctx, orgId, name)
 	return result, StoreErrorToApiStatus(err, false, api.CertificateSigningRequestKind, &name)
 }
 
-func (h *ServiceHandler) PatchCertificateSigningRequest(ctx context.Context, name string, patch api.PatchRequest) (*api.CertificateSigningRequest, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) PatchCertificateSigningRequest(ctx context.Context, orgId uuid.UUID, name string, patch api.PatchRequest) (*api.CertificateSigningRequest, api.Status) {
 	currentObj, err := h.store.CertificateSigningRequest().Get(ctx, orgId, name)
 	if err != nil {
 		return nil, StoreErrorToApiStatus(err, false, api.CertificateSigningRequestKind, &name)
@@ -249,7 +223,7 @@ func (h *ServiceHandler) PatchCertificateSigningRequest(ctx context.Context, nam
 	result, updatedDesc, err := h.store.CertificateSigningRequest().Update(ctx, orgId, newObj)
 	if err != nil {
 		status := StoreErrorToApiStatus(err, false, api.CertificateSigningRequestKind, &name)
-		h.CreateEvent(ctx, GetResourceCreatedOrUpdatedEvent(ctx, false, api.CertificateSigningRequestKind, name, status, &updatedDesc))
+		h.CreateEvent(ctx, orgId, GetResourceCreatedOrUpdatedEvent(ctx, false, api.CertificateSigningRequestKind, name, status, &updatedDesc))
 		return nil, status
 	}
 
@@ -260,16 +234,11 @@ func (h *ServiceHandler) PatchCertificateSigningRequest(ctx context.Context, nam
 		h.signApprovedCertificateSigningRequest(ctx, orgId, result)
 	}
 
-	h.CreateEvent(ctx, GetResourceCreatedOrUpdatedEvent(ctx, false, api.CertificateSigningRequestKind, name, api.StatusOK(), &updatedDesc))
+	h.CreateEvent(ctx, orgId, GetResourceCreatedOrUpdatedEvent(ctx, false, api.CertificateSigningRequestKind, name, api.StatusOK(), &updatedDesc))
 	return result, api.StatusOK()
 }
 
-func (h *ServiceHandler) ReplaceCertificateSigningRequest(ctx context.Context, name string, csr api.CertificateSigningRequest) (*api.CertificateSigningRequest, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) ReplaceCertificateSigningRequest(ctx context.Context, orgId uuid.UUID, name string, csr api.CertificateSigningRequest) (*api.CertificateSigningRequest, api.Status) {
 	// don't overwrite fields that are managed by the service
 	csr.Status = nil
 	NilOutManagedObjectMetaProperties(&csr.Metadata)
@@ -289,7 +258,7 @@ func (h *ServiceHandler) ReplaceCertificateSigningRequest(ctx context.Context, n
 	result, created, updatedDesc, err := h.store.CertificateSigningRequest().CreateOrUpdate(ctx, orgId, &csr)
 	if err != nil {
 		status := StoreErrorToApiStatus(err, created, api.CertificateSigningRequestKind, &name)
-		h.CreateEvent(ctx, GetResourceCreatedOrUpdatedEvent(ctx, created, api.CertificateSigningRequestKind, name, status, &updatedDesc))
+		h.CreateEvent(ctx, orgId, GetResourceCreatedOrUpdatedEvent(ctx, created, api.CertificateSigningRequestKind, name, status, &updatedDesc))
 		return nil, status
 	}
 
@@ -304,12 +273,7 @@ func (h *ServiceHandler) ReplaceCertificateSigningRequest(ctx context.Context, n
 }
 
 // NOTE: Approval currently also issues a certificate - this will change in the future based on policy
-func (h *ServiceHandler) UpdateCertificateSigningRequestApproval(ctx context.Context, name string, csr api.CertificateSigningRequest) (*api.CertificateSigningRequest, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) UpdateCertificateSigningRequestApproval(ctx context.Context, orgId uuid.UUID, name string, csr api.CertificateSigningRequest) (*api.CertificateSigningRequest, api.Status) {
 	newCSR := &csr
 	NilOutManagedObjectMetaProperties(&newCSR.Metadata)
 	if errs := newCSR.Validate(); len(errs) > 0 {

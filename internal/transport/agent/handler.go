@@ -11,8 +11,10 @@ import (
 	agentServer "github.com/flightctl/flightctl/internal/api/server/agent"
 	"github.com/flightctl/flightctl/internal/api_server/middleware"
 	"github.com/flightctl/flightctl/internal/crypto"
+	"github.com/flightctl/flightctl/internal/flterrors"
 	"github.com/flightctl/flightctl/internal/service"
 	"github.com/flightctl/flightctl/internal/transport"
+	"github.com/flightctl/flightctl/internal/util"
 	"github.com/sirupsen/logrus"
 )
 
@@ -68,7 +70,14 @@ func (s *AgentTransportHandler) GetRenderedDevice(w http.ResponseWriter, r *http
 		return
 	}
 
-	body, status := s.serviceHandler.GetRenderedDevice(r.Context(), name, params)
+	orgId, ok := util.GetOrgIdFromContext(r.Context())
+	if !ok {
+		status := api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+		transport.SetResponse(w, status, status)
+		return
+	}
+
+	body, status := s.serviceHandler.GetRenderedDevice(r.Context(), orgId, name, params)
 	transport.SetResponse(w, body, status)
 }
 
@@ -87,7 +96,14 @@ func (s *AgentTransportHandler) ReplaceDeviceStatus(w http.ResponseWriter, r *ht
 		return
 	}
 
-	body, status := s.serviceHandler.ReplaceDeviceStatus(r.Context(), name, device)
+	orgId, ok := util.GetOrgIdFromContext(r.Context())
+	if !ok {
+		status := api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+		transport.SetResponse(w, status, status)
+		return
+	}
+
+	body, status := s.serviceHandler.ReplaceDeviceStatus(r.Context(), orgId, name, device)
 	transport.SetResponse(w, body, status)
 }
 
@@ -106,7 +122,14 @@ func (s *AgentTransportHandler) PatchDeviceStatus(w http.ResponseWriter, r *http
 		return
 	}
 
-	body, status := s.serviceHandler.PatchDeviceStatus(r.Context(), name, patch)
+	orgId, ok := util.GetOrgIdFromContext(r.Context())
+	if !ok {
+		status := api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+		transport.SetResponse(w, status, status)
+		return
+	}
+
+	body, status := s.serviceHandler.PatchDeviceStatus(r.Context(), orgId, name, patch)
 	transport.SetResponse(w, body, status)
 }
 
@@ -125,7 +148,14 @@ func (s *AgentTransportHandler) CreateEnrollmentRequest(w http.ResponseWriter, r
 		return
 	}
 
-	body, status := s.serviceHandler.CreateEnrollmentRequest(r.Context(), er)
+	orgId, ok := util.GetOrgIdFromContext(r.Context())
+	if !ok {
+		status := api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+		transport.SetResponse(w, status, status)
+		return
+	}
+
+	body, status := s.serviceHandler.CreateEnrollmentRequest(r.Context(), orgId, er)
 	transport.SetResponse(w, body, status)
 }
 
@@ -138,6 +168,13 @@ func (s *AgentTransportHandler) ReadEnrollmentRequest(w http.ResponseWriter, r *
 		return
 	}
 
-	body, status := s.serviceHandler.GetEnrollmentRequest(r.Context(), name)
+	orgId, ok := util.GetOrgIdFromContext(r.Context())
+	if !ok {
+		status := api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
+		transport.SetResponse(w, status, status)
+		return
+	}
+
+	body, status := s.serviceHandler.GetEnrollmentRequest(r.Context(), orgId, name)
 	transport.SetResponse(w, body, status)
 }

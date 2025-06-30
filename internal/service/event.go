@@ -7,38 +7,25 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/consts"
-	"github.com/flightctl/flightctl/internal/flterrors"
 	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/store/selector"
-	"github.com/flightctl/flightctl/internal/util"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 )
 
-func (h *ServiceHandler) CreateEvent(ctx context.Context, event *api.Event) {
+func (h *ServiceHandler) CreateEvent(ctx context.Context, orgID uuid.UUID, event *api.Event) {
 	if event == nil {
 		return
 	}
 
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		h.log.Errorf("failed emitting resource updated %s event for %s %s/%s: %v", event.Reason, event.InvolvedObject.Kind, orgId, event.InvolvedObject.Name, flterrors.ErrInvalidOrganizationID)
-		return
-	}
-
-	err := h.store.Event().Create(ctx, orgId, event)
+	err := h.store.Event().Create(ctx, orgID, event)
 	if err != nil {
-		h.log.Errorf("failed emitting resource updated %s event for %s %s/%s: %v", event.Reason, event.InvolvedObject.Kind, orgId, event.InvolvedObject.Name, err)
+		h.log.Errorf("failed emitting resource updated %s event for %s %s/%s: %v", event.Reason, event.InvolvedObject.Kind, orgID, event.InvolvedObject.Name, err)
 	}
 }
 
-func (h *ServiceHandler) ListEvents(ctx context.Context, params api.ListEventsParams) (*api.EventList, api.Status) {
-	orgId, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, api.StatusBadRequest(flterrors.ErrInvalidOrganizationID.Error())
-	}
-
+func (h *ServiceHandler) ListEvents(ctx context.Context, orgID uuid.UUID, params api.ListEventsParams) (*api.EventList, api.Status) {
 	listParams, status := prepareListParams(params.Continue, nil, params.FieldSelector, params.Limit)
 	if status != api.StatusOK() {
 		return nil, status
@@ -51,7 +38,7 @@ func (h *ServiceHandler) ListEvents(ctx context.Context, params api.ListEventsPa
 		listParams.SortOrder = lo.ToPtr(map[api.ListEventsParamsOrder]store.SortOrder{api.Asc: store.SortAsc, api.Desc: store.SortDesc}[*params.Order])
 	}
 
-	result, err := h.store.Event().List(ctx, orgId, *listParams)
+	result, err := h.store.Event().List(ctx, orgID, *listParams)
 	if err == nil {
 		return result, api.StatusOK()
 	}
@@ -66,7 +53,7 @@ func (h *ServiceHandler) ListEvents(ctx context.Context, params api.ListEventsPa
 	}
 }
 
-func (h *ServiceHandler) DeleteEventsOlderThan(ctx context.Context, cutoffTime time.Time) (int64, api.Status) {
+func (h *ServiceHandler) DeleteEventsOlderThan(ctx context.Context, orgID uuid.UUID, cutoffTime time.Time) (int64, api.Status) {
 	numDeleted, err := h.store.Event().DeleteOlderThan(ctx, cutoffTime)
 	return numDeleted, StoreErrorToApiStatus(err, false, api.EventKind, nil)
 }

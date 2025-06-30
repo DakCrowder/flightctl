@@ -32,6 +32,8 @@ tags:
     description: Operations on Repository resources.
   - name: resourcesync
     description: Operations on ResourceSync resources.
+  - name: organization
+    description: Operations on Organization resources.
   - name: version
     description: Operations for receiving service version.
 paths:
@@ -122,13 +124,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/resourcesyncs:
+  /api/v1/organizations/{orgID}/resourcesyncs:
     get:
       tags:
         - resourcesync
       description: List ResourceSync resources.
       operationId: listResourceSyncs
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: continue
           in: query
           description: An optional parameter to query more results from the server. The value of the paramter must match the value of the 'continue' field in the previous list response.
@@ -188,6 +197,14 @@ paths:
         - resourcesync
       description: Create a ResourceSync resource.
       operationId: createResourceSync
+      parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         content:
           application/json:
@@ -231,13 +248,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/resourcesyncs/{name}:
+  /api/v1/organizations/{orgID}/resourcesyncs/{name}:
     get:
       tags:
         - resourcesync
       description: Get a ResourceSync resource.
       operationId: getResourceSync
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the ResourceSync resource to get.
@@ -281,6 +305,13 @@ paths:
       description: Update a ResourceSync resource.
       operationId: replaceResourceSync
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the ResourceSync resource to update.
@@ -348,6 +379,13 @@ paths:
       description: Patch a ResourceSync resource.
       operationId: patchResourceSync
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the ResourceSync resource to patch.
@@ -409,6 +447,13 @@ paths:
       description: Delete a ResourceSync resource.
       operationId: deleteResourceSync
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the ResourceSync resource to delete.
@@ -446,13 +491,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/repositories:
+  /api/v1/organizations/{orgID}/repositories:
     get:
       tags:
         - repository
       description: List Repository resources.
       operationId: listRepositories
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: continue
           in: query
           description: An optional parameter to query more results from the server. The value of the paramter must match the value of the 'continue' field in the previous list response.
@@ -512,6 +564,14 @@ paths:
         - repository
       description: Create a Repository resource.
       operationId: createRepository
+      parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         content:
           application/json:
@@ -555,13 +615,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/repositories/{name}:
+  /api/v1/organizations/{orgID}/repositories/{name}:
     get:
       tags:
         - repository
       description: Get a Repository resource.
       operationId: getRepository
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Repository resource to get.
@@ -605,6 +672,13 @@ paths:
       description: Update a Repository resource.
       operationId: replaceRepository
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Repository resource to update.
@@ -672,6 +746,13 @@ paths:
       description: Delete a Repository resource.
       operationId: deleteRepository
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Repository resource to delete.
@@ -715,6 +796,13 @@ paths:
       description: Patch a Repository resource.
       operationId: patchRepository
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Repository resource to patch.
@@ -770,13 +858,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/devices:
+  /api/v1/organizations/{orgID}/devices:
     get:
       tags:
         - device
       description: List Device resources.
       operationId: listDevices
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: continue
           in: query
           description: An optional parameter to query more results from the server. The value of the paramter must match the value of the 'continue' field in the previous list response.
@@ -842,6 +937,14 @@ paths:
         - device
       description: Create a Device resource.
       operationId: createDevice
+      parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         content:
           application/json:
@@ -885,13 +988,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/devices/{name}:
+  /api/v1/organizations/{orgID}/devices/{name}:
     get:
       tags:
         - device
       description: Get a Device resource.
       operationId: getDevice
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Device resource to get.
@@ -935,6 +1045,13 @@ paths:
       description: Update a Device resource.
       operationId: replaceDevice
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Device resource to update.
@@ -1002,6 +1119,13 @@ paths:
       description: Delete a Device resource.
       operationId: deleteDevice
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Device resource to delete.
@@ -1045,6 +1169,13 @@ paths:
       description: Patch a Device resource.
       operationId: patchDevice
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Device resource to patch.
@@ -1100,13 +1231,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/devices/{name}/status:
+  /api/v1/organizations/{orgID}/devices/{name}/status:
     get:
       tags:
         - device
       description: Get the status of a Device resource.
       operationId: getDeviceStatus
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Device resource to get.
@@ -1150,6 +1288,13 @@ paths:
       description: Patch the status of a Device resource.
       operationId: patchDeviceStatus
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Device resource to patch.
@@ -1205,6 +1350,13 @@ paths:
       description: Update the status of a Device resource.
       operationId: replaceDeviceStatus
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Device resource to update.
@@ -1254,13 +1406,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/devices/{name}/decommission:
+  /api/v1/organizations/{orgID}/devices/{name}/decommission:
     put:
       tags:
         - device
       description: schedule the device to decommission
       operationId: decommissionDevice
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Device resource to decommission.
@@ -1310,13 +1469,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/devices/{name}/rendered:
+  /api/v1/organizations/{orgID}/devices/{name}/rendered:
     get:
       tags:
         - device
       description: Get the rendered device.
       operationId: getRenderedDevice
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Device resource to get the rendered device specification for.
@@ -1369,13 +1535,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/enrollmentconfig:
+  /api/v1/organizations/{orgID}/enrollmentconfig:
     get:
       tags:
         - enrollmentrequest
       description: Get enrollment information.
       operationId: getEnrollmentConfig
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: csr
           in: query
           description: The name of a CertificateSigningRequest resource to query for an issued certificate. If provided, the service will check if the CertificateSigningRequest contains an issued certificate and in this case include it the returned EnrollmentConfig. In all other case, the enrollment certificate field will be empty.
@@ -1419,13 +1592,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/enrollmentrequests:
+  /api/v1/organizations/{orgID}/enrollmentrequests:
     get:
       tags:
         - enrollmentrequest
       description: List EnrollmentRequest resources.
       operationId: listEnrollmentRequests
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: continue
           in: query
           description: An optional parameter to query more results from the server. The value of the paramter must match the value of the 'continue' field in the previous list response.
@@ -1485,6 +1665,14 @@ paths:
         - enrollmentrequest
       description: Create an EnrollmentRequest resource.
       operationId: createEnrollmentRequest
+      parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         content:
           application/json:
@@ -1528,13 +1716,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/enrollmentrequests/{name}:
+  /api/v1/organizations/{orgID}/enrollmentrequests/{name}:
     get:
       tags:
         - enrollmentrequest
       description: Get an EnrollmentRequest resource.
       operationId: getEnrollmentRequest
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the EnrollmentRequest resource to get.
@@ -1578,6 +1773,13 @@ paths:
       description: Update an EnrollmentRequest resource.
       operationId: replaceEnrollmentRequest
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the EnrollmentRequest resource to update.
@@ -1645,6 +1847,13 @@ paths:
       description: Patch an EnrollmentRequest resource.
       operationId: patchEnrollmentRequest
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the EnrollmentRequest resource to patch.
@@ -1706,6 +1915,13 @@ paths:
       description: Delete an EnrollmentRequest resource.
       operationId: deleteEnrollmentRequest
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the EnrollmentRequest resource to delete.
@@ -1743,13 +1959,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/enrollmentrequests/{name}/status:
+  /api/v1/organizations/{orgID}/enrollmentrequests/{name}/status:
     get:
       tags:
         - enrollmentrequest
       description: Get the status of an EnrollmentRequest resource.
       operationId: getEnrollmentRequestStatus
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the EnrollmentRequest resource to get.
@@ -1793,6 +2016,13 @@ paths:
       description: Update the status of an EnrollmentRequest resource.
       operationId: replaceEnrollmentRequestStatus
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the EnrollmentRequest resource to update.
@@ -1842,6 +2072,13 @@ paths:
       description: Patch the status of an EnrollmentRequest resource.
       operationId: patchEnrollmentRequestStatus
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the EnrollmentRequest resource to patch.
@@ -1897,13 +2134,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/enrollmentrequests/{name}/approval:
+  /api/v1/organizations/{orgID}/enrollmentrequests/{name}/approval:
     put:
       tags:
         - enrollmentrequest
       description: Approve or deny an EnrollmentRequest.
       operationId: approveEnrollmentRequest
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the EnrollmentRequest to approve or deny.
@@ -1953,13 +2197,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/certificatesigningrequests:
+  /api/v1/organizations/{orgID}/certificatesigningrequests:
     get:
       tags:
         - certificatesigningrequest
       description: List CertificateSigningRequest resources.
       operationId: listCertificateSigningRequests
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: continue
           in: query
           description: An optional parameter to query more results from the server. The value of the paramter must match the value of the 'continue' field in the previous list response.
@@ -2019,6 +2270,14 @@ paths:
         - certificatesigningrequest
       description: Create a CertificateSigningRequest resource.
       operationId: createCertificateSigningRequest
+      parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         content:
           application/json:
@@ -2062,13 +2321,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/certificatesigningrequests/{name}:
+  /api/v1/organizations/{orgID}/certificatesigningrequests/{name}:
     patch:
       tags:
         - certificatesigningrequest
       description: Patch a CertificateSigningRequest resource.
       operationId: patchCertificateSigningRequest
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the CertificateSigningRequest resource to patch.
@@ -2130,6 +2396,13 @@ paths:
       description: read the specified certificateSigningRequest
       operationId: getCertificateSigningRequest
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the CertificateSigningRequest resource to get.
@@ -2174,6 +2447,13 @@ paths:
       description: replace the specified CertificateSigningRequest
       operationId: replaceCertificateSigningRequest
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the CertificateSigningRequest resource to update.
@@ -2241,6 +2521,13 @@ paths:
       description: delete a Certificate Signing Request
       operationId: deleteCertificateSigningRequest
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the CertificateSigningRequest resource to delete.
@@ -2278,13 +2565,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/certificatesigningrequests/{name}/approval:
+  /api/v1/organizations/{orgID}/certificatesigningrequests/{name}/approval:
     put:
       tags:
         - certificatesigningrequest
       description: Approve or deny a CertificateSigningRequest.
       operationId: updateCertificateSigningRequestApproval
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the CertificateSigningRequest to approve or deny.
@@ -2340,13 +2634,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/fleets:
+  /api/v1/organizations/{orgID}/fleets:
     get:
       tags:
         - fleet
       description: List Fleet resources.
       operationId: listFleets
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: continue
           in: query
           description: An optional parameter to query more results from the server. The value of the paramter must match the value of the 'continue' field in the previous list response.
@@ -2412,6 +2713,14 @@ paths:
         - fleet
       description: Create a Fleet resource.
       operationId: createFleet
+      parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         content:
           application/json:
@@ -2455,13 +2764,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/fleets/{name}:
+  /api/v1/organizations/{orgID}/fleets/{name}:
     get:
       tags:
         - fleet
       description: Get a Fleet resource.
       operationId: getFleet
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Fleet resource to get.
@@ -2511,6 +2827,13 @@ paths:
       description: Update a Fleet resource.
       operationId: replaceFleet
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Fleet resource to update.
@@ -2578,6 +2901,13 @@ paths:
       description: Patch a Fleet resource.
       operationId: patchFleet
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Fleet resource to patch.
@@ -2639,6 +2969,13 @@ paths:
       description: Delete a Fleet resource.
       operationId: deleteFleet
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Fleet resource to delete.
@@ -2676,13 +3013,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/fleets/{name}/status:
+  /api/v1/organizations/{orgID}/fleets/{name}/status:
     get:
       tags:
         - fleet
       description: read status of the specified Fleet
       operationId: getFleetStatus
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Fleet resource to get.
@@ -2726,6 +3070,13 @@ paths:
       description: Patch the status of a Fleet resource.
       operationId: patchFleetStatus
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Fleet resource to patch.
@@ -2781,6 +3132,13 @@ paths:
       description: replace status of the specified Fleet
       operationId: replaceFleetStatus
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: name
           in: path
           description: The name of the Fleet resource to update.
@@ -2824,13 +3182,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/fleets/{fleet}/templateversions:
+  /api/v1/organizations/{orgID}/fleets/{fleet}/templateversions:
     get:
       tags:
         - fleet
       description: list template versions
       operationId: listTemplateVersions
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: fleet
           in: path
           description: The owner of the template versions.
@@ -2891,13 +3256,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/fleets/{fleet}/templateversions/{name}:
+  /api/v1/organizations/{orgID}/fleets/{fleet}/templateversions/{name}:
     get:
       tags:
         - fleet
       description: read the specified template version
       operationId: getTemplateVersion
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: fleet
           in: path
           description: The owner of the template version.
@@ -2947,6 +3319,13 @@ paths:
       description: delete a template version
       operationId: deleteTemplateVersion
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: fleet
           in: path
           description: The owner of the template version.
@@ -2990,7 +3369,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/labels:
+  /api/v1/organizations/{orgID}/labels:
     get:
       tags:
         - label
@@ -2998,6 +3377,13 @@ paths:
         Retrieves a distinct list of labels for the specified resource type.
       operationId: listLabels
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: kind
           in: query
           description: The type of resource to retrieve labels from.
@@ -3061,7 +3447,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
-  /api/v1/events:
+  /api/v1/organizations/{orgID}/events:
     get:
       tags:
         - event
@@ -3069,6 +3455,13 @@ paths:
         Retrieves a list of events.
       operationId: listEvents
       parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization.
+          required: true
+          schema:
+            type: string
+            format: uuid
         - name: fieldSelector
           in: query
           description: A selector to restrict the list of returned objects by their fields, supporting operators like '=', '==', and '!=' (e.g., "key1=value1,key2!=value2").

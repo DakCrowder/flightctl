@@ -38,7 +38,7 @@ func testRepositoryPatch(require *require.Assertions, patch api.PatchRequest) (*
 	ctx := util.WithOrganizationID(context.Background(), store.NullOrgId)
 	_, err = serviceHandler.store.Repository().Create(ctx, store.NullOrgId, &repository, nil)
 	require.NoError(err)
-	resp, status := serviceHandler.PatchRepository(ctx, "foo", patch)
+	resp, status := serviceHandler.PatchRepository(ctx, store.NullOrgId, "foo", patch)
 	require.NotEqual(statusFailedCode, status.Code)
 	return resp, repository, status
 }
@@ -169,6 +169,6 @@ func TestRepositoryNonExistingResource(t *testing.T) {
 		Metadata: api.ObjectMeta{Name: lo.ToPtr("foo")},
 	}, nil)
 	require.NoError(err)
-	_, status := serviceHandler.PatchRepository(ctx, "bar", pr)
+	_, status := serviceHandler.PatchRepository(ctx, store.NullOrgId, "bar", pr)
 	require.Equal(statusNotFoundCode, status.Code)
 }

@@ -15,6 +15,7 @@ import (
 
 	. "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/oapi-codegen/runtime"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
@@ -96,177 +97,6 @@ type ClientInterface interface {
 	// AuthValidate request
 	AuthValidate(ctx context.Context, params *AuthValidateParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ListCertificateSigningRequests request
-	ListCertificateSigningRequests(ctx context.Context, params *ListCertificateSigningRequestsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// CreateCertificateSigningRequestWithBody request with any body
-	CreateCertificateSigningRequestWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	CreateCertificateSigningRequest(ctx context.Context, body CreateCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// DeleteCertificateSigningRequest request
-	DeleteCertificateSigningRequest(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetCertificateSigningRequest request
-	GetCertificateSigningRequest(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PatchCertificateSigningRequestWithBody request with any body
-	PatchCertificateSigningRequestWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PatchCertificateSigningRequestWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchCertificateSigningRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ReplaceCertificateSigningRequestWithBody request with any body
-	ReplaceCertificateSigningRequestWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	ReplaceCertificateSigningRequest(ctx context.Context, name string, body ReplaceCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// UpdateCertificateSigningRequestApprovalWithBody request with any body
-	UpdateCertificateSigningRequestApprovalWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	UpdateCertificateSigningRequestApproval(ctx context.Context, name string, body UpdateCertificateSigningRequestApprovalJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListDevices request
-	ListDevices(ctx context.Context, params *ListDevicesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// CreateDeviceWithBody request with any body
-	CreateDeviceWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	CreateDevice(ctx context.Context, body CreateDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// DeleteDevice request
-	DeleteDevice(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetDevice request
-	GetDevice(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PatchDeviceWithBody request with any body
-	PatchDeviceWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PatchDeviceWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchDeviceApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ReplaceDeviceWithBody request with any body
-	ReplaceDeviceWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	ReplaceDevice(ctx context.Context, name string, body ReplaceDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// DecommissionDeviceWithBody request with any body
-	DecommissionDeviceWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	DecommissionDevice(ctx context.Context, name string, body DecommissionDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetRenderedDevice request
-	GetRenderedDevice(ctx context.Context, name string, params *GetRenderedDeviceParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetDeviceStatus request
-	GetDeviceStatus(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PatchDeviceStatusWithBody request with any body
-	PatchDeviceStatusWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PatchDeviceStatusWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchDeviceStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ReplaceDeviceStatusWithBody request with any body
-	ReplaceDeviceStatusWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	ReplaceDeviceStatus(ctx context.Context, name string, body ReplaceDeviceStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetEnrollmentConfig request
-	GetEnrollmentConfig(ctx context.Context, params *GetEnrollmentConfigParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListEnrollmentRequests request
-	ListEnrollmentRequests(ctx context.Context, params *ListEnrollmentRequestsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// CreateEnrollmentRequestWithBody request with any body
-	CreateEnrollmentRequestWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	CreateEnrollmentRequest(ctx context.Context, body CreateEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// DeleteEnrollmentRequest request
-	DeleteEnrollmentRequest(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetEnrollmentRequest request
-	GetEnrollmentRequest(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PatchEnrollmentRequestWithBody request with any body
-	PatchEnrollmentRequestWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PatchEnrollmentRequestWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchEnrollmentRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ReplaceEnrollmentRequestWithBody request with any body
-	ReplaceEnrollmentRequestWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	ReplaceEnrollmentRequest(ctx context.Context, name string, body ReplaceEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ApproveEnrollmentRequestWithBody request with any body
-	ApproveEnrollmentRequestWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	ApproveEnrollmentRequest(ctx context.Context, name string, body ApproveEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetEnrollmentRequestStatus request
-	GetEnrollmentRequestStatus(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PatchEnrollmentRequestStatusWithBody request with any body
-	PatchEnrollmentRequestStatusWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PatchEnrollmentRequestStatusWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchEnrollmentRequestStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ReplaceEnrollmentRequestStatusWithBody request with any body
-	ReplaceEnrollmentRequestStatusWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	ReplaceEnrollmentRequestStatus(ctx context.Context, name string, body ReplaceEnrollmentRequestStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListEvents request
-	ListEvents(ctx context.Context, params *ListEventsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListFleets request
-	ListFleets(ctx context.Context, params *ListFleetsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// CreateFleetWithBody request with any body
-	CreateFleetWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	CreateFleet(ctx context.Context, body CreateFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListTemplateVersions request
-	ListTemplateVersions(ctx context.Context, fleet string, params *ListTemplateVersionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// DeleteTemplateVersion request
-	DeleteTemplateVersion(ctx context.Context, fleet string, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetTemplateVersion request
-	GetTemplateVersion(ctx context.Context, fleet string, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// DeleteFleet request
-	DeleteFleet(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetFleet request
-	GetFleet(ctx context.Context, name string, params *GetFleetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PatchFleetWithBody request with any body
-	PatchFleetWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PatchFleetWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchFleetApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ReplaceFleetWithBody request with any body
-	ReplaceFleetWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	ReplaceFleet(ctx context.Context, name string, body ReplaceFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// GetFleetStatus request
-	GetFleetStatus(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// PatchFleetStatusWithBody request with any body
-	PatchFleetStatusWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	PatchFleetStatusWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchFleetStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ReplaceFleetStatusWithBody request with any body
-	ReplaceFleetStatusWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	ReplaceFleetStatus(ctx context.Context, name string, body ReplaceFleetStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// ListLabels request
-	ListLabels(ctx context.Context, params *ListLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// ListOrganizations request
 	ListOrganizations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -280,53 +110,224 @@ type ClientInterface interface {
 
 	ReplaceOrganization(ctx context.Context, orgID string, body ReplaceOrganizationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ListCertificateSigningRequests request
+	ListCertificateSigningRequests(ctx context.Context, orgID openapi_types.UUID, params *ListCertificateSigningRequestsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateCertificateSigningRequestWithBody request with any body
+	CreateCertificateSigningRequestWithBody(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateCertificateSigningRequest(ctx context.Context, orgID openapi_types.UUID, body CreateCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteCertificateSigningRequest request
+	DeleteCertificateSigningRequest(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetCertificateSigningRequest request
+	GetCertificateSigningRequest(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PatchCertificateSigningRequestWithBody request with any body
+	PatchCertificateSigningRequestWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PatchCertificateSigningRequestWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchCertificateSigningRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ReplaceCertificateSigningRequestWithBody request with any body
+	ReplaceCertificateSigningRequestWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ReplaceCertificateSigningRequest(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateCertificateSigningRequestApprovalWithBody request with any body
+	UpdateCertificateSigningRequestApprovalWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateCertificateSigningRequestApproval(ctx context.Context, orgID openapi_types.UUID, name string, body UpdateCertificateSigningRequestApprovalJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListDevices request
+	ListDevices(ctx context.Context, orgID openapi_types.UUID, params *ListDevicesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateDeviceWithBody request with any body
+	CreateDeviceWithBody(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateDevice(ctx context.Context, orgID openapi_types.UUID, body CreateDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteDevice request
+	DeleteDevice(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetDevice request
+	GetDevice(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PatchDeviceWithBody request with any body
+	PatchDeviceWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PatchDeviceWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchDeviceApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ReplaceDeviceWithBody request with any body
+	ReplaceDeviceWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ReplaceDevice(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DecommissionDeviceWithBody request with any body
+	DecommissionDeviceWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	DecommissionDevice(ctx context.Context, orgID openapi_types.UUID, name string, body DecommissionDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetRenderedDevice request
+	GetRenderedDevice(ctx context.Context, orgID openapi_types.UUID, name string, params *GetRenderedDeviceParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetDeviceStatus request
+	GetDeviceStatus(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PatchDeviceStatusWithBody request with any body
+	PatchDeviceStatusWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PatchDeviceStatusWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchDeviceStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ReplaceDeviceStatusWithBody request with any body
+	ReplaceDeviceStatusWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ReplaceDeviceStatus(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceDeviceStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetEnrollmentConfig request
+	GetEnrollmentConfig(ctx context.Context, orgID openapi_types.UUID, params *GetEnrollmentConfigParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListEnrollmentRequests request
+	ListEnrollmentRequests(ctx context.Context, orgID openapi_types.UUID, params *ListEnrollmentRequestsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateEnrollmentRequestWithBody request with any body
+	CreateEnrollmentRequestWithBody(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateEnrollmentRequest(ctx context.Context, orgID openapi_types.UUID, body CreateEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteEnrollmentRequest request
+	DeleteEnrollmentRequest(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetEnrollmentRequest request
+	GetEnrollmentRequest(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PatchEnrollmentRequestWithBody request with any body
+	PatchEnrollmentRequestWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PatchEnrollmentRequestWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchEnrollmentRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ReplaceEnrollmentRequestWithBody request with any body
+	ReplaceEnrollmentRequestWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ReplaceEnrollmentRequest(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ApproveEnrollmentRequestWithBody request with any body
+	ApproveEnrollmentRequestWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ApproveEnrollmentRequest(ctx context.Context, orgID openapi_types.UUID, name string, body ApproveEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetEnrollmentRequestStatus request
+	GetEnrollmentRequestStatus(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PatchEnrollmentRequestStatusWithBody request with any body
+	PatchEnrollmentRequestStatusWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PatchEnrollmentRequestStatusWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchEnrollmentRequestStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ReplaceEnrollmentRequestStatusWithBody request with any body
+	ReplaceEnrollmentRequestStatusWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ReplaceEnrollmentRequestStatus(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceEnrollmentRequestStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListEvents request
+	ListEvents(ctx context.Context, orgID openapi_types.UUID, params *ListEventsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListFleets request
+	ListFleets(ctx context.Context, orgID openapi_types.UUID, params *ListFleetsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateFleetWithBody request with any body
+	CreateFleetWithBody(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateFleet(ctx context.Context, orgID openapi_types.UUID, body CreateFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListTemplateVersions request
+	ListTemplateVersions(ctx context.Context, orgID openapi_types.UUID, fleet string, params *ListTemplateVersionsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteTemplateVersion request
+	DeleteTemplateVersion(ctx context.Context, orgID openapi_types.UUID, fleet string, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetTemplateVersion request
+	GetTemplateVersion(ctx context.Context, orgID openapi_types.UUID, fleet string, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteFleet request
+	DeleteFleet(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetFleet request
+	GetFleet(ctx context.Context, orgID openapi_types.UUID, name string, params *GetFleetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PatchFleetWithBody request with any body
+	PatchFleetWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PatchFleetWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchFleetApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ReplaceFleetWithBody request with any body
+	ReplaceFleetWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ReplaceFleet(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetFleetStatus request
+	GetFleetStatus(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PatchFleetStatusWithBody request with any body
+	PatchFleetStatusWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PatchFleetStatusWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchFleetStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ReplaceFleetStatusWithBody request with any body
+	ReplaceFleetStatusWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ReplaceFleetStatus(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceFleetStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ListLabels request
+	ListLabels(ctx context.Context, orgID openapi_types.UUID, params *ListLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ListRepositories request
-	ListRepositories(ctx context.Context, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ListRepositories(ctx context.Context, orgID openapi_types.UUID, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateRepositoryWithBody request with any body
-	CreateRepositoryWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateRepositoryWithBody(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateRepository(ctx context.Context, body CreateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateRepository(ctx context.Context, orgID openapi_types.UUID, body CreateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteRepository request
-	DeleteRepository(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteRepository(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetRepository request
-	GetRepository(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetRepository(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PatchRepositoryWithBody request with any body
-	PatchRepositoryWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PatchRepositoryWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	PatchRepositoryWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchRepositoryApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PatchRepositoryWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchRepositoryApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReplaceRepositoryWithBody request with any body
-	ReplaceRepositoryWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReplaceRepositoryWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	ReplaceRepository(ctx context.Context, name string, body ReplaceRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReplaceRepository(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListResourceSyncs request
-	ListResourceSyncs(ctx context.Context, params *ListResourceSyncsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ListResourceSyncs(ctx context.Context, orgID openapi_types.UUID, params *ListResourceSyncsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// CreateResourceSyncWithBody request with any body
-	CreateResourceSyncWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateResourceSyncWithBody(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateResourceSync(ctx context.Context, body CreateResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateResourceSync(ctx context.Context, orgID openapi_types.UUID, body CreateResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteResourceSync request
-	DeleteResourceSync(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteResourceSync(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetResourceSync request
-	GetResourceSync(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetResourceSync(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PatchResourceSyncWithBody request with any body
-	PatchResourceSyncWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PatchResourceSyncWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	PatchResourceSyncWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchResourceSyncApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PatchResourceSyncWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchResourceSyncApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ReplaceResourceSyncWithBody request with any body
-	ReplaceResourceSyncWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReplaceResourceSyncWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	ReplaceResourceSync(ctx context.Context, name string, body ReplaceResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ReplaceResourceSync(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListUserOrganizations request
 	ListUserOrganizations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -349,774 +350,6 @@ func (c *Client) AuthConfig(ctx context.Context, reqEditors ...RequestEditorFn) 
 
 func (c *Client) AuthValidate(ctx context.Context, params *AuthValidateParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAuthValidateRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListCertificateSigningRequests(ctx context.Context, params *ListCertificateSigningRequestsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListCertificateSigningRequestsRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) CreateCertificateSigningRequestWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateCertificateSigningRequestRequestWithBody(c.Server, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) CreateCertificateSigningRequest(ctx context.Context, body CreateCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateCertificateSigningRequestRequest(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DeleteCertificateSigningRequest(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteCertificateSigningRequestRequest(c.Server, name)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetCertificateSigningRequest(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetCertificateSigningRequestRequest(c.Server, name)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchCertificateSigningRequestWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchCertificateSigningRequestRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchCertificateSigningRequestWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchCertificateSigningRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchCertificateSigningRequestRequestWithApplicationJSONPatchPlusJSONBody(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ReplaceCertificateSigningRequestWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceCertificateSigningRequestRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ReplaceCertificateSigningRequest(ctx context.Context, name string, body ReplaceCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceCertificateSigningRequestRequest(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) UpdateCertificateSigningRequestApprovalWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateCertificateSigningRequestApprovalRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) UpdateCertificateSigningRequestApproval(ctx context.Context, name string, body UpdateCertificateSigningRequestApprovalJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateCertificateSigningRequestApprovalRequest(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListDevices(ctx context.Context, params *ListDevicesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListDevicesRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) CreateDeviceWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateDeviceRequestWithBody(c.Server, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) CreateDevice(ctx context.Context, body CreateDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateDeviceRequest(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DeleteDevice(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteDeviceRequest(c.Server, name)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetDevice(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetDeviceRequest(c.Server, name)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchDeviceWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchDeviceRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchDeviceWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchDeviceApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchDeviceRequestWithApplicationJSONPatchPlusJSONBody(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ReplaceDeviceWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceDeviceRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ReplaceDevice(ctx context.Context, name string, body ReplaceDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceDeviceRequest(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DecommissionDeviceWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDecommissionDeviceRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DecommissionDevice(ctx context.Context, name string, body DecommissionDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDecommissionDeviceRequest(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetRenderedDevice(ctx context.Context, name string, params *GetRenderedDeviceParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetRenderedDeviceRequest(c.Server, name, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetDeviceStatus(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetDeviceStatusRequest(c.Server, name)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchDeviceStatusWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchDeviceStatusRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchDeviceStatusWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchDeviceStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchDeviceStatusRequestWithApplicationJSONPatchPlusJSONBody(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ReplaceDeviceStatusWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceDeviceStatusRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ReplaceDeviceStatus(ctx context.Context, name string, body ReplaceDeviceStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceDeviceStatusRequest(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetEnrollmentConfig(ctx context.Context, params *GetEnrollmentConfigParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetEnrollmentConfigRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListEnrollmentRequests(ctx context.Context, params *ListEnrollmentRequestsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListEnrollmentRequestsRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) CreateEnrollmentRequestWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateEnrollmentRequestRequestWithBody(c.Server, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) CreateEnrollmentRequest(ctx context.Context, body CreateEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateEnrollmentRequestRequest(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DeleteEnrollmentRequest(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteEnrollmentRequestRequest(c.Server, name)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetEnrollmentRequest(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetEnrollmentRequestRequest(c.Server, name)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchEnrollmentRequestWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchEnrollmentRequestRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchEnrollmentRequestWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchEnrollmentRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchEnrollmentRequestRequestWithApplicationJSONPatchPlusJSONBody(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ReplaceEnrollmentRequestWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceEnrollmentRequestRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ReplaceEnrollmentRequest(ctx context.Context, name string, body ReplaceEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceEnrollmentRequestRequest(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ApproveEnrollmentRequestWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewApproveEnrollmentRequestRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ApproveEnrollmentRequest(ctx context.Context, name string, body ApproveEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewApproveEnrollmentRequestRequest(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetEnrollmentRequestStatus(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetEnrollmentRequestStatusRequest(c.Server, name)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchEnrollmentRequestStatusWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchEnrollmentRequestStatusRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchEnrollmentRequestStatusWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchEnrollmentRequestStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchEnrollmentRequestStatusRequestWithApplicationJSONPatchPlusJSONBody(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ReplaceEnrollmentRequestStatusWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceEnrollmentRequestStatusRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ReplaceEnrollmentRequestStatus(ctx context.Context, name string, body ReplaceEnrollmentRequestStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceEnrollmentRequestStatusRequest(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListEvents(ctx context.Context, params *ListEventsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListEventsRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListFleets(ctx context.Context, params *ListFleetsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListFleetsRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) CreateFleetWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateFleetRequestWithBody(c.Server, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) CreateFleet(ctx context.Context, body CreateFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateFleetRequest(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListTemplateVersions(ctx context.Context, fleet string, params *ListTemplateVersionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListTemplateVersionsRequest(c.Server, fleet, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DeleteTemplateVersion(ctx context.Context, fleet string, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteTemplateVersionRequest(c.Server, fleet, name)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetTemplateVersion(ctx context.Context, fleet string, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetTemplateVersionRequest(c.Server, fleet, name)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) DeleteFleet(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteFleetRequest(c.Server, name)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetFleet(ctx context.Context, name string, params *GetFleetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetFleetRequest(c.Server, name, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchFleetWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchFleetRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchFleetWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchFleetApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchFleetRequestWithApplicationJSONPatchPlusJSONBody(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ReplaceFleetWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceFleetRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ReplaceFleet(ctx context.Context, name string, body ReplaceFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceFleetRequest(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetFleetStatus(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetFleetStatusRequest(c.Server, name)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchFleetStatusWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchFleetStatusRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) PatchFleetStatusWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchFleetStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchFleetStatusRequestWithApplicationJSONPatchPlusJSONBody(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ReplaceFleetStatusWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceFleetStatusRequestWithBody(c.Server, name, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ReplaceFleetStatus(ctx context.Context, name string, body ReplaceFleetStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceFleetStatusRequest(c.Server, name, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListLabels(ctx context.Context, params *ListLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListLabelsRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1187,8 +420,8 @@ func (c *Client) ReplaceOrganization(ctx context.Context, orgID string, body Rep
 	return c.Client.Do(req)
 }
 
-func (c *Client) ListRepositories(ctx context.Context, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListRepositoriesRequest(c.Server, params)
+func (c *Client) ListCertificateSigningRequests(ctx context.Context, orgID openapi_types.UUID, params *ListCertificateSigningRequestsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListCertificateSigningRequestsRequest(c.Server, orgID, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1199,8 +432,8 @@ func (c *Client) ListRepositories(ctx context.Context, params *ListRepositoriesP
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateRepositoryWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateRepositoryRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateCertificateSigningRequestWithBody(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateCertificateSigningRequestRequestWithBody(c.Server, orgID, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1211,8 +444,8 @@ func (c *Client) CreateRepositoryWithBody(ctx context.Context, contentType strin
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateRepository(ctx context.Context, body CreateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateRepositoryRequest(c.Server, body)
+func (c *Client) CreateCertificateSigningRequest(ctx context.Context, orgID openapi_types.UUID, body CreateCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateCertificateSigningRequestRequest(c.Server, orgID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1223,8 +456,8 @@ func (c *Client) CreateRepository(ctx context.Context, body CreateRepositoryJSON
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteRepository(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteRepositoryRequest(c.Server, name)
+func (c *Client) DeleteCertificateSigningRequest(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteCertificateSigningRequestRequest(c.Server, orgID, name)
 	if err != nil {
 		return nil, err
 	}
@@ -1235,8 +468,8 @@ func (c *Client) DeleteRepository(ctx context.Context, name string, reqEditors .
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetRepository(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetRepositoryRequest(c.Server, name)
+func (c *Client) GetCertificateSigningRequest(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetCertificateSigningRequestRequest(c.Server, orgID, name)
 	if err != nil {
 		return nil, err
 	}
@@ -1247,8 +480,8 @@ func (c *Client) GetRepository(ctx context.Context, name string, reqEditors ...R
 	return c.Client.Do(req)
 }
 
-func (c *Client) PatchRepositoryWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchRepositoryRequestWithBody(c.Server, name, contentType, body)
+func (c *Client) PatchCertificateSigningRequestWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchCertificateSigningRequestRequestWithBody(c.Server, orgID, name, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1259,8 +492,8 @@ func (c *Client) PatchRepositoryWithBody(ctx context.Context, name string, conte
 	return c.Client.Do(req)
 }
 
-func (c *Client) PatchRepositoryWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchRepositoryApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchRepositoryRequestWithApplicationJSONPatchPlusJSONBody(c.Server, name, body)
+func (c *Client) PatchCertificateSigningRequestWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchCertificateSigningRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchCertificateSigningRequestRequestWithApplicationJSONPatchPlusJSONBody(c.Server, orgID, name, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1271,8 +504,8 @@ func (c *Client) PatchRepositoryWithApplicationJSONPatchPlusJSONBody(ctx context
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReplaceRepositoryWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceRepositoryRequestWithBody(c.Server, name, contentType, body)
+func (c *Client) ReplaceCertificateSigningRequestWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceCertificateSigningRequestRequestWithBody(c.Server, orgID, name, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1283,8 +516,8 @@ func (c *Client) ReplaceRepositoryWithBody(ctx context.Context, name string, con
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReplaceRepository(ctx context.Context, name string, body ReplaceRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceRepositoryRequest(c.Server, name, body)
+func (c *Client) ReplaceCertificateSigningRequest(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceCertificateSigningRequestRequest(c.Server, orgID, name, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1295,8 +528,8 @@ func (c *Client) ReplaceRepository(ctx context.Context, name string, body Replac
 	return c.Client.Do(req)
 }
 
-func (c *Client) ListResourceSyncs(ctx context.Context, params *ListResourceSyncsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListResourceSyncsRequest(c.Server, params)
+func (c *Client) UpdateCertificateSigningRequestApprovalWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateCertificateSigningRequestApprovalRequestWithBody(c.Server, orgID, name, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1307,8 +540,8 @@ func (c *Client) ListResourceSyncs(ctx context.Context, params *ListResourceSync
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateResourceSyncWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateResourceSyncRequestWithBody(c.Server, contentType, body)
+func (c *Client) UpdateCertificateSigningRequestApproval(ctx context.Context, orgID openapi_types.UUID, name string, body UpdateCertificateSigningRequestApprovalJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateCertificateSigningRequestApprovalRequest(c.Server, orgID, name, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1319,8 +552,8 @@ func (c *Client) CreateResourceSyncWithBody(ctx context.Context, contentType str
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateResourceSync(ctx context.Context, body CreateResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateResourceSyncRequest(c.Server, body)
+func (c *Client) ListDevices(ctx context.Context, orgID openapi_types.UUID, params *ListDevicesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListDevicesRequest(c.Server, orgID, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1331,8 +564,8 @@ func (c *Client) CreateResourceSync(ctx context.Context, body CreateResourceSync
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteResourceSync(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteResourceSyncRequest(c.Server, name)
+func (c *Client) CreateDeviceWithBody(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateDeviceRequestWithBody(c.Server, orgID, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1343,8 +576,8 @@ func (c *Client) DeleteResourceSync(ctx context.Context, name string, reqEditors
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetResourceSync(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetResourceSyncRequest(c.Server, name)
+func (c *Client) CreateDevice(ctx context.Context, orgID openapi_types.UUID, body CreateDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateDeviceRequest(c.Server, orgID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1355,8 +588,8 @@ func (c *Client) GetResourceSync(ctx context.Context, name string, reqEditors ..
 	return c.Client.Do(req)
 }
 
-func (c *Client) PatchResourceSyncWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchResourceSyncRequestWithBody(c.Server, name, contentType, body)
+func (c *Client) DeleteDevice(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteDeviceRequest(c.Server, orgID, name)
 	if err != nil {
 		return nil, err
 	}
@@ -1367,8 +600,8 @@ func (c *Client) PatchResourceSyncWithBody(ctx context.Context, name string, con
 	return c.Client.Do(req)
 }
 
-func (c *Client) PatchResourceSyncWithApplicationJSONPatchPlusJSONBody(ctx context.Context, name string, body PatchResourceSyncApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPatchResourceSyncRequestWithApplicationJSONPatchPlusJSONBody(c.Server, name, body)
+func (c *Client) GetDevice(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetDeviceRequest(c.Server, orgID, name)
 	if err != nil {
 		return nil, err
 	}
@@ -1379,8 +612,8 @@ func (c *Client) PatchResourceSyncWithApplicationJSONPatchPlusJSONBody(ctx conte
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReplaceResourceSyncWithBody(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceResourceSyncRequestWithBody(c.Server, name, contentType, body)
+func (c *Client) PatchDeviceWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchDeviceRequestWithBody(c.Server, orgID, name, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1391,8 +624,776 @@ func (c *Client) ReplaceResourceSyncWithBody(ctx context.Context, name string, c
 	return c.Client.Do(req)
 }
 
-func (c *Client) ReplaceResourceSync(ctx context.Context, name string, body ReplaceResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReplaceResourceSyncRequest(c.Server, name, body)
+func (c *Client) PatchDeviceWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchDeviceApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchDeviceRequestWithApplicationJSONPatchPlusJSONBody(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceDeviceWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceDeviceRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceDevice(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceDeviceRequest(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DecommissionDeviceWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDecommissionDeviceRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DecommissionDevice(ctx context.Context, orgID openapi_types.UUID, name string, body DecommissionDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDecommissionDeviceRequest(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetRenderedDevice(ctx context.Context, orgID openapi_types.UUID, name string, params *GetRenderedDeviceParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetRenderedDeviceRequest(c.Server, orgID, name, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetDeviceStatus(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetDeviceStatusRequest(c.Server, orgID, name)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchDeviceStatusWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchDeviceStatusRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchDeviceStatusWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchDeviceStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchDeviceStatusRequestWithApplicationJSONPatchPlusJSONBody(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceDeviceStatusWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceDeviceStatusRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceDeviceStatus(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceDeviceStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceDeviceStatusRequest(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetEnrollmentConfig(ctx context.Context, orgID openapi_types.UUID, params *GetEnrollmentConfigParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetEnrollmentConfigRequest(c.Server, orgID, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListEnrollmentRequests(ctx context.Context, orgID openapi_types.UUID, params *ListEnrollmentRequestsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListEnrollmentRequestsRequest(c.Server, orgID, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateEnrollmentRequestWithBody(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateEnrollmentRequestRequestWithBody(c.Server, orgID, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateEnrollmentRequest(ctx context.Context, orgID openapi_types.UUID, body CreateEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateEnrollmentRequestRequest(c.Server, orgID, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteEnrollmentRequest(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteEnrollmentRequestRequest(c.Server, orgID, name)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetEnrollmentRequest(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetEnrollmentRequestRequest(c.Server, orgID, name)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchEnrollmentRequestWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchEnrollmentRequestRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchEnrollmentRequestWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchEnrollmentRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchEnrollmentRequestRequestWithApplicationJSONPatchPlusJSONBody(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceEnrollmentRequestWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceEnrollmentRequestRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceEnrollmentRequest(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceEnrollmentRequestRequest(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ApproveEnrollmentRequestWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewApproveEnrollmentRequestRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ApproveEnrollmentRequest(ctx context.Context, orgID openapi_types.UUID, name string, body ApproveEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewApproveEnrollmentRequestRequest(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetEnrollmentRequestStatus(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetEnrollmentRequestStatusRequest(c.Server, orgID, name)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchEnrollmentRequestStatusWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchEnrollmentRequestStatusRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchEnrollmentRequestStatusWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchEnrollmentRequestStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchEnrollmentRequestStatusRequestWithApplicationJSONPatchPlusJSONBody(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceEnrollmentRequestStatusWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceEnrollmentRequestStatusRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceEnrollmentRequestStatus(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceEnrollmentRequestStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceEnrollmentRequestStatusRequest(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListEvents(ctx context.Context, orgID openapi_types.UUID, params *ListEventsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListEventsRequest(c.Server, orgID, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListFleets(ctx context.Context, orgID openapi_types.UUID, params *ListFleetsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListFleetsRequest(c.Server, orgID, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateFleetWithBody(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateFleetRequestWithBody(c.Server, orgID, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateFleet(ctx context.Context, orgID openapi_types.UUID, body CreateFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateFleetRequest(c.Server, orgID, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListTemplateVersions(ctx context.Context, orgID openapi_types.UUID, fleet string, params *ListTemplateVersionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListTemplateVersionsRequest(c.Server, orgID, fleet, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteTemplateVersion(ctx context.Context, orgID openapi_types.UUID, fleet string, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteTemplateVersionRequest(c.Server, orgID, fleet, name)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetTemplateVersion(ctx context.Context, orgID openapi_types.UUID, fleet string, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetTemplateVersionRequest(c.Server, orgID, fleet, name)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteFleet(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteFleetRequest(c.Server, orgID, name)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetFleet(ctx context.Context, orgID openapi_types.UUID, name string, params *GetFleetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetFleetRequest(c.Server, orgID, name, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchFleetWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchFleetRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchFleetWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchFleetApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchFleetRequestWithApplicationJSONPatchPlusJSONBody(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceFleetWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceFleetRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceFleet(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceFleetRequest(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetFleetStatus(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetFleetStatusRequest(c.Server, orgID, name)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchFleetStatusWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchFleetStatusRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchFleetStatusWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchFleetStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchFleetStatusRequestWithApplicationJSONPatchPlusJSONBody(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceFleetStatusWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceFleetStatusRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceFleetStatus(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceFleetStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceFleetStatusRequest(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListLabels(ctx context.Context, orgID openapi_types.UUID, params *ListLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListLabelsRequest(c.Server, orgID, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListRepositories(ctx context.Context, orgID openapi_types.UUID, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRepositoriesRequest(c.Server, orgID, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateRepositoryWithBody(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRepositoryRequestWithBody(c.Server, orgID, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateRepository(ctx context.Context, orgID openapi_types.UUID, body CreateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRepositoryRequest(c.Server, orgID, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteRepository(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRepositoryRequest(c.Server, orgID, name)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetRepository(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetRepositoryRequest(c.Server, orgID, name)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchRepositoryWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchRepositoryRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchRepositoryWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchRepositoryApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchRepositoryRequestWithApplicationJSONPatchPlusJSONBody(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceRepositoryWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceRepositoryRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceRepository(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceRepositoryRequest(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ListResourceSyncs(ctx context.Context, orgID openapi_types.UUID, params *ListResourceSyncsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListResourceSyncsRequest(c.Server, orgID, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateResourceSyncWithBody(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateResourceSyncRequestWithBody(c.Server, orgID, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateResourceSync(ctx context.Context, orgID openapi_types.UUID, body CreateResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateResourceSyncRequest(c.Server, orgID, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteResourceSync(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteResourceSyncRequest(c.Server, orgID, name)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetResourceSync(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetResourceSyncRequest(c.Server, orgID, name)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchResourceSyncWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchResourceSyncRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchResourceSyncWithApplicationJSONPatchPlusJSONBody(ctx context.Context, orgID openapi_types.UUID, name string, body PatchResourceSyncApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchResourceSyncRequestWithApplicationJSONPatchPlusJSONBody(c.Server, orgID, name, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceResourceSyncWithBody(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceResourceSyncRequestWithBody(c.Server, orgID, name, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceResourceSync(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceResourceSyncRequest(c.Server, orgID, name, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1491,2262 +1492,6 @@ func NewAuthValidateRequest(server string, params *AuthValidateParams) (*http.Re
 			req.Header.Set("Authorization", headerParam0)
 		}
 
-	}
-
-	return req, nil
-}
-
-// NewListCertificateSigningRequestsRequest generates requests for ListCertificateSigningRequests
-func NewListCertificateSigningRequestsRequest(server string, params *ListCertificateSigningRequestsParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/certificatesigningrequests")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Continue != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "continue", runtime.ParamLocationQuery, *params.Continue); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.LabelSelector != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "labelSelector", runtime.ParamLocationQuery, *params.LabelSelector); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.FieldSelector != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fieldSelector", runtime.ParamLocationQuery, *params.FieldSelector); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewCreateCertificateSigningRequestRequest calls the generic CreateCertificateSigningRequest builder with application/json body
-func NewCreateCertificateSigningRequestRequest(server string, body CreateCertificateSigningRequestJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewCreateCertificateSigningRequestRequestWithBody(server, "application/json", bodyReader)
-}
-
-// NewCreateCertificateSigningRequestRequestWithBody generates requests for CreateCertificateSigningRequest with any type of body
-func NewCreateCertificateSigningRequestRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/certificatesigningrequests")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewDeleteCertificateSigningRequestRequest generates requests for DeleteCertificateSigningRequest
-func NewDeleteCertificateSigningRequestRequest(server string, name string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/certificatesigningrequests/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewGetCertificateSigningRequestRequest generates requests for GetCertificateSigningRequest
-func NewGetCertificateSigningRequestRequest(server string, name string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/certificatesigningrequests/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewPatchCertificateSigningRequestRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchCertificateSigningRequest builder with application/json-patch+json body
-func NewPatchCertificateSigningRequestRequestWithApplicationJSONPatchPlusJSONBody(server string, name string, body PatchCertificateSigningRequestApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPatchCertificateSigningRequestRequestWithBody(server, name, "application/json-patch+json", bodyReader)
-}
-
-// NewPatchCertificateSigningRequestRequestWithBody generates requests for PatchCertificateSigningRequest with any type of body
-func NewPatchCertificateSigningRequestRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/certificatesigningrequests/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PATCH", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewReplaceCertificateSigningRequestRequest calls the generic ReplaceCertificateSigningRequest builder with application/json body
-func NewReplaceCertificateSigningRequestRequest(server string, name string, body ReplaceCertificateSigningRequestJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewReplaceCertificateSigningRequestRequestWithBody(server, name, "application/json", bodyReader)
-}
-
-// NewReplaceCertificateSigningRequestRequestWithBody generates requests for ReplaceCertificateSigningRequest with any type of body
-func NewReplaceCertificateSigningRequestRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/certificatesigningrequests/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewUpdateCertificateSigningRequestApprovalRequest calls the generic UpdateCertificateSigningRequestApproval builder with application/json body
-func NewUpdateCertificateSigningRequestApprovalRequest(server string, name string, body UpdateCertificateSigningRequestApprovalJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewUpdateCertificateSigningRequestApprovalRequestWithBody(server, name, "application/json", bodyReader)
-}
-
-// NewUpdateCertificateSigningRequestApprovalRequestWithBody generates requests for UpdateCertificateSigningRequestApproval with any type of body
-func NewUpdateCertificateSigningRequestApprovalRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/certificatesigningrequests/%s/approval", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewListDevicesRequest generates requests for ListDevices
-func NewListDevicesRequest(server string, params *ListDevicesParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/devices")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Continue != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "continue", runtime.ParamLocationQuery, *params.Continue); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.LabelSelector != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "labelSelector", runtime.ParamLocationQuery, *params.LabelSelector); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.FieldSelector != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fieldSelector", runtime.ParamLocationQuery, *params.FieldSelector); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.SummaryOnly != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "summaryOnly", runtime.ParamLocationQuery, *params.SummaryOnly); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewCreateDeviceRequest calls the generic CreateDevice builder with application/json body
-func NewCreateDeviceRequest(server string, body CreateDeviceJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewCreateDeviceRequestWithBody(server, "application/json", bodyReader)
-}
-
-// NewCreateDeviceRequestWithBody generates requests for CreateDevice with any type of body
-func NewCreateDeviceRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/devices")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewDeleteDeviceRequest generates requests for DeleteDevice
-func NewDeleteDeviceRequest(server string, name string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/devices/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewGetDeviceRequest generates requests for GetDevice
-func NewGetDeviceRequest(server string, name string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/devices/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewPatchDeviceRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchDevice builder with application/json-patch+json body
-func NewPatchDeviceRequestWithApplicationJSONPatchPlusJSONBody(server string, name string, body PatchDeviceApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPatchDeviceRequestWithBody(server, name, "application/json-patch+json", bodyReader)
-}
-
-// NewPatchDeviceRequestWithBody generates requests for PatchDevice with any type of body
-func NewPatchDeviceRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/devices/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PATCH", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewReplaceDeviceRequest calls the generic ReplaceDevice builder with application/json body
-func NewReplaceDeviceRequest(server string, name string, body ReplaceDeviceJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewReplaceDeviceRequestWithBody(server, name, "application/json", bodyReader)
-}
-
-// NewReplaceDeviceRequestWithBody generates requests for ReplaceDevice with any type of body
-func NewReplaceDeviceRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/devices/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewDecommissionDeviceRequest calls the generic DecommissionDevice builder with application/json body
-func NewDecommissionDeviceRequest(server string, name string, body DecommissionDeviceJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewDecommissionDeviceRequestWithBody(server, name, "application/json", bodyReader)
-}
-
-// NewDecommissionDeviceRequestWithBody generates requests for DecommissionDevice with any type of body
-func NewDecommissionDeviceRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/devices/%s/decommission", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewGetRenderedDeviceRequest generates requests for GetRenderedDevice
-func NewGetRenderedDeviceRequest(server string, name string, params *GetRenderedDeviceParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/devices/%s/rendered", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.KnownRenderedVersion != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "knownRenderedVersion", runtime.ParamLocationQuery, *params.KnownRenderedVersion); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewGetDeviceStatusRequest generates requests for GetDeviceStatus
-func NewGetDeviceStatusRequest(server string, name string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/devices/%s/status", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewPatchDeviceStatusRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchDeviceStatus builder with application/json-patch+json body
-func NewPatchDeviceStatusRequestWithApplicationJSONPatchPlusJSONBody(server string, name string, body PatchDeviceStatusApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPatchDeviceStatusRequestWithBody(server, name, "application/json-patch+json", bodyReader)
-}
-
-// NewPatchDeviceStatusRequestWithBody generates requests for PatchDeviceStatus with any type of body
-func NewPatchDeviceStatusRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/devices/%s/status", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PATCH", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewReplaceDeviceStatusRequest calls the generic ReplaceDeviceStatus builder with application/json body
-func NewReplaceDeviceStatusRequest(server string, name string, body ReplaceDeviceStatusJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewReplaceDeviceStatusRequestWithBody(server, name, "application/json", bodyReader)
-}
-
-// NewReplaceDeviceStatusRequestWithBody generates requests for ReplaceDeviceStatus with any type of body
-func NewReplaceDeviceStatusRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/devices/%s/status", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewGetEnrollmentConfigRequest generates requests for GetEnrollmentConfig
-func NewGetEnrollmentConfigRequest(server string, params *GetEnrollmentConfigParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/enrollmentconfig")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Csr != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "csr", runtime.ParamLocationQuery, *params.Csr); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewListEnrollmentRequestsRequest generates requests for ListEnrollmentRequests
-func NewListEnrollmentRequestsRequest(server string, params *ListEnrollmentRequestsParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/enrollmentrequests")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Continue != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "continue", runtime.ParamLocationQuery, *params.Continue); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.LabelSelector != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "labelSelector", runtime.ParamLocationQuery, *params.LabelSelector); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.FieldSelector != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fieldSelector", runtime.ParamLocationQuery, *params.FieldSelector); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewCreateEnrollmentRequestRequest calls the generic CreateEnrollmentRequest builder with application/json body
-func NewCreateEnrollmentRequestRequest(server string, body CreateEnrollmentRequestJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewCreateEnrollmentRequestRequestWithBody(server, "application/json", bodyReader)
-}
-
-// NewCreateEnrollmentRequestRequestWithBody generates requests for CreateEnrollmentRequest with any type of body
-func NewCreateEnrollmentRequestRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/enrollmentrequests")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewDeleteEnrollmentRequestRequest generates requests for DeleteEnrollmentRequest
-func NewDeleteEnrollmentRequestRequest(server string, name string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/enrollmentrequests/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewGetEnrollmentRequestRequest generates requests for GetEnrollmentRequest
-func NewGetEnrollmentRequestRequest(server string, name string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/enrollmentrequests/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewPatchEnrollmentRequestRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchEnrollmentRequest builder with application/json-patch+json body
-func NewPatchEnrollmentRequestRequestWithApplicationJSONPatchPlusJSONBody(server string, name string, body PatchEnrollmentRequestApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPatchEnrollmentRequestRequestWithBody(server, name, "application/json-patch+json", bodyReader)
-}
-
-// NewPatchEnrollmentRequestRequestWithBody generates requests for PatchEnrollmentRequest with any type of body
-func NewPatchEnrollmentRequestRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/enrollmentrequests/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PATCH", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewReplaceEnrollmentRequestRequest calls the generic ReplaceEnrollmentRequest builder with application/json body
-func NewReplaceEnrollmentRequestRequest(server string, name string, body ReplaceEnrollmentRequestJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewReplaceEnrollmentRequestRequestWithBody(server, name, "application/json", bodyReader)
-}
-
-// NewReplaceEnrollmentRequestRequestWithBody generates requests for ReplaceEnrollmentRequest with any type of body
-func NewReplaceEnrollmentRequestRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/enrollmentrequests/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewApproveEnrollmentRequestRequest calls the generic ApproveEnrollmentRequest builder with application/json body
-func NewApproveEnrollmentRequestRequest(server string, name string, body ApproveEnrollmentRequestJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewApproveEnrollmentRequestRequestWithBody(server, name, "application/json", bodyReader)
-}
-
-// NewApproveEnrollmentRequestRequestWithBody generates requests for ApproveEnrollmentRequest with any type of body
-func NewApproveEnrollmentRequestRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/enrollmentrequests/%s/approval", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewGetEnrollmentRequestStatusRequest generates requests for GetEnrollmentRequestStatus
-func NewGetEnrollmentRequestStatusRequest(server string, name string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/enrollmentrequests/%s/status", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewPatchEnrollmentRequestStatusRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchEnrollmentRequestStatus builder with application/json-patch+json body
-func NewPatchEnrollmentRequestStatusRequestWithApplicationJSONPatchPlusJSONBody(server string, name string, body PatchEnrollmentRequestStatusApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPatchEnrollmentRequestStatusRequestWithBody(server, name, "application/json-patch+json", bodyReader)
-}
-
-// NewPatchEnrollmentRequestStatusRequestWithBody generates requests for PatchEnrollmentRequestStatus with any type of body
-func NewPatchEnrollmentRequestStatusRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/enrollmentrequests/%s/status", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PATCH", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewReplaceEnrollmentRequestStatusRequest calls the generic ReplaceEnrollmentRequestStatus builder with application/json body
-func NewReplaceEnrollmentRequestStatusRequest(server string, name string, body ReplaceEnrollmentRequestStatusJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewReplaceEnrollmentRequestStatusRequestWithBody(server, name, "application/json", bodyReader)
-}
-
-// NewReplaceEnrollmentRequestStatusRequestWithBody generates requests for ReplaceEnrollmentRequestStatus with any type of body
-func NewReplaceEnrollmentRequestStatusRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/enrollmentrequests/%s/status", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewListEventsRequest generates requests for ListEvents
-func NewListEventsRequest(server string, params *ListEventsParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/events")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.FieldSelector != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fieldSelector", runtime.ParamLocationQuery, *params.FieldSelector); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Order != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "order", runtime.ParamLocationQuery, *params.Order); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Continue != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "continue", runtime.ParamLocationQuery, *params.Continue); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewListFleetsRequest generates requests for ListFleets
-func NewListFleetsRequest(server string, params *ListFleetsParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/fleets")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Continue != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "continue", runtime.ParamLocationQuery, *params.Continue); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.LabelSelector != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "labelSelector", runtime.ParamLocationQuery, *params.LabelSelector); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.FieldSelector != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fieldSelector", runtime.ParamLocationQuery, *params.FieldSelector); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.AddDevicesSummary != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "addDevicesSummary", runtime.ParamLocationQuery, *params.AddDevicesSummary); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewCreateFleetRequest calls the generic CreateFleet builder with application/json body
-func NewCreateFleetRequest(server string, body CreateFleetJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewCreateFleetRequestWithBody(server, "application/json", bodyReader)
-}
-
-// NewCreateFleetRequestWithBody generates requests for CreateFleet with any type of body
-func NewCreateFleetRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/fleets")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewListTemplateVersionsRequest generates requests for ListTemplateVersions
-func NewListTemplateVersionsRequest(server string, fleet string, params *ListTemplateVersionsParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "fleet", runtime.ParamLocationPath, fleet)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/fleets/%s/templateversions", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.Continue != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "continue", runtime.ParamLocationQuery, *params.Continue); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.LabelSelector != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "labelSelector", runtime.ParamLocationQuery, *params.LabelSelector); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.FieldSelector != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fieldSelector", runtime.ParamLocationQuery, *params.FieldSelector); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewDeleteTemplateVersionRequest generates requests for DeleteTemplateVersion
-func NewDeleteTemplateVersionRequest(server string, fleet string, name string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "fleet", runtime.ParamLocationPath, fleet)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/fleets/%s/templateversions/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewGetTemplateVersionRequest generates requests for GetTemplateVersion
-func NewGetTemplateVersionRequest(server string, fleet string, name string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "fleet", runtime.ParamLocationPath, fleet)
-	if err != nil {
-		return nil, err
-	}
-
-	var pathParam1 string
-
-	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/fleets/%s/templateversions/%s", pathParam0, pathParam1)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewDeleteFleetRequest generates requests for DeleteFleet
-func NewDeleteFleetRequest(server string, name string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/fleets/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewGetFleetRequest generates requests for GetFleet
-func NewGetFleetRequest(server string, name string, params *GetFleetParams) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/fleets/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if params.AddDevicesSummary != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "addDevicesSummary", runtime.ParamLocationQuery, *params.AddDevicesSummary); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewPatchFleetRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchFleet builder with application/json-patch+json body
-func NewPatchFleetRequestWithApplicationJSONPatchPlusJSONBody(server string, name string, body PatchFleetApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPatchFleetRequestWithBody(server, name, "application/json-patch+json", bodyReader)
-}
-
-// NewPatchFleetRequestWithBody generates requests for PatchFleet with any type of body
-func NewPatchFleetRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/fleets/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PATCH", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewReplaceFleetRequest calls the generic ReplaceFleet builder with application/json body
-func NewReplaceFleetRequest(server string, name string, body ReplaceFleetJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewReplaceFleetRequestWithBody(server, name, "application/json", bodyReader)
-}
-
-// NewReplaceFleetRequestWithBody generates requests for ReplaceFleet with any type of body
-func NewReplaceFleetRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/fleets/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewGetFleetStatusRequest generates requests for GetFleetStatus
-func NewGetFleetStatusRequest(server string, name string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/fleets/%s/status", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewPatchFleetStatusRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchFleetStatus builder with application/json-patch+json body
-func NewPatchFleetStatusRequestWithApplicationJSONPatchPlusJSONBody(server string, name string, body PatchFleetStatusApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewPatchFleetStatusRequestWithBody(server, name, "application/json-patch+json", bodyReader)
-}
-
-// NewPatchFleetStatusRequestWithBody generates requests for PatchFleetStatus with any type of body
-func NewPatchFleetStatusRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/fleets/%s/status", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PATCH", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewReplaceFleetStatusRequest calls the generic ReplaceFleetStatus builder with application/json body
-func NewReplaceFleetStatusRequest(server string, name string, body ReplaceFleetStatusJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewReplaceFleetStatusRequestWithBody(server, name, "application/json", bodyReader)
-}
-
-// NewReplaceFleetStatusRequestWithBody generates requests for ReplaceFleetStatus with any type of body
-func NewReplaceFleetStatusRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/fleets/%s/status", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("PUT", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewListLabelsRequest generates requests for ListLabels
-func NewListLabelsRequest(server string, params *ListLabelsParams) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/api/v1/labels")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	if params != nil {
-		queryValues := queryURL.Query()
-
-		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "kind", runtime.ParamLocationQuery, params.Kind); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
-		if params.LabelSelector != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "labelSelector", runtime.ParamLocationQuery, *params.LabelSelector); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.FieldSelector != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fieldSelector", runtime.ParamLocationQuery, *params.FieldSelector); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		if params.Limit != nil {
-
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
-				return nil, err
-			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-				return nil, err
-			} else {
-				for k, v := range parsed {
-					for _, v2 := range v {
-						queryValues.Add(k, v2)
-					}
-				}
-			}
-
-		}
-
-		queryURL.RawQuery = queryValues.Encode()
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
 	}
 
 	return req, nil
@@ -3866,16 +1611,2580 @@ func NewReplaceOrganizationRequestWithBody(server string, orgID string, contentT
 	return req, nil
 }
 
-// NewListRepositoriesRequest generates requests for ListRepositories
-func NewListRepositoriesRequest(server string, params *ListRepositoriesParams) (*http.Request, error) {
+// NewListCertificateSigningRequestsRequest generates requests for ListCertificateSigningRequests
+func NewListCertificateSigningRequestsRequest(server string, orgID openapi_types.UUID, params *ListCertificateSigningRequestsParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/repositories")
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/certificatesigningrequests", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Continue != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "continue", runtime.ParamLocationQuery, *params.Continue); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.LabelSelector != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "labelSelector", runtime.ParamLocationQuery, *params.LabelSelector); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FieldSelector != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fieldSelector", runtime.ParamLocationQuery, *params.FieldSelector); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateCertificateSigningRequestRequest calls the generic CreateCertificateSigningRequest builder with application/json body
+func NewCreateCertificateSigningRequestRequest(server string, orgID openapi_types.UUID, body CreateCertificateSigningRequestJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateCertificateSigningRequestRequestWithBody(server, orgID, "application/json", bodyReader)
+}
+
+// NewCreateCertificateSigningRequestRequestWithBody generates requests for CreateCertificateSigningRequest with any type of body
+func NewCreateCertificateSigningRequestRequestWithBody(server string, orgID openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/certificatesigningrequests", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteCertificateSigningRequestRequest generates requests for DeleteCertificateSigningRequest
+func NewDeleteCertificateSigningRequestRequest(server string, orgID openapi_types.UUID, name string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/certificatesigningrequests/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetCertificateSigningRequestRequest generates requests for GetCertificateSigningRequest
+func NewGetCertificateSigningRequestRequest(server string, orgID openapi_types.UUID, name string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/certificatesigningrequests/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPatchCertificateSigningRequestRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchCertificateSigningRequest builder with application/json-patch+json body
+func NewPatchCertificateSigningRequestRequestWithApplicationJSONPatchPlusJSONBody(server string, orgID openapi_types.UUID, name string, body PatchCertificateSigningRequestApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPatchCertificateSigningRequestRequestWithBody(server, orgID, name, "application/json-patch+json", bodyReader)
+}
+
+// NewPatchCertificateSigningRequestRequestWithBody generates requests for PatchCertificateSigningRequest with any type of body
+func NewPatchCertificateSigningRequestRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/certificatesigningrequests/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewReplaceCertificateSigningRequestRequest calls the generic ReplaceCertificateSigningRequest builder with application/json body
+func NewReplaceCertificateSigningRequestRequest(server string, orgID openapi_types.UUID, name string, body ReplaceCertificateSigningRequestJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewReplaceCertificateSigningRequestRequestWithBody(server, orgID, name, "application/json", bodyReader)
+}
+
+// NewReplaceCertificateSigningRequestRequestWithBody generates requests for ReplaceCertificateSigningRequest with any type of body
+func NewReplaceCertificateSigningRequestRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/certificatesigningrequests/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewUpdateCertificateSigningRequestApprovalRequest calls the generic UpdateCertificateSigningRequestApproval builder with application/json body
+func NewUpdateCertificateSigningRequestApprovalRequest(server string, orgID openapi_types.UUID, name string, body UpdateCertificateSigningRequestApprovalJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateCertificateSigningRequestApprovalRequestWithBody(server, orgID, name, "application/json", bodyReader)
+}
+
+// NewUpdateCertificateSigningRequestApprovalRequestWithBody generates requests for UpdateCertificateSigningRequestApproval with any type of body
+func NewUpdateCertificateSigningRequestApprovalRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/certificatesigningrequests/%s/approval", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListDevicesRequest generates requests for ListDevices
+func NewListDevicesRequest(server string, orgID openapi_types.UUID, params *ListDevicesParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/devices", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Continue != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "continue", runtime.ParamLocationQuery, *params.Continue); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.LabelSelector != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "labelSelector", runtime.ParamLocationQuery, *params.LabelSelector); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FieldSelector != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fieldSelector", runtime.ParamLocationQuery, *params.FieldSelector); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.SummaryOnly != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "summaryOnly", runtime.ParamLocationQuery, *params.SummaryOnly); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateDeviceRequest calls the generic CreateDevice builder with application/json body
+func NewCreateDeviceRequest(server string, orgID openapi_types.UUID, body CreateDeviceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateDeviceRequestWithBody(server, orgID, "application/json", bodyReader)
+}
+
+// NewCreateDeviceRequestWithBody generates requests for CreateDevice with any type of body
+func NewCreateDeviceRequestWithBody(server string, orgID openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/devices", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteDeviceRequest generates requests for DeleteDevice
+func NewDeleteDeviceRequest(server string, orgID openapi_types.UUID, name string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/devices/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetDeviceRequest generates requests for GetDevice
+func NewGetDeviceRequest(server string, orgID openapi_types.UUID, name string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/devices/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPatchDeviceRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchDevice builder with application/json-patch+json body
+func NewPatchDeviceRequestWithApplicationJSONPatchPlusJSONBody(server string, orgID openapi_types.UUID, name string, body PatchDeviceApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPatchDeviceRequestWithBody(server, orgID, name, "application/json-patch+json", bodyReader)
+}
+
+// NewPatchDeviceRequestWithBody generates requests for PatchDevice with any type of body
+func NewPatchDeviceRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/devices/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewReplaceDeviceRequest calls the generic ReplaceDevice builder with application/json body
+func NewReplaceDeviceRequest(server string, orgID openapi_types.UUID, name string, body ReplaceDeviceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewReplaceDeviceRequestWithBody(server, orgID, name, "application/json", bodyReader)
+}
+
+// NewReplaceDeviceRequestWithBody generates requests for ReplaceDevice with any type of body
+func NewReplaceDeviceRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/devices/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDecommissionDeviceRequest calls the generic DecommissionDevice builder with application/json body
+func NewDecommissionDeviceRequest(server string, orgID openapi_types.UUID, name string, body DecommissionDeviceJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewDecommissionDeviceRequestWithBody(server, orgID, name, "application/json", bodyReader)
+}
+
+// NewDecommissionDeviceRequestWithBody generates requests for DecommissionDevice with any type of body
+func NewDecommissionDeviceRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/devices/%s/decommission", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetRenderedDeviceRequest generates requests for GetRenderedDevice
+func NewGetRenderedDeviceRequest(server string, orgID openapi_types.UUID, name string, params *GetRenderedDeviceParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/devices/%s/rendered", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.KnownRenderedVersion != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "knownRenderedVersion", runtime.ParamLocationQuery, *params.KnownRenderedVersion); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetDeviceStatusRequest generates requests for GetDeviceStatus
+func NewGetDeviceStatusRequest(server string, orgID openapi_types.UUID, name string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/devices/%s/status", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPatchDeviceStatusRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchDeviceStatus builder with application/json-patch+json body
+func NewPatchDeviceStatusRequestWithApplicationJSONPatchPlusJSONBody(server string, orgID openapi_types.UUID, name string, body PatchDeviceStatusApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPatchDeviceStatusRequestWithBody(server, orgID, name, "application/json-patch+json", bodyReader)
+}
+
+// NewPatchDeviceStatusRequestWithBody generates requests for PatchDeviceStatus with any type of body
+func NewPatchDeviceStatusRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/devices/%s/status", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewReplaceDeviceStatusRequest calls the generic ReplaceDeviceStatus builder with application/json body
+func NewReplaceDeviceStatusRequest(server string, orgID openapi_types.UUID, name string, body ReplaceDeviceStatusJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewReplaceDeviceStatusRequestWithBody(server, orgID, name, "application/json", bodyReader)
+}
+
+// NewReplaceDeviceStatusRequestWithBody generates requests for ReplaceDeviceStatus with any type of body
+func NewReplaceDeviceStatusRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/devices/%s/status", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetEnrollmentConfigRequest generates requests for GetEnrollmentConfig
+func NewGetEnrollmentConfigRequest(server string, orgID openapi_types.UUID, params *GetEnrollmentConfigParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/enrollmentconfig", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Csr != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "csr", runtime.ParamLocationQuery, *params.Csr); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewListEnrollmentRequestsRequest generates requests for ListEnrollmentRequests
+func NewListEnrollmentRequestsRequest(server string, orgID openapi_types.UUID, params *ListEnrollmentRequestsParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/enrollmentrequests", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Continue != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "continue", runtime.ParamLocationQuery, *params.Continue); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.LabelSelector != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "labelSelector", runtime.ParamLocationQuery, *params.LabelSelector); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FieldSelector != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fieldSelector", runtime.ParamLocationQuery, *params.FieldSelector); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateEnrollmentRequestRequest calls the generic CreateEnrollmentRequest builder with application/json body
+func NewCreateEnrollmentRequestRequest(server string, orgID openapi_types.UUID, body CreateEnrollmentRequestJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateEnrollmentRequestRequestWithBody(server, orgID, "application/json", bodyReader)
+}
+
+// NewCreateEnrollmentRequestRequestWithBody generates requests for CreateEnrollmentRequest with any type of body
+func NewCreateEnrollmentRequestRequestWithBody(server string, orgID openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/enrollmentrequests", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteEnrollmentRequestRequest generates requests for DeleteEnrollmentRequest
+func NewDeleteEnrollmentRequestRequest(server string, orgID openapi_types.UUID, name string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/enrollmentrequests/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetEnrollmentRequestRequest generates requests for GetEnrollmentRequest
+func NewGetEnrollmentRequestRequest(server string, orgID openapi_types.UUID, name string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/enrollmentrequests/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPatchEnrollmentRequestRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchEnrollmentRequest builder with application/json-patch+json body
+func NewPatchEnrollmentRequestRequestWithApplicationJSONPatchPlusJSONBody(server string, orgID openapi_types.UUID, name string, body PatchEnrollmentRequestApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPatchEnrollmentRequestRequestWithBody(server, orgID, name, "application/json-patch+json", bodyReader)
+}
+
+// NewPatchEnrollmentRequestRequestWithBody generates requests for PatchEnrollmentRequest with any type of body
+func NewPatchEnrollmentRequestRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/enrollmentrequests/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewReplaceEnrollmentRequestRequest calls the generic ReplaceEnrollmentRequest builder with application/json body
+func NewReplaceEnrollmentRequestRequest(server string, orgID openapi_types.UUID, name string, body ReplaceEnrollmentRequestJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewReplaceEnrollmentRequestRequestWithBody(server, orgID, name, "application/json", bodyReader)
+}
+
+// NewReplaceEnrollmentRequestRequestWithBody generates requests for ReplaceEnrollmentRequest with any type of body
+func NewReplaceEnrollmentRequestRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/enrollmentrequests/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewApproveEnrollmentRequestRequest calls the generic ApproveEnrollmentRequest builder with application/json body
+func NewApproveEnrollmentRequestRequest(server string, orgID openapi_types.UUID, name string, body ApproveEnrollmentRequestJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewApproveEnrollmentRequestRequestWithBody(server, orgID, name, "application/json", bodyReader)
+}
+
+// NewApproveEnrollmentRequestRequestWithBody generates requests for ApproveEnrollmentRequest with any type of body
+func NewApproveEnrollmentRequestRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/enrollmentrequests/%s/approval", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetEnrollmentRequestStatusRequest generates requests for GetEnrollmentRequestStatus
+func NewGetEnrollmentRequestStatusRequest(server string, orgID openapi_types.UUID, name string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/enrollmentrequests/%s/status", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPatchEnrollmentRequestStatusRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchEnrollmentRequestStatus builder with application/json-patch+json body
+func NewPatchEnrollmentRequestStatusRequestWithApplicationJSONPatchPlusJSONBody(server string, orgID openapi_types.UUID, name string, body PatchEnrollmentRequestStatusApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPatchEnrollmentRequestStatusRequestWithBody(server, orgID, name, "application/json-patch+json", bodyReader)
+}
+
+// NewPatchEnrollmentRequestStatusRequestWithBody generates requests for PatchEnrollmentRequestStatus with any type of body
+func NewPatchEnrollmentRequestStatusRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/enrollmentrequests/%s/status", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewReplaceEnrollmentRequestStatusRequest calls the generic ReplaceEnrollmentRequestStatus builder with application/json body
+func NewReplaceEnrollmentRequestStatusRequest(server string, orgID openapi_types.UUID, name string, body ReplaceEnrollmentRequestStatusJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewReplaceEnrollmentRequestStatusRequestWithBody(server, orgID, name, "application/json", bodyReader)
+}
+
+// NewReplaceEnrollmentRequestStatusRequestWithBody generates requests for ReplaceEnrollmentRequestStatus with any type of body
+func NewReplaceEnrollmentRequestStatusRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/enrollmentrequests/%s/status", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListEventsRequest generates requests for ListEvents
+func NewListEventsRequest(server string, orgID openapi_types.UUID, params *ListEventsParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/events", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.FieldSelector != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fieldSelector", runtime.ParamLocationQuery, *params.FieldSelector); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Order != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "order", runtime.ParamLocationQuery, *params.Order); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Continue != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "continue", runtime.ParamLocationQuery, *params.Continue); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewListFleetsRequest generates requests for ListFleets
+func NewListFleetsRequest(server string, orgID openapi_types.UUID, params *ListFleetsParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/fleets", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Continue != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "continue", runtime.ParamLocationQuery, *params.Continue); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.LabelSelector != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "labelSelector", runtime.ParamLocationQuery, *params.LabelSelector); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FieldSelector != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fieldSelector", runtime.ParamLocationQuery, *params.FieldSelector); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.AddDevicesSummary != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "addDevicesSummary", runtime.ParamLocationQuery, *params.AddDevicesSummary); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateFleetRequest calls the generic CreateFleet builder with application/json body
+func NewCreateFleetRequest(server string, orgID openapi_types.UUID, body CreateFleetJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateFleetRequestWithBody(server, orgID, "application/json", bodyReader)
+}
+
+// NewCreateFleetRequestWithBody generates requests for CreateFleet with any type of body
+func NewCreateFleetRequestWithBody(server string, orgID openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/fleets", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListTemplateVersionsRequest generates requests for ListTemplateVersions
+func NewListTemplateVersionsRequest(server string, orgID openapi_types.UUID, fleet string, params *ListTemplateVersionsParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "fleet", runtime.ParamLocationPath, fleet)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/fleets/%s/templateversions", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Continue != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "continue", runtime.ParamLocationQuery, *params.Continue); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.LabelSelector != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "labelSelector", runtime.ParamLocationQuery, *params.LabelSelector); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FieldSelector != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fieldSelector", runtime.ParamLocationQuery, *params.FieldSelector); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDeleteTemplateVersionRequest generates requests for DeleteTemplateVersion
+func NewDeleteTemplateVersionRequest(server string, orgID openapi_types.UUID, fleet string, name string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "fleet", runtime.ParamLocationPath, fleet)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/fleets/%s/templateversions/%s", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetTemplateVersionRequest generates requests for GetTemplateVersion
+func NewGetTemplateVersionRequest(server string, orgID openapi_types.UUID, fleet string, name string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "fleet", runtime.ParamLocationPath, fleet)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/fleets/%s/templateversions/%s", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewDeleteFleetRequest generates requests for DeleteFleet
+func NewDeleteFleetRequest(server string, orgID openapi_types.UUID, name string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/fleets/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetFleetRequest generates requests for GetFleet
+func NewGetFleetRequest(server string, orgID openapi_types.UUID, name string, params *GetFleetParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/fleets/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.AddDevicesSummary != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "addDevicesSummary", runtime.ParamLocationQuery, *params.AddDevicesSummary); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPatchFleetRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchFleet builder with application/json-patch+json body
+func NewPatchFleetRequestWithApplicationJSONPatchPlusJSONBody(server string, orgID openapi_types.UUID, name string, body PatchFleetApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPatchFleetRequestWithBody(server, orgID, name, "application/json-patch+json", bodyReader)
+}
+
+// NewPatchFleetRequestWithBody generates requests for PatchFleet with any type of body
+func NewPatchFleetRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/fleets/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewReplaceFleetRequest calls the generic ReplaceFleet builder with application/json body
+func NewReplaceFleetRequest(server string, orgID openapi_types.UUID, name string, body ReplaceFleetJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewReplaceFleetRequestWithBody(server, orgID, name, "application/json", bodyReader)
+}
+
+// NewReplaceFleetRequestWithBody generates requests for ReplaceFleet with any type of body
+func NewReplaceFleetRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/fleets/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetFleetStatusRequest generates requests for GetFleetStatus
+func NewGetFleetStatusRequest(server string, orgID openapi_types.UUID, name string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/fleets/%s/status", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewPatchFleetStatusRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchFleetStatus builder with application/json-patch+json body
+func NewPatchFleetStatusRequestWithApplicationJSONPatchPlusJSONBody(server string, orgID openapi_types.UUID, name string, body PatchFleetStatusApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPatchFleetStatusRequestWithBody(server, orgID, name, "application/json-patch+json", bodyReader)
+}
+
+// NewPatchFleetStatusRequestWithBody generates requests for PatchFleetStatus with any type of body
+func NewPatchFleetStatusRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/fleets/%s/status", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewReplaceFleetStatusRequest calls the generic ReplaceFleetStatus builder with application/json body
+func NewReplaceFleetStatusRequest(server string, orgID openapi_types.UUID, name string, body ReplaceFleetStatusJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewReplaceFleetStatusRequestWithBody(server, orgID, name, "application/json", bodyReader)
+}
+
+// NewReplaceFleetStatusRequestWithBody generates requests for ReplaceFleetStatus with any type of body
+func NewReplaceFleetStatusRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/fleets/%s/status", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewListLabelsRequest generates requests for ListLabels
+func NewListLabelsRequest(server string, orgID openapi_types.UUID, params *ListLabelsParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/labels", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "kind", runtime.ParamLocationQuery, params.Kind); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if params.LabelSelector != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "labelSelector", runtime.ParamLocationQuery, *params.LabelSelector); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.FieldSelector != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fieldSelector", runtime.ParamLocationQuery, *params.FieldSelector); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewListRepositoriesRequest generates requests for ListRepositories
+func NewListRepositoriesRequest(server string, orgID openapi_types.UUID, params *ListRepositoriesParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/repositories", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -3964,26 +4273,33 @@ func NewListRepositoriesRequest(server string, params *ListRepositoriesParams) (
 }
 
 // NewCreateRepositoryRequest calls the generic CreateRepository builder with application/json body
-func NewCreateRepositoryRequest(server string, body CreateRepositoryJSONRequestBody) (*http.Request, error) {
+func NewCreateRepositoryRequest(server string, orgID openapi_types.UUID, body CreateRepositoryJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateRepositoryRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateRepositoryRequestWithBody(server, orgID, "application/json", bodyReader)
 }
 
 // NewCreateRepositoryRequestWithBody generates requests for CreateRepository with any type of body
-func NewCreateRepositoryRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateRepositoryRequestWithBody(server string, orgID openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/repositories")
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/repositories", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4004,12 +4320,19 @@ func NewCreateRepositoryRequestWithBody(server string, contentType string, body 
 }
 
 // NewDeleteRepositoryRequest generates requests for DeleteRepository
-func NewDeleteRepositoryRequest(server string, name string) (*http.Request, error) {
+func NewDeleteRepositoryRequest(server string, orgID openapi_types.UUID, name string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
 	if err != nil {
 		return nil, err
 	}
@@ -4019,7 +4342,7 @@ func NewDeleteRepositoryRequest(server string, name string) (*http.Request, erro
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/repositories/%s", pathParam0)
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/repositories/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4038,12 +4361,19 @@ func NewDeleteRepositoryRequest(server string, name string) (*http.Request, erro
 }
 
 // NewGetRepositoryRequest generates requests for GetRepository
-func NewGetRepositoryRequest(server string, name string) (*http.Request, error) {
+func NewGetRepositoryRequest(server string, orgID openapi_types.UUID, name string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
 	if err != nil {
 		return nil, err
 	}
@@ -4053,7 +4383,7 @@ func NewGetRepositoryRequest(server string, name string) (*http.Request, error) 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/repositories/%s", pathParam0)
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/repositories/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4072,23 +4402,30 @@ func NewGetRepositoryRequest(server string, name string) (*http.Request, error) 
 }
 
 // NewPatchRepositoryRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchRepository builder with application/json-patch+json body
-func NewPatchRepositoryRequestWithApplicationJSONPatchPlusJSONBody(server string, name string, body PatchRepositoryApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
+func NewPatchRepositoryRequestWithApplicationJSONPatchPlusJSONBody(server string, orgID openapi_types.UUID, name string, body PatchRepositoryApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPatchRepositoryRequestWithBody(server, name, "application/json-patch+json", bodyReader)
+	return NewPatchRepositoryRequestWithBody(server, orgID, name, "application/json-patch+json", bodyReader)
 }
 
 // NewPatchRepositoryRequestWithBody generates requests for PatchRepository with any type of body
-func NewPatchRepositoryRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
+func NewPatchRepositoryRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
 	if err != nil {
 		return nil, err
 	}
@@ -4098,7 +4435,7 @@ func NewPatchRepositoryRequestWithBody(server string, name string, contentType s
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/repositories/%s", pathParam0)
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/repositories/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4119,23 +4456,30 @@ func NewPatchRepositoryRequestWithBody(server string, name string, contentType s
 }
 
 // NewReplaceRepositoryRequest calls the generic ReplaceRepository builder with application/json body
-func NewReplaceRepositoryRequest(server string, name string, body ReplaceRepositoryJSONRequestBody) (*http.Request, error) {
+func NewReplaceRepositoryRequest(server string, orgID openapi_types.UUID, name string, body ReplaceRepositoryJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewReplaceRepositoryRequestWithBody(server, name, "application/json", bodyReader)
+	return NewReplaceRepositoryRequestWithBody(server, orgID, name, "application/json", bodyReader)
 }
 
 // NewReplaceRepositoryRequestWithBody generates requests for ReplaceRepository with any type of body
-func NewReplaceRepositoryRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
+func NewReplaceRepositoryRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
 	if err != nil {
 		return nil, err
 	}
@@ -4145,7 +4489,7 @@ func NewReplaceRepositoryRequestWithBody(server string, name string, contentType
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/repositories/%s", pathParam0)
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/repositories/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4166,15 +4510,22 @@ func NewReplaceRepositoryRequestWithBody(server string, name string, contentType
 }
 
 // NewListResourceSyncsRequest generates requests for ListResourceSyncs
-func NewListResourceSyncsRequest(server string, params *ListResourceSyncsParams) (*http.Request, error) {
+func NewListResourceSyncsRequest(server string, orgID openapi_types.UUID, params *ListResourceSyncsParams) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/resourcesyncs")
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/resourcesyncs", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4263,26 +4614,33 @@ func NewListResourceSyncsRequest(server string, params *ListResourceSyncsParams)
 }
 
 // NewCreateResourceSyncRequest calls the generic CreateResourceSync builder with application/json body
-func NewCreateResourceSyncRequest(server string, body CreateResourceSyncJSONRequestBody) (*http.Request, error) {
+func NewCreateResourceSyncRequest(server string, orgID openapi_types.UUID, body CreateResourceSyncJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateResourceSyncRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateResourceSyncRequestWithBody(server, orgID, "application/json", bodyReader)
 }
 
 // NewCreateResourceSyncRequestWithBody generates requests for CreateResourceSync with any type of body
-func NewCreateResourceSyncRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateResourceSyncRequestWithBody(server string, orgID openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
 
 	serverURL, err := url.Parse(server)
 	if err != nil {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/resourcesyncs")
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/resourcesyncs", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4303,12 +4661,19 @@ func NewCreateResourceSyncRequestWithBody(server string, contentType string, bod
 }
 
 // NewDeleteResourceSyncRequest generates requests for DeleteResourceSync
-func NewDeleteResourceSyncRequest(server string, name string) (*http.Request, error) {
+func NewDeleteResourceSyncRequest(server string, orgID openapi_types.UUID, name string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
 	if err != nil {
 		return nil, err
 	}
@@ -4318,7 +4683,7 @@ func NewDeleteResourceSyncRequest(server string, name string) (*http.Request, er
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/resourcesyncs/%s", pathParam0)
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/resourcesyncs/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4337,12 +4702,19 @@ func NewDeleteResourceSyncRequest(server string, name string) (*http.Request, er
 }
 
 // NewGetResourceSyncRequest generates requests for GetResourceSync
-func NewGetResourceSyncRequest(server string, name string) (*http.Request, error) {
+func NewGetResourceSyncRequest(server string, orgID openapi_types.UUID, name string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
 	if err != nil {
 		return nil, err
 	}
@@ -4352,7 +4724,7 @@ func NewGetResourceSyncRequest(server string, name string) (*http.Request, error
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/resourcesyncs/%s", pathParam0)
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/resourcesyncs/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4371,23 +4743,30 @@ func NewGetResourceSyncRequest(server string, name string) (*http.Request, error
 }
 
 // NewPatchResourceSyncRequestWithApplicationJSONPatchPlusJSONBody calls the generic PatchResourceSync builder with application/json-patch+json body
-func NewPatchResourceSyncRequestWithApplicationJSONPatchPlusJSONBody(server string, name string, body PatchResourceSyncApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
+func NewPatchResourceSyncRequestWithApplicationJSONPatchPlusJSONBody(server string, orgID openapi_types.UUID, name string, body PatchResourceSyncApplicationJSONPatchPlusJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPatchResourceSyncRequestWithBody(server, name, "application/json-patch+json", bodyReader)
+	return NewPatchResourceSyncRequestWithBody(server, orgID, name, "application/json-patch+json", bodyReader)
 }
 
 // NewPatchResourceSyncRequestWithBody generates requests for PatchResourceSync with any type of body
-func NewPatchResourceSyncRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
+func NewPatchResourceSyncRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
 	if err != nil {
 		return nil, err
 	}
@@ -4397,7 +4776,7 @@ func NewPatchResourceSyncRequestWithBody(server string, name string, contentType
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/resourcesyncs/%s", pathParam0)
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/resourcesyncs/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4418,23 +4797,30 @@ func NewPatchResourceSyncRequestWithBody(server string, name string, contentType
 }
 
 // NewReplaceResourceSyncRequest calls the generic ReplaceResourceSync builder with application/json body
-func NewReplaceResourceSyncRequest(server string, name string, body ReplaceResourceSyncJSONRequestBody) (*http.Request, error) {
+func NewReplaceResourceSyncRequest(server string, orgID openapi_types.UUID, name string, body ReplaceResourceSyncJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewReplaceResourceSyncRequestWithBody(server, name, "application/json", bodyReader)
+	return NewReplaceResourceSyncRequestWithBody(server, orgID, name, "application/json", bodyReader)
 }
 
 // NewReplaceResourceSyncRequestWithBody generates requests for ReplaceResourceSync with any type of body
-func NewReplaceResourceSyncRequestWithBody(server string, name string, contentType string, body io.Reader) (*http.Request, error) {
+func NewReplaceResourceSyncRequestWithBody(server string, orgID openapi_types.UUID, name string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "name", runtime.ParamLocationPath, name)
 	if err != nil {
 		return nil, err
 	}
@@ -4444,7 +4830,7 @@ func NewReplaceResourceSyncRequestWithBody(server string, name string, contentTy
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/api/v1/resourcesyncs/%s", pathParam0)
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s/resourcesyncs/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4567,177 +4953,6 @@ type ClientWithResponsesInterface interface {
 	// AuthValidateWithResponse request
 	AuthValidateWithResponse(ctx context.Context, params *AuthValidateParams, reqEditors ...RequestEditorFn) (*AuthValidateResponse, error)
 
-	// ListCertificateSigningRequestsWithResponse request
-	ListCertificateSigningRequestsWithResponse(ctx context.Context, params *ListCertificateSigningRequestsParams, reqEditors ...RequestEditorFn) (*ListCertificateSigningRequestsResponse, error)
-
-	// CreateCertificateSigningRequestWithBodyWithResponse request with any body
-	CreateCertificateSigningRequestWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCertificateSigningRequestResponse, error)
-
-	CreateCertificateSigningRequestWithResponse(ctx context.Context, body CreateCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCertificateSigningRequestResponse, error)
-
-	// DeleteCertificateSigningRequestWithResponse request
-	DeleteCertificateSigningRequestWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*DeleteCertificateSigningRequestResponse, error)
-
-	// GetCertificateSigningRequestWithResponse request
-	GetCertificateSigningRequestWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetCertificateSigningRequestResponse, error)
-
-	// PatchCertificateSigningRequestWithBodyWithResponse request with any body
-	PatchCertificateSigningRequestWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchCertificateSigningRequestResponse, error)
-
-	PatchCertificateSigningRequestWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchCertificateSigningRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchCertificateSigningRequestResponse, error)
-
-	// ReplaceCertificateSigningRequestWithBodyWithResponse request with any body
-	ReplaceCertificateSigningRequestWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceCertificateSigningRequestResponse, error)
-
-	ReplaceCertificateSigningRequestWithResponse(ctx context.Context, name string, body ReplaceCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceCertificateSigningRequestResponse, error)
-
-	// UpdateCertificateSigningRequestApprovalWithBodyWithResponse request with any body
-	UpdateCertificateSigningRequestApprovalWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateCertificateSigningRequestApprovalResponse, error)
-
-	UpdateCertificateSigningRequestApprovalWithResponse(ctx context.Context, name string, body UpdateCertificateSigningRequestApprovalJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateCertificateSigningRequestApprovalResponse, error)
-
-	// ListDevicesWithResponse request
-	ListDevicesWithResponse(ctx context.Context, params *ListDevicesParams, reqEditors ...RequestEditorFn) (*ListDevicesResponse, error)
-
-	// CreateDeviceWithBodyWithResponse request with any body
-	CreateDeviceWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDeviceResponse, error)
-
-	CreateDeviceWithResponse(ctx context.Context, body CreateDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDeviceResponse, error)
-
-	// DeleteDeviceWithResponse request
-	DeleteDeviceWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*DeleteDeviceResponse, error)
-
-	// GetDeviceWithResponse request
-	GetDeviceWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetDeviceResponse, error)
-
-	// PatchDeviceWithBodyWithResponse request with any body
-	PatchDeviceWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchDeviceResponse, error)
-
-	PatchDeviceWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchDeviceApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchDeviceResponse, error)
-
-	// ReplaceDeviceWithBodyWithResponse request with any body
-	ReplaceDeviceWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceDeviceResponse, error)
-
-	ReplaceDeviceWithResponse(ctx context.Context, name string, body ReplaceDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceDeviceResponse, error)
-
-	// DecommissionDeviceWithBodyWithResponse request with any body
-	DecommissionDeviceWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DecommissionDeviceResponse, error)
-
-	DecommissionDeviceWithResponse(ctx context.Context, name string, body DecommissionDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*DecommissionDeviceResponse, error)
-
-	// GetRenderedDeviceWithResponse request
-	GetRenderedDeviceWithResponse(ctx context.Context, name string, params *GetRenderedDeviceParams, reqEditors ...RequestEditorFn) (*GetRenderedDeviceResponse, error)
-
-	// GetDeviceStatusWithResponse request
-	GetDeviceStatusWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetDeviceStatusResponse, error)
-
-	// PatchDeviceStatusWithBodyWithResponse request with any body
-	PatchDeviceStatusWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchDeviceStatusResponse, error)
-
-	PatchDeviceStatusWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchDeviceStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchDeviceStatusResponse, error)
-
-	// ReplaceDeviceStatusWithBodyWithResponse request with any body
-	ReplaceDeviceStatusWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceDeviceStatusResponse, error)
-
-	ReplaceDeviceStatusWithResponse(ctx context.Context, name string, body ReplaceDeviceStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceDeviceStatusResponse, error)
-
-	// GetEnrollmentConfigWithResponse request
-	GetEnrollmentConfigWithResponse(ctx context.Context, params *GetEnrollmentConfigParams, reqEditors ...RequestEditorFn) (*GetEnrollmentConfigResponse, error)
-
-	// ListEnrollmentRequestsWithResponse request
-	ListEnrollmentRequestsWithResponse(ctx context.Context, params *ListEnrollmentRequestsParams, reqEditors ...RequestEditorFn) (*ListEnrollmentRequestsResponse, error)
-
-	// CreateEnrollmentRequestWithBodyWithResponse request with any body
-	CreateEnrollmentRequestWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateEnrollmentRequestResponse, error)
-
-	CreateEnrollmentRequestWithResponse(ctx context.Context, body CreateEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateEnrollmentRequestResponse, error)
-
-	// DeleteEnrollmentRequestWithResponse request
-	DeleteEnrollmentRequestWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*DeleteEnrollmentRequestResponse, error)
-
-	// GetEnrollmentRequestWithResponse request
-	GetEnrollmentRequestWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetEnrollmentRequestResponse, error)
-
-	// PatchEnrollmentRequestWithBodyWithResponse request with any body
-	PatchEnrollmentRequestWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestResponse, error)
-
-	PatchEnrollmentRequestWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchEnrollmentRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestResponse, error)
-
-	// ReplaceEnrollmentRequestWithBodyWithResponse request with any body
-	ReplaceEnrollmentRequestWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestResponse, error)
-
-	ReplaceEnrollmentRequestWithResponse(ctx context.Context, name string, body ReplaceEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestResponse, error)
-
-	// ApproveEnrollmentRequestWithBodyWithResponse request with any body
-	ApproveEnrollmentRequestWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApproveEnrollmentRequestResponse, error)
-
-	ApproveEnrollmentRequestWithResponse(ctx context.Context, name string, body ApproveEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*ApproveEnrollmentRequestResponse, error)
-
-	// GetEnrollmentRequestStatusWithResponse request
-	GetEnrollmentRequestStatusWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetEnrollmentRequestStatusResponse, error)
-
-	// PatchEnrollmentRequestStatusWithBodyWithResponse request with any body
-	PatchEnrollmentRequestStatusWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestStatusResponse, error)
-
-	PatchEnrollmentRequestStatusWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchEnrollmentRequestStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestStatusResponse, error)
-
-	// ReplaceEnrollmentRequestStatusWithBodyWithResponse request with any body
-	ReplaceEnrollmentRequestStatusWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestStatusResponse, error)
-
-	ReplaceEnrollmentRequestStatusWithResponse(ctx context.Context, name string, body ReplaceEnrollmentRequestStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestStatusResponse, error)
-
-	// ListEventsWithResponse request
-	ListEventsWithResponse(ctx context.Context, params *ListEventsParams, reqEditors ...RequestEditorFn) (*ListEventsResponse, error)
-
-	// ListFleetsWithResponse request
-	ListFleetsWithResponse(ctx context.Context, params *ListFleetsParams, reqEditors ...RequestEditorFn) (*ListFleetsResponse, error)
-
-	// CreateFleetWithBodyWithResponse request with any body
-	CreateFleetWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFleetResponse, error)
-
-	CreateFleetWithResponse(ctx context.Context, body CreateFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFleetResponse, error)
-
-	// ListTemplateVersionsWithResponse request
-	ListTemplateVersionsWithResponse(ctx context.Context, fleet string, params *ListTemplateVersionsParams, reqEditors ...RequestEditorFn) (*ListTemplateVersionsResponse, error)
-
-	// DeleteTemplateVersionWithResponse request
-	DeleteTemplateVersionWithResponse(ctx context.Context, fleet string, name string, reqEditors ...RequestEditorFn) (*DeleteTemplateVersionResponse, error)
-
-	// GetTemplateVersionWithResponse request
-	GetTemplateVersionWithResponse(ctx context.Context, fleet string, name string, reqEditors ...RequestEditorFn) (*GetTemplateVersionResponse, error)
-
-	// DeleteFleetWithResponse request
-	DeleteFleetWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*DeleteFleetResponse, error)
-
-	// GetFleetWithResponse request
-	GetFleetWithResponse(ctx context.Context, name string, params *GetFleetParams, reqEditors ...RequestEditorFn) (*GetFleetResponse, error)
-
-	// PatchFleetWithBodyWithResponse request with any body
-	PatchFleetWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchFleetResponse, error)
-
-	PatchFleetWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchFleetApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchFleetResponse, error)
-
-	// ReplaceFleetWithBodyWithResponse request with any body
-	ReplaceFleetWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceFleetResponse, error)
-
-	ReplaceFleetWithResponse(ctx context.Context, name string, body ReplaceFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceFleetResponse, error)
-
-	// GetFleetStatusWithResponse request
-	GetFleetStatusWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetFleetStatusResponse, error)
-
-	// PatchFleetStatusWithBodyWithResponse request with any body
-	PatchFleetStatusWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchFleetStatusResponse, error)
-
-	PatchFleetStatusWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchFleetStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchFleetStatusResponse, error)
-
-	// ReplaceFleetStatusWithBodyWithResponse request with any body
-	ReplaceFleetStatusWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceFleetStatusResponse, error)
-
-	ReplaceFleetStatusWithResponse(ctx context.Context, name string, body ReplaceFleetStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceFleetStatusResponse, error)
-
-	// ListLabelsWithResponse request
-	ListLabelsWithResponse(ctx context.Context, params *ListLabelsParams, reqEditors ...RequestEditorFn) (*ListLabelsResponse, error)
-
 	// ListOrganizationsWithResponse request
 	ListOrganizationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListOrganizationsResponse, error)
 
@@ -4751,53 +4966,224 @@ type ClientWithResponsesInterface interface {
 
 	ReplaceOrganizationWithResponse(ctx context.Context, orgID string, body ReplaceOrganizationJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceOrganizationResponse, error)
 
+	// ListCertificateSigningRequestsWithResponse request
+	ListCertificateSigningRequestsWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListCertificateSigningRequestsParams, reqEditors ...RequestEditorFn) (*ListCertificateSigningRequestsResponse, error)
+
+	// CreateCertificateSigningRequestWithBodyWithResponse request with any body
+	CreateCertificateSigningRequestWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCertificateSigningRequestResponse, error)
+
+	CreateCertificateSigningRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, body CreateCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCertificateSigningRequestResponse, error)
+
+	// DeleteCertificateSigningRequestWithResponse request
+	DeleteCertificateSigningRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*DeleteCertificateSigningRequestResponse, error)
+
+	// GetCertificateSigningRequestWithResponse request
+	GetCertificateSigningRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetCertificateSigningRequestResponse, error)
+
+	// PatchCertificateSigningRequestWithBodyWithResponse request with any body
+	PatchCertificateSigningRequestWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchCertificateSigningRequestResponse, error)
+
+	PatchCertificateSigningRequestWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchCertificateSigningRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchCertificateSigningRequestResponse, error)
+
+	// ReplaceCertificateSigningRequestWithBodyWithResponse request with any body
+	ReplaceCertificateSigningRequestWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceCertificateSigningRequestResponse, error)
+
+	ReplaceCertificateSigningRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceCertificateSigningRequestResponse, error)
+
+	// UpdateCertificateSigningRequestApprovalWithBodyWithResponse request with any body
+	UpdateCertificateSigningRequestApprovalWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateCertificateSigningRequestApprovalResponse, error)
+
+	UpdateCertificateSigningRequestApprovalWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body UpdateCertificateSigningRequestApprovalJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateCertificateSigningRequestApprovalResponse, error)
+
+	// ListDevicesWithResponse request
+	ListDevicesWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListDevicesParams, reqEditors ...RequestEditorFn) (*ListDevicesResponse, error)
+
+	// CreateDeviceWithBodyWithResponse request with any body
+	CreateDeviceWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDeviceResponse, error)
+
+	CreateDeviceWithResponse(ctx context.Context, orgID openapi_types.UUID, body CreateDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDeviceResponse, error)
+
+	// DeleteDeviceWithResponse request
+	DeleteDeviceWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*DeleteDeviceResponse, error)
+
+	// GetDeviceWithResponse request
+	GetDeviceWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetDeviceResponse, error)
+
+	// PatchDeviceWithBodyWithResponse request with any body
+	PatchDeviceWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchDeviceResponse, error)
+
+	PatchDeviceWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchDeviceApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchDeviceResponse, error)
+
+	// ReplaceDeviceWithBodyWithResponse request with any body
+	ReplaceDeviceWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceDeviceResponse, error)
+
+	ReplaceDeviceWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceDeviceResponse, error)
+
+	// DecommissionDeviceWithBodyWithResponse request with any body
+	DecommissionDeviceWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DecommissionDeviceResponse, error)
+
+	DecommissionDeviceWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body DecommissionDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*DecommissionDeviceResponse, error)
+
+	// GetRenderedDeviceWithResponse request
+	GetRenderedDeviceWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, params *GetRenderedDeviceParams, reqEditors ...RequestEditorFn) (*GetRenderedDeviceResponse, error)
+
+	// GetDeviceStatusWithResponse request
+	GetDeviceStatusWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetDeviceStatusResponse, error)
+
+	// PatchDeviceStatusWithBodyWithResponse request with any body
+	PatchDeviceStatusWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchDeviceStatusResponse, error)
+
+	PatchDeviceStatusWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchDeviceStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchDeviceStatusResponse, error)
+
+	// ReplaceDeviceStatusWithBodyWithResponse request with any body
+	ReplaceDeviceStatusWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceDeviceStatusResponse, error)
+
+	ReplaceDeviceStatusWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceDeviceStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceDeviceStatusResponse, error)
+
+	// GetEnrollmentConfigWithResponse request
+	GetEnrollmentConfigWithResponse(ctx context.Context, orgID openapi_types.UUID, params *GetEnrollmentConfigParams, reqEditors ...RequestEditorFn) (*GetEnrollmentConfigResponse, error)
+
+	// ListEnrollmentRequestsWithResponse request
+	ListEnrollmentRequestsWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListEnrollmentRequestsParams, reqEditors ...RequestEditorFn) (*ListEnrollmentRequestsResponse, error)
+
+	// CreateEnrollmentRequestWithBodyWithResponse request with any body
+	CreateEnrollmentRequestWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateEnrollmentRequestResponse, error)
+
+	CreateEnrollmentRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, body CreateEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateEnrollmentRequestResponse, error)
+
+	// DeleteEnrollmentRequestWithResponse request
+	DeleteEnrollmentRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*DeleteEnrollmentRequestResponse, error)
+
+	// GetEnrollmentRequestWithResponse request
+	GetEnrollmentRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetEnrollmentRequestResponse, error)
+
+	// PatchEnrollmentRequestWithBodyWithResponse request with any body
+	PatchEnrollmentRequestWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestResponse, error)
+
+	PatchEnrollmentRequestWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchEnrollmentRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestResponse, error)
+
+	// ReplaceEnrollmentRequestWithBodyWithResponse request with any body
+	ReplaceEnrollmentRequestWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestResponse, error)
+
+	ReplaceEnrollmentRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestResponse, error)
+
+	// ApproveEnrollmentRequestWithBodyWithResponse request with any body
+	ApproveEnrollmentRequestWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApproveEnrollmentRequestResponse, error)
+
+	ApproveEnrollmentRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ApproveEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*ApproveEnrollmentRequestResponse, error)
+
+	// GetEnrollmentRequestStatusWithResponse request
+	GetEnrollmentRequestStatusWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetEnrollmentRequestStatusResponse, error)
+
+	// PatchEnrollmentRequestStatusWithBodyWithResponse request with any body
+	PatchEnrollmentRequestStatusWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestStatusResponse, error)
+
+	PatchEnrollmentRequestStatusWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchEnrollmentRequestStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestStatusResponse, error)
+
+	// ReplaceEnrollmentRequestStatusWithBodyWithResponse request with any body
+	ReplaceEnrollmentRequestStatusWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestStatusResponse, error)
+
+	ReplaceEnrollmentRequestStatusWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceEnrollmentRequestStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestStatusResponse, error)
+
+	// ListEventsWithResponse request
+	ListEventsWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListEventsParams, reqEditors ...RequestEditorFn) (*ListEventsResponse, error)
+
+	// ListFleetsWithResponse request
+	ListFleetsWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListFleetsParams, reqEditors ...RequestEditorFn) (*ListFleetsResponse, error)
+
+	// CreateFleetWithBodyWithResponse request with any body
+	CreateFleetWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFleetResponse, error)
+
+	CreateFleetWithResponse(ctx context.Context, orgID openapi_types.UUID, body CreateFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFleetResponse, error)
+
+	// ListTemplateVersionsWithResponse request
+	ListTemplateVersionsWithResponse(ctx context.Context, orgID openapi_types.UUID, fleet string, params *ListTemplateVersionsParams, reqEditors ...RequestEditorFn) (*ListTemplateVersionsResponse, error)
+
+	// DeleteTemplateVersionWithResponse request
+	DeleteTemplateVersionWithResponse(ctx context.Context, orgID openapi_types.UUID, fleet string, name string, reqEditors ...RequestEditorFn) (*DeleteTemplateVersionResponse, error)
+
+	// GetTemplateVersionWithResponse request
+	GetTemplateVersionWithResponse(ctx context.Context, orgID openapi_types.UUID, fleet string, name string, reqEditors ...RequestEditorFn) (*GetTemplateVersionResponse, error)
+
+	// DeleteFleetWithResponse request
+	DeleteFleetWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*DeleteFleetResponse, error)
+
+	// GetFleetWithResponse request
+	GetFleetWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, params *GetFleetParams, reqEditors ...RequestEditorFn) (*GetFleetResponse, error)
+
+	// PatchFleetWithBodyWithResponse request with any body
+	PatchFleetWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchFleetResponse, error)
+
+	PatchFleetWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchFleetApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchFleetResponse, error)
+
+	// ReplaceFleetWithBodyWithResponse request with any body
+	ReplaceFleetWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceFleetResponse, error)
+
+	ReplaceFleetWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceFleetResponse, error)
+
+	// GetFleetStatusWithResponse request
+	GetFleetStatusWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetFleetStatusResponse, error)
+
+	// PatchFleetStatusWithBodyWithResponse request with any body
+	PatchFleetStatusWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchFleetStatusResponse, error)
+
+	PatchFleetStatusWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchFleetStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchFleetStatusResponse, error)
+
+	// ReplaceFleetStatusWithBodyWithResponse request with any body
+	ReplaceFleetStatusWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceFleetStatusResponse, error)
+
+	ReplaceFleetStatusWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceFleetStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceFleetStatusResponse, error)
+
+	// ListLabelsWithResponse request
+	ListLabelsWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListLabelsParams, reqEditors ...RequestEditorFn) (*ListLabelsResponse, error)
+
 	// ListRepositoriesWithResponse request
-	ListRepositoriesWithResponse(ctx context.Context, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*ListRepositoriesResponse, error)
+	ListRepositoriesWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*ListRepositoriesResponse, error)
 
 	// CreateRepositoryWithBodyWithResponse request with any body
-	CreateRepositoryWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRepositoryResponse, error)
+	CreateRepositoryWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRepositoryResponse, error)
 
-	CreateRepositoryWithResponse(ctx context.Context, body CreateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRepositoryResponse, error)
+	CreateRepositoryWithResponse(ctx context.Context, orgID openapi_types.UUID, body CreateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRepositoryResponse, error)
 
 	// DeleteRepositoryWithResponse request
-	DeleteRepositoryWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*DeleteRepositoryResponse, error)
+	DeleteRepositoryWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*DeleteRepositoryResponse, error)
 
 	// GetRepositoryWithResponse request
-	GetRepositoryWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetRepositoryResponse, error)
+	GetRepositoryWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetRepositoryResponse, error)
 
 	// PatchRepositoryWithBodyWithResponse request with any body
-	PatchRepositoryWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchRepositoryResponse, error)
+	PatchRepositoryWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchRepositoryResponse, error)
 
-	PatchRepositoryWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchRepositoryApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchRepositoryResponse, error)
+	PatchRepositoryWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchRepositoryApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchRepositoryResponse, error)
 
 	// ReplaceRepositoryWithBodyWithResponse request with any body
-	ReplaceRepositoryWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceRepositoryResponse, error)
+	ReplaceRepositoryWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceRepositoryResponse, error)
 
-	ReplaceRepositoryWithResponse(ctx context.Context, name string, body ReplaceRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceRepositoryResponse, error)
+	ReplaceRepositoryWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceRepositoryResponse, error)
 
 	// ListResourceSyncsWithResponse request
-	ListResourceSyncsWithResponse(ctx context.Context, params *ListResourceSyncsParams, reqEditors ...RequestEditorFn) (*ListResourceSyncsResponse, error)
+	ListResourceSyncsWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListResourceSyncsParams, reqEditors ...RequestEditorFn) (*ListResourceSyncsResponse, error)
 
 	// CreateResourceSyncWithBodyWithResponse request with any body
-	CreateResourceSyncWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResourceSyncResponse, error)
+	CreateResourceSyncWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResourceSyncResponse, error)
 
-	CreateResourceSyncWithResponse(ctx context.Context, body CreateResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResourceSyncResponse, error)
+	CreateResourceSyncWithResponse(ctx context.Context, orgID openapi_types.UUID, body CreateResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResourceSyncResponse, error)
 
 	// DeleteResourceSyncWithResponse request
-	DeleteResourceSyncWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*DeleteResourceSyncResponse, error)
+	DeleteResourceSyncWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*DeleteResourceSyncResponse, error)
 
 	// GetResourceSyncWithResponse request
-	GetResourceSyncWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetResourceSyncResponse, error)
+	GetResourceSyncWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetResourceSyncResponse, error)
 
 	// PatchResourceSyncWithBodyWithResponse request with any body
-	PatchResourceSyncWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchResourceSyncResponse, error)
+	PatchResourceSyncWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchResourceSyncResponse, error)
 
-	PatchResourceSyncWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchResourceSyncApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchResourceSyncResponse, error)
+	PatchResourceSyncWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchResourceSyncApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchResourceSyncResponse, error)
 
 	// ReplaceResourceSyncWithBodyWithResponse request with any body
-	ReplaceResourceSyncWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceResourceSyncResponse, error)
+	ReplaceResourceSyncWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceResourceSyncResponse, error)
 
-	ReplaceResourceSyncWithResponse(ctx context.Context, name string, body ReplaceResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceResourceSyncResponse, error)
+	ReplaceResourceSyncWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceResourceSyncResponse, error)
 
 	// ListUserOrganizationsWithResponse request
 	ListUserOrganizationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListUserOrganizationsResponse, error)
@@ -4849,6 +5235,72 @@ func (r AuthValidateResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r AuthValidateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ListOrganizationsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OrganizationList
+}
+
+// Status returns HTTPResponse.Status
+func (r ListOrganizationsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListOrganizationsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateOrganizationResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Organization
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateOrganizationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateOrganizationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ReplaceOrganizationResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Organization
+}
+
+// Status returns HTTPResponse.Status
+func (r ReplaceOrganizationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ReplaceOrganizationResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -6008,72 +6460,6 @@ func (r ListLabelsResponse) StatusCode() int {
 	return 0
 }
 
-type ListOrganizationsResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *OrganizationList
-}
-
-// Status returns HTTPResponse.Status
-func (r ListOrganizationsResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ListOrganizationsResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type CreateOrganizationResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *Organization
-}
-
-// Status returns HTTPResponse.Status
-func (r CreateOrganizationResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r CreateOrganizationResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ReplaceOrganizationResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *Organization
-}
-
-// Status returns HTTPResponse.Status
-func (r ReplaceOrganizationResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ReplaceOrganizationResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 type ListRepositoriesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -6462,561 +6848,6 @@ func (c *ClientWithResponses) AuthValidateWithResponse(ctx context.Context, para
 	return ParseAuthValidateResponse(rsp)
 }
 
-// ListCertificateSigningRequestsWithResponse request returning *ListCertificateSigningRequestsResponse
-func (c *ClientWithResponses) ListCertificateSigningRequestsWithResponse(ctx context.Context, params *ListCertificateSigningRequestsParams, reqEditors ...RequestEditorFn) (*ListCertificateSigningRequestsResponse, error) {
-	rsp, err := c.ListCertificateSigningRequests(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListCertificateSigningRequestsResponse(rsp)
-}
-
-// CreateCertificateSigningRequestWithBodyWithResponse request with arbitrary body returning *CreateCertificateSigningRequestResponse
-func (c *ClientWithResponses) CreateCertificateSigningRequestWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCertificateSigningRequestResponse, error) {
-	rsp, err := c.CreateCertificateSigningRequestWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateCertificateSigningRequestResponse(rsp)
-}
-
-func (c *ClientWithResponses) CreateCertificateSigningRequestWithResponse(ctx context.Context, body CreateCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCertificateSigningRequestResponse, error) {
-	rsp, err := c.CreateCertificateSigningRequest(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateCertificateSigningRequestResponse(rsp)
-}
-
-// DeleteCertificateSigningRequestWithResponse request returning *DeleteCertificateSigningRequestResponse
-func (c *ClientWithResponses) DeleteCertificateSigningRequestWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*DeleteCertificateSigningRequestResponse, error) {
-	rsp, err := c.DeleteCertificateSigningRequest(ctx, name, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteCertificateSigningRequestResponse(rsp)
-}
-
-// GetCertificateSigningRequestWithResponse request returning *GetCertificateSigningRequestResponse
-func (c *ClientWithResponses) GetCertificateSigningRequestWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetCertificateSigningRequestResponse, error) {
-	rsp, err := c.GetCertificateSigningRequest(ctx, name, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetCertificateSigningRequestResponse(rsp)
-}
-
-// PatchCertificateSigningRequestWithBodyWithResponse request with arbitrary body returning *PatchCertificateSigningRequestResponse
-func (c *ClientWithResponses) PatchCertificateSigningRequestWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchCertificateSigningRequestResponse, error) {
-	rsp, err := c.PatchCertificateSigningRequestWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchCertificateSigningRequestResponse(rsp)
-}
-
-func (c *ClientWithResponses) PatchCertificateSigningRequestWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchCertificateSigningRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchCertificateSigningRequestResponse, error) {
-	rsp, err := c.PatchCertificateSigningRequestWithApplicationJSONPatchPlusJSONBody(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchCertificateSigningRequestResponse(rsp)
-}
-
-// ReplaceCertificateSigningRequestWithBodyWithResponse request with arbitrary body returning *ReplaceCertificateSigningRequestResponse
-func (c *ClientWithResponses) ReplaceCertificateSigningRequestWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceCertificateSigningRequestResponse, error) {
-	rsp, err := c.ReplaceCertificateSigningRequestWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseReplaceCertificateSigningRequestResponse(rsp)
-}
-
-func (c *ClientWithResponses) ReplaceCertificateSigningRequestWithResponse(ctx context.Context, name string, body ReplaceCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceCertificateSigningRequestResponse, error) {
-	rsp, err := c.ReplaceCertificateSigningRequest(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseReplaceCertificateSigningRequestResponse(rsp)
-}
-
-// UpdateCertificateSigningRequestApprovalWithBodyWithResponse request with arbitrary body returning *UpdateCertificateSigningRequestApprovalResponse
-func (c *ClientWithResponses) UpdateCertificateSigningRequestApprovalWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateCertificateSigningRequestApprovalResponse, error) {
-	rsp, err := c.UpdateCertificateSigningRequestApprovalWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseUpdateCertificateSigningRequestApprovalResponse(rsp)
-}
-
-func (c *ClientWithResponses) UpdateCertificateSigningRequestApprovalWithResponse(ctx context.Context, name string, body UpdateCertificateSigningRequestApprovalJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateCertificateSigningRequestApprovalResponse, error) {
-	rsp, err := c.UpdateCertificateSigningRequestApproval(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseUpdateCertificateSigningRequestApprovalResponse(rsp)
-}
-
-// ListDevicesWithResponse request returning *ListDevicesResponse
-func (c *ClientWithResponses) ListDevicesWithResponse(ctx context.Context, params *ListDevicesParams, reqEditors ...RequestEditorFn) (*ListDevicesResponse, error) {
-	rsp, err := c.ListDevices(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListDevicesResponse(rsp)
-}
-
-// CreateDeviceWithBodyWithResponse request with arbitrary body returning *CreateDeviceResponse
-func (c *ClientWithResponses) CreateDeviceWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDeviceResponse, error) {
-	rsp, err := c.CreateDeviceWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateDeviceResponse(rsp)
-}
-
-func (c *ClientWithResponses) CreateDeviceWithResponse(ctx context.Context, body CreateDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDeviceResponse, error) {
-	rsp, err := c.CreateDevice(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateDeviceResponse(rsp)
-}
-
-// DeleteDeviceWithResponse request returning *DeleteDeviceResponse
-func (c *ClientWithResponses) DeleteDeviceWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*DeleteDeviceResponse, error) {
-	rsp, err := c.DeleteDevice(ctx, name, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteDeviceResponse(rsp)
-}
-
-// GetDeviceWithResponse request returning *GetDeviceResponse
-func (c *ClientWithResponses) GetDeviceWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetDeviceResponse, error) {
-	rsp, err := c.GetDevice(ctx, name, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetDeviceResponse(rsp)
-}
-
-// PatchDeviceWithBodyWithResponse request with arbitrary body returning *PatchDeviceResponse
-func (c *ClientWithResponses) PatchDeviceWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchDeviceResponse, error) {
-	rsp, err := c.PatchDeviceWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchDeviceResponse(rsp)
-}
-
-func (c *ClientWithResponses) PatchDeviceWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchDeviceApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchDeviceResponse, error) {
-	rsp, err := c.PatchDeviceWithApplicationJSONPatchPlusJSONBody(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchDeviceResponse(rsp)
-}
-
-// ReplaceDeviceWithBodyWithResponse request with arbitrary body returning *ReplaceDeviceResponse
-func (c *ClientWithResponses) ReplaceDeviceWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceDeviceResponse, error) {
-	rsp, err := c.ReplaceDeviceWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseReplaceDeviceResponse(rsp)
-}
-
-func (c *ClientWithResponses) ReplaceDeviceWithResponse(ctx context.Context, name string, body ReplaceDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceDeviceResponse, error) {
-	rsp, err := c.ReplaceDevice(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseReplaceDeviceResponse(rsp)
-}
-
-// DecommissionDeviceWithBodyWithResponse request with arbitrary body returning *DecommissionDeviceResponse
-func (c *ClientWithResponses) DecommissionDeviceWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DecommissionDeviceResponse, error) {
-	rsp, err := c.DecommissionDeviceWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDecommissionDeviceResponse(rsp)
-}
-
-func (c *ClientWithResponses) DecommissionDeviceWithResponse(ctx context.Context, name string, body DecommissionDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*DecommissionDeviceResponse, error) {
-	rsp, err := c.DecommissionDevice(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDecommissionDeviceResponse(rsp)
-}
-
-// GetRenderedDeviceWithResponse request returning *GetRenderedDeviceResponse
-func (c *ClientWithResponses) GetRenderedDeviceWithResponse(ctx context.Context, name string, params *GetRenderedDeviceParams, reqEditors ...RequestEditorFn) (*GetRenderedDeviceResponse, error) {
-	rsp, err := c.GetRenderedDevice(ctx, name, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetRenderedDeviceResponse(rsp)
-}
-
-// GetDeviceStatusWithResponse request returning *GetDeviceStatusResponse
-func (c *ClientWithResponses) GetDeviceStatusWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetDeviceStatusResponse, error) {
-	rsp, err := c.GetDeviceStatus(ctx, name, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetDeviceStatusResponse(rsp)
-}
-
-// PatchDeviceStatusWithBodyWithResponse request with arbitrary body returning *PatchDeviceStatusResponse
-func (c *ClientWithResponses) PatchDeviceStatusWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchDeviceStatusResponse, error) {
-	rsp, err := c.PatchDeviceStatusWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchDeviceStatusResponse(rsp)
-}
-
-func (c *ClientWithResponses) PatchDeviceStatusWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchDeviceStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchDeviceStatusResponse, error) {
-	rsp, err := c.PatchDeviceStatusWithApplicationJSONPatchPlusJSONBody(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchDeviceStatusResponse(rsp)
-}
-
-// ReplaceDeviceStatusWithBodyWithResponse request with arbitrary body returning *ReplaceDeviceStatusResponse
-func (c *ClientWithResponses) ReplaceDeviceStatusWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceDeviceStatusResponse, error) {
-	rsp, err := c.ReplaceDeviceStatusWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseReplaceDeviceStatusResponse(rsp)
-}
-
-func (c *ClientWithResponses) ReplaceDeviceStatusWithResponse(ctx context.Context, name string, body ReplaceDeviceStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceDeviceStatusResponse, error) {
-	rsp, err := c.ReplaceDeviceStatus(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseReplaceDeviceStatusResponse(rsp)
-}
-
-// GetEnrollmentConfigWithResponse request returning *GetEnrollmentConfigResponse
-func (c *ClientWithResponses) GetEnrollmentConfigWithResponse(ctx context.Context, params *GetEnrollmentConfigParams, reqEditors ...RequestEditorFn) (*GetEnrollmentConfigResponse, error) {
-	rsp, err := c.GetEnrollmentConfig(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetEnrollmentConfigResponse(rsp)
-}
-
-// ListEnrollmentRequestsWithResponse request returning *ListEnrollmentRequestsResponse
-func (c *ClientWithResponses) ListEnrollmentRequestsWithResponse(ctx context.Context, params *ListEnrollmentRequestsParams, reqEditors ...RequestEditorFn) (*ListEnrollmentRequestsResponse, error) {
-	rsp, err := c.ListEnrollmentRequests(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListEnrollmentRequestsResponse(rsp)
-}
-
-// CreateEnrollmentRequestWithBodyWithResponse request with arbitrary body returning *CreateEnrollmentRequestResponse
-func (c *ClientWithResponses) CreateEnrollmentRequestWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateEnrollmentRequestResponse, error) {
-	rsp, err := c.CreateEnrollmentRequestWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateEnrollmentRequestResponse(rsp)
-}
-
-func (c *ClientWithResponses) CreateEnrollmentRequestWithResponse(ctx context.Context, body CreateEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateEnrollmentRequestResponse, error) {
-	rsp, err := c.CreateEnrollmentRequest(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateEnrollmentRequestResponse(rsp)
-}
-
-// DeleteEnrollmentRequestWithResponse request returning *DeleteEnrollmentRequestResponse
-func (c *ClientWithResponses) DeleteEnrollmentRequestWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*DeleteEnrollmentRequestResponse, error) {
-	rsp, err := c.DeleteEnrollmentRequest(ctx, name, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteEnrollmentRequestResponse(rsp)
-}
-
-// GetEnrollmentRequestWithResponse request returning *GetEnrollmentRequestResponse
-func (c *ClientWithResponses) GetEnrollmentRequestWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetEnrollmentRequestResponse, error) {
-	rsp, err := c.GetEnrollmentRequest(ctx, name, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetEnrollmentRequestResponse(rsp)
-}
-
-// PatchEnrollmentRequestWithBodyWithResponse request with arbitrary body returning *PatchEnrollmentRequestResponse
-func (c *ClientWithResponses) PatchEnrollmentRequestWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestResponse, error) {
-	rsp, err := c.PatchEnrollmentRequestWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchEnrollmentRequestResponse(rsp)
-}
-
-func (c *ClientWithResponses) PatchEnrollmentRequestWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchEnrollmentRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestResponse, error) {
-	rsp, err := c.PatchEnrollmentRequestWithApplicationJSONPatchPlusJSONBody(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchEnrollmentRequestResponse(rsp)
-}
-
-// ReplaceEnrollmentRequestWithBodyWithResponse request with arbitrary body returning *ReplaceEnrollmentRequestResponse
-func (c *ClientWithResponses) ReplaceEnrollmentRequestWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestResponse, error) {
-	rsp, err := c.ReplaceEnrollmentRequestWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseReplaceEnrollmentRequestResponse(rsp)
-}
-
-func (c *ClientWithResponses) ReplaceEnrollmentRequestWithResponse(ctx context.Context, name string, body ReplaceEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestResponse, error) {
-	rsp, err := c.ReplaceEnrollmentRequest(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseReplaceEnrollmentRequestResponse(rsp)
-}
-
-// ApproveEnrollmentRequestWithBodyWithResponse request with arbitrary body returning *ApproveEnrollmentRequestResponse
-func (c *ClientWithResponses) ApproveEnrollmentRequestWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApproveEnrollmentRequestResponse, error) {
-	rsp, err := c.ApproveEnrollmentRequestWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseApproveEnrollmentRequestResponse(rsp)
-}
-
-func (c *ClientWithResponses) ApproveEnrollmentRequestWithResponse(ctx context.Context, name string, body ApproveEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*ApproveEnrollmentRequestResponse, error) {
-	rsp, err := c.ApproveEnrollmentRequest(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseApproveEnrollmentRequestResponse(rsp)
-}
-
-// GetEnrollmentRequestStatusWithResponse request returning *GetEnrollmentRequestStatusResponse
-func (c *ClientWithResponses) GetEnrollmentRequestStatusWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetEnrollmentRequestStatusResponse, error) {
-	rsp, err := c.GetEnrollmentRequestStatus(ctx, name, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetEnrollmentRequestStatusResponse(rsp)
-}
-
-// PatchEnrollmentRequestStatusWithBodyWithResponse request with arbitrary body returning *PatchEnrollmentRequestStatusResponse
-func (c *ClientWithResponses) PatchEnrollmentRequestStatusWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestStatusResponse, error) {
-	rsp, err := c.PatchEnrollmentRequestStatusWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchEnrollmentRequestStatusResponse(rsp)
-}
-
-func (c *ClientWithResponses) PatchEnrollmentRequestStatusWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchEnrollmentRequestStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestStatusResponse, error) {
-	rsp, err := c.PatchEnrollmentRequestStatusWithApplicationJSONPatchPlusJSONBody(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchEnrollmentRequestStatusResponse(rsp)
-}
-
-// ReplaceEnrollmentRequestStatusWithBodyWithResponse request with arbitrary body returning *ReplaceEnrollmentRequestStatusResponse
-func (c *ClientWithResponses) ReplaceEnrollmentRequestStatusWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestStatusResponse, error) {
-	rsp, err := c.ReplaceEnrollmentRequestStatusWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseReplaceEnrollmentRequestStatusResponse(rsp)
-}
-
-func (c *ClientWithResponses) ReplaceEnrollmentRequestStatusWithResponse(ctx context.Context, name string, body ReplaceEnrollmentRequestStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestStatusResponse, error) {
-	rsp, err := c.ReplaceEnrollmentRequestStatus(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseReplaceEnrollmentRequestStatusResponse(rsp)
-}
-
-// ListEventsWithResponse request returning *ListEventsResponse
-func (c *ClientWithResponses) ListEventsWithResponse(ctx context.Context, params *ListEventsParams, reqEditors ...RequestEditorFn) (*ListEventsResponse, error) {
-	rsp, err := c.ListEvents(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListEventsResponse(rsp)
-}
-
-// ListFleetsWithResponse request returning *ListFleetsResponse
-func (c *ClientWithResponses) ListFleetsWithResponse(ctx context.Context, params *ListFleetsParams, reqEditors ...RequestEditorFn) (*ListFleetsResponse, error) {
-	rsp, err := c.ListFleets(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListFleetsResponse(rsp)
-}
-
-// CreateFleetWithBodyWithResponse request with arbitrary body returning *CreateFleetResponse
-func (c *ClientWithResponses) CreateFleetWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFleetResponse, error) {
-	rsp, err := c.CreateFleetWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateFleetResponse(rsp)
-}
-
-func (c *ClientWithResponses) CreateFleetWithResponse(ctx context.Context, body CreateFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFleetResponse, error) {
-	rsp, err := c.CreateFleet(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateFleetResponse(rsp)
-}
-
-// ListTemplateVersionsWithResponse request returning *ListTemplateVersionsResponse
-func (c *ClientWithResponses) ListTemplateVersionsWithResponse(ctx context.Context, fleet string, params *ListTemplateVersionsParams, reqEditors ...RequestEditorFn) (*ListTemplateVersionsResponse, error) {
-	rsp, err := c.ListTemplateVersions(ctx, fleet, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListTemplateVersionsResponse(rsp)
-}
-
-// DeleteTemplateVersionWithResponse request returning *DeleteTemplateVersionResponse
-func (c *ClientWithResponses) DeleteTemplateVersionWithResponse(ctx context.Context, fleet string, name string, reqEditors ...RequestEditorFn) (*DeleteTemplateVersionResponse, error) {
-	rsp, err := c.DeleteTemplateVersion(ctx, fleet, name, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteTemplateVersionResponse(rsp)
-}
-
-// GetTemplateVersionWithResponse request returning *GetTemplateVersionResponse
-func (c *ClientWithResponses) GetTemplateVersionWithResponse(ctx context.Context, fleet string, name string, reqEditors ...RequestEditorFn) (*GetTemplateVersionResponse, error) {
-	rsp, err := c.GetTemplateVersion(ctx, fleet, name, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetTemplateVersionResponse(rsp)
-}
-
-// DeleteFleetWithResponse request returning *DeleteFleetResponse
-func (c *ClientWithResponses) DeleteFleetWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*DeleteFleetResponse, error) {
-	rsp, err := c.DeleteFleet(ctx, name, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseDeleteFleetResponse(rsp)
-}
-
-// GetFleetWithResponse request returning *GetFleetResponse
-func (c *ClientWithResponses) GetFleetWithResponse(ctx context.Context, name string, params *GetFleetParams, reqEditors ...RequestEditorFn) (*GetFleetResponse, error) {
-	rsp, err := c.GetFleet(ctx, name, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetFleetResponse(rsp)
-}
-
-// PatchFleetWithBodyWithResponse request with arbitrary body returning *PatchFleetResponse
-func (c *ClientWithResponses) PatchFleetWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchFleetResponse, error) {
-	rsp, err := c.PatchFleetWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchFleetResponse(rsp)
-}
-
-func (c *ClientWithResponses) PatchFleetWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchFleetApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchFleetResponse, error) {
-	rsp, err := c.PatchFleetWithApplicationJSONPatchPlusJSONBody(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchFleetResponse(rsp)
-}
-
-// ReplaceFleetWithBodyWithResponse request with arbitrary body returning *ReplaceFleetResponse
-func (c *ClientWithResponses) ReplaceFleetWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceFleetResponse, error) {
-	rsp, err := c.ReplaceFleetWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseReplaceFleetResponse(rsp)
-}
-
-func (c *ClientWithResponses) ReplaceFleetWithResponse(ctx context.Context, name string, body ReplaceFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceFleetResponse, error) {
-	rsp, err := c.ReplaceFleet(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseReplaceFleetResponse(rsp)
-}
-
-// GetFleetStatusWithResponse request returning *GetFleetStatusResponse
-func (c *ClientWithResponses) GetFleetStatusWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetFleetStatusResponse, error) {
-	rsp, err := c.GetFleetStatus(ctx, name, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetFleetStatusResponse(rsp)
-}
-
-// PatchFleetStatusWithBodyWithResponse request with arbitrary body returning *PatchFleetStatusResponse
-func (c *ClientWithResponses) PatchFleetStatusWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchFleetStatusResponse, error) {
-	rsp, err := c.PatchFleetStatusWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchFleetStatusResponse(rsp)
-}
-
-func (c *ClientWithResponses) PatchFleetStatusWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchFleetStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchFleetStatusResponse, error) {
-	rsp, err := c.PatchFleetStatusWithApplicationJSONPatchPlusJSONBody(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParsePatchFleetStatusResponse(rsp)
-}
-
-// ReplaceFleetStatusWithBodyWithResponse request with arbitrary body returning *ReplaceFleetStatusResponse
-func (c *ClientWithResponses) ReplaceFleetStatusWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceFleetStatusResponse, error) {
-	rsp, err := c.ReplaceFleetStatusWithBody(ctx, name, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseReplaceFleetStatusResponse(rsp)
-}
-
-func (c *ClientWithResponses) ReplaceFleetStatusWithResponse(ctx context.Context, name string, body ReplaceFleetStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceFleetStatusResponse, error) {
-	rsp, err := c.ReplaceFleetStatus(ctx, name, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseReplaceFleetStatusResponse(rsp)
-}
-
-// ListLabelsWithResponse request returning *ListLabelsResponse
-func (c *ClientWithResponses) ListLabelsWithResponse(ctx context.Context, params *ListLabelsParams, reqEditors ...RequestEditorFn) (*ListLabelsResponse, error) {
-	rsp, err := c.ListLabels(ctx, params, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListLabelsResponse(rsp)
-}
-
 // ListOrganizationsWithResponse request returning *ListOrganizationsResponse
 func (c *ClientWithResponses) ListOrganizationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListOrganizationsResponse, error) {
 	rsp, err := c.ListOrganizations(ctx, reqEditors...)
@@ -7060,9 +6891,564 @@ func (c *ClientWithResponses) ReplaceOrganizationWithResponse(ctx context.Contex
 	return ParseReplaceOrganizationResponse(rsp)
 }
 
+// ListCertificateSigningRequestsWithResponse request returning *ListCertificateSigningRequestsResponse
+func (c *ClientWithResponses) ListCertificateSigningRequestsWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListCertificateSigningRequestsParams, reqEditors ...RequestEditorFn) (*ListCertificateSigningRequestsResponse, error) {
+	rsp, err := c.ListCertificateSigningRequests(ctx, orgID, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListCertificateSigningRequestsResponse(rsp)
+}
+
+// CreateCertificateSigningRequestWithBodyWithResponse request with arbitrary body returning *CreateCertificateSigningRequestResponse
+func (c *ClientWithResponses) CreateCertificateSigningRequestWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCertificateSigningRequestResponse, error) {
+	rsp, err := c.CreateCertificateSigningRequestWithBody(ctx, orgID, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateCertificateSigningRequestResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateCertificateSigningRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, body CreateCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCertificateSigningRequestResponse, error) {
+	rsp, err := c.CreateCertificateSigningRequest(ctx, orgID, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateCertificateSigningRequestResponse(rsp)
+}
+
+// DeleteCertificateSigningRequestWithResponse request returning *DeleteCertificateSigningRequestResponse
+func (c *ClientWithResponses) DeleteCertificateSigningRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*DeleteCertificateSigningRequestResponse, error) {
+	rsp, err := c.DeleteCertificateSigningRequest(ctx, orgID, name, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteCertificateSigningRequestResponse(rsp)
+}
+
+// GetCertificateSigningRequestWithResponse request returning *GetCertificateSigningRequestResponse
+func (c *ClientWithResponses) GetCertificateSigningRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetCertificateSigningRequestResponse, error) {
+	rsp, err := c.GetCertificateSigningRequest(ctx, orgID, name, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetCertificateSigningRequestResponse(rsp)
+}
+
+// PatchCertificateSigningRequestWithBodyWithResponse request with arbitrary body returning *PatchCertificateSigningRequestResponse
+func (c *ClientWithResponses) PatchCertificateSigningRequestWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchCertificateSigningRequestResponse, error) {
+	rsp, err := c.PatchCertificateSigningRequestWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchCertificateSigningRequestResponse(rsp)
+}
+
+func (c *ClientWithResponses) PatchCertificateSigningRequestWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchCertificateSigningRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchCertificateSigningRequestResponse, error) {
+	rsp, err := c.PatchCertificateSigningRequestWithApplicationJSONPatchPlusJSONBody(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchCertificateSigningRequestResponse(rsp)
+}
+
+// ReplaceCertificateSigningRequestWithBodyWithResponse request with arbitrary body returning *ReplaceCertificateSigningRequestResponse
+func (c *ClientWithResponses) ReplaceCertificateSigningRequestWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceCertificateSigningRequestResponse, error) {
+	rsp, err := c.ReplaceCertificateSigningRequestWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceCertificateSigningRequestResponse(rsp)
+}
+
+func (c *ClientWithResponses) ReplaceCertificateSigningRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceCertificateSigningRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceCertificateSigningRequestResponse, error) {
+	rsp, err := c.ReplaceCertificateSigningRequest(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceCertificateSigningRequestResponse(rsp)
+}
+
+// UpdateCertificateSigningRequestApprovalWithBodyWithResponse request with arbitrary body returning *UpdateCertificateSigningRequestApprovalResponse
+func (c *ClientWithResponses) UpdateCertificateSigningRequestApprovalWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateCertificateSigningRequestApprovalResponse, error) {
+	rsp, err := c.UpdateCertificateSigningRequestApprovalWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateCertificateSigningRequestApprovalResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateCertificateSigningRequestApprovalWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body UpdateCertificateSigningRequestApprovalJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateCertificateSigningRequestApprovalResponse, error) {
+	rsp, err := c.UpdateCertificateSigningRequestApproval(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateCertificateSigningRequestApprovalResponse(rsp)
+}
+
+// ListDevicesWithResponse request returning *ListDevicesResponse
+func (c *ClientWithResponses) ListDevicesWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListDevicesParams, reqEditors ...RequestEditorFn) (*ListDevicesResponse, error) {
+	rsp, err := c.ListDevices(ctx, orgID, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListDevicesResponse(rsp)
+}
+
+// CreateDeviceWithBodyWithResponse request with arbitrary body returning *CreateDeviceResponse
+func (c *ClientWithResponses) CreateDeviceWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateDeviceResponse, error) {
+	rsp, err := c.CreateDeviceWithBody(ctx, orgID, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateDeviceResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateDeviceWithResponse(ctx context.Context, orgID openapi_types.UUID, body CreateDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateDeviceResponse, error) {
+	rsp, err := c.CreateDevice(ctx, orgID, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateDeviceResponse(rsp)
+}
+
+// DeleteDeviceWithResponse request returning *DeleteDeviceResponse
+func (c *ClientWithResponses) DeleteDeviceWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*DeleteDeviceResponse, error) {
+	rsp, err := c.DeleteDevice(ctx, orgID, name, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteDeviceResponse(rsp)
+}
+
+// GetDeviceWithResponse request returning *GetDeviceResponse
+func (c *ClientWithResponses) GetDeviceWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetDeviceResponse, error) {
+	rsp, err := c.GetDevice(ctx, orgID, name, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetDeviceResponse(rsp)
+}
+
+// PatchDeviceWithBodyWithResponse request with arbitrary body returning *PatchDeviceResponse
+func (c *ClientWithResponses) PatchDeviceWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchDeviceResponse, error) {
+	rsp, err := c.PatchDeviceWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchDeviceResponse(rsp)
+}
+
+func (c *ClientWithResponses) PatchDeviceWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchDeviceApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchDeviceResponse, error) {
+	rsp, err := c.PatchDeviceWithApplicationJSONPatchPlusJSONBody(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchDeviceResponse(rsp)
+}
+
+// ReplaceDeviceWithBodyWithResponse request with arbitrary body returning *ReplaceDeviceResponse
+func (c *ClientWithResponses) ReplaceDeviceWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceDeviceResponse, error) {
+	rsp, err := c.ReplaceDeviceWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceDeviceResponse(rsp)
+}
+
+func (c *ClientWithResponses) ReplaceDeviceWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceDeviceResponse, error) {
+	rsp, err := c.ReplaceDevice(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceDeviceResponse(rsp)
+}
+
+// DecommissionDeviceWithBodyWithResponse request with arbitrary body returning *DecommissionDeviceResponse
+func (c *ClientWithResponses) DecommissionDeviceWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*DecommissionDeviceResponse, error) {
+	rsp, err := c.DecommissionDeviceWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDecommissionDeviceResponse(rsp)
+}
+
+func (c *ClientWithResponses) DecommissionDeviceWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body DecommissionDeviceJSONRequestBody, reqEditors ...RequestEditorFn) (*DecommissionDeviceResponse, error) {
+	rsp, err := c.DecommissionDevice(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDecommissionDeviceResponse(rsp)
+}
+
+// GetRenderedDeviceWithResponse request returning *GetRenderedDeviceResponse
+func (c *ClientWithResponses) GetRenderedDeviceWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, params *GetRenderedDeviceParams, reqEditors ...RequestEditorFn) (*GetRenderedDeviceResponse, error) {
+	rsp, err := c.GetRenderedDevice(ctx, orgID, name, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetRenderedDeviceResponse(rsp)
+}
+
+// GetDeviceStatusWithResponse request returning *GetDeviceStatusResponse
+func (c *ClientWithResponses) GetDeviceStatusWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetDeviceStatusResponse, error) {
+	rsp, err := c.GetDeviceStatus(ctx, orgID, name, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetDeviceStatusResponse(rsp)
+}
+
+// PatchDeviceStatusWithBodyWithResponse request with arbitrary body returning *PatchDeviceStatusResponse
+func (c *ClientWithResponses) PatchDeviceStatusWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchDeviceStatusResponse, error) {
+	rsp, err := c.PatchDeviceStatusWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchDeviceStatusResponse(rsp)
+}
+
+func (c *ClientWithResponses) PatchDeviceStatusWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchDeviceStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchDeviceStatusResponse, error) {
+	rsp, err := c.PatchDeviceStatusWithApplicationJSONPatchPlusJSONBody(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchDeviceStatusResponse(rsp)
+}
+
+// ReplaceDeviceStatusWithBodyWithResponse request with arbitrary body returning *ReplaceDeviceStatusResponse
+func (c *ClientWithResponses) ReplaceDeviceStatusWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceDeviceStatusResponse, error) {
+	rsp, err := c.ReplaceDeviceStatusWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceDeviceStatusResponse(rsp)
+}
+
+func (c *ClientWithResponses) ReplaceDeviceStatusWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceDeviceStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceDeviceStatusResponse, error) {
+	rsp, err := c.ReplaceDeviceStatus(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceDeviceStatusResponse(rsp)
+}
+
+// GetEnrollmentConfigWithResponse request returning *GetEnrollmentConfigResponse
+func (c *ClientWithResponses) GetEnrollmentConfigWithResponse(ctx context.Context, orgID openapi_types.UUID, params *GetEnrollmentConfigParams, reqEditors ...RequestEditorFn) (*GetEnrollmentConfigResponse, error) {
+	rsp, err := c.GetEnrollmentConfig(ctx, orgID, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetEnrollmentConfigResponse(rsp)
+}
+
+// ListEnrollmentRequestsWithResponse request returning *ListEnrollmentRequestsResponse
+func (c *ClientWithResponses) ListEnrollmentRequestsWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListEnrollmentRequestsParams, reqEditors ...RequestEditorFn) (*ListEnrollmentRequestsResponse, error) {
+	rsp, err := c.ListEnrollmentRequests(ctx, orgID, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListEnrollmentRequestsResponse(rsp)
+}
+
+// CreateEnrollmentRequestWithBodyWithResponse request with arbitrary body returning *CreateEnrollmentRequestResponse
+func (c *ClientWithResponses) CreateEnrollmentRequestWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateEnrollmentRequestResponse, error) {
+	rsp, err := c.CreateEnrollmentRequestWithBody(ctx, orgID, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateEnrollmentRequestResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateEnrollmentRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, body CreateEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateEnrollmentRequestResponse, error) {
+	rsp, err := c.CreateEnrollmentRequest(ctx, orgID, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateEnrollmentRequestResponse(rsp)
+}
+
+// DeleteEnrollmentRequestWithResponse request returning *DeleteEnrollmentRequestResponse
+func (c *ClientWithResponses) DeleteEnrollmentRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*DeleteEnrollmentRequestResponse, error) {
+	rsp, err := c.DeleteEnrollmentRequest(ctx, orgID, name, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteEnrollmentRequestResponse(rsp)
+}
+
+// GetEnrollmentRequestWithResponse request returning *GetEnrollmentRequestResponse
+func (c *ClientWithResponses) GetEnrollmentRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetEnrollmentRequestResponse, error) {
+	rsp, err := c.GetEnrollmentRequest(ctx, orgID, name, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetEnrollmentRequestResponse(rsp)
+}
+
+// PatchEnrollmentRequestWithBodyWithResponse request with arbitrary body returning *PatchEnrollmentRequestResponse
+func (c *ClientWithResponses) PatchEnrollmentRequestWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestResponse, error) {
+	rsp, err := c.PatchEnrollmentRequestWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchEnrollmentRequestResponse(rsp)
+}
+
+func (c *ClientWithResponses) PatchEnrollmentRequestWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchEnrollmentRequestApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestResponse, error) {
+	rsp, err := c.PatchEnrollmentRequestWithApplicationJSONPatchPlusJSONBody(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchEnrollmentRequestResponse(rsp)
+}
+
+// ReplaceEnrollmentRequestWithBodyWithResponse request with arbitrary body returning *ReplaceEnrollmentRequestResponse
+func (c *ClientWithResponses) ReplaceEnrollmentRequestWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestResponse, error) {
+	rsp, err := c.ReplaceEnrollmentRequestWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceEnrollmentRequestResponse(rsp)
+}
+
+func (c *ClientWithResponses) ReplaceEnrollmentRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestResponse, error) {
+	rsp, err := c.ReplaceEnrollmentRequest(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceEnrollmentRequestResponse(rsp)
+}
+
+// ApproveEnrollmentRequestWithBodyWithResponse request with arbitrary body returning *ApproveEnrollmentRequestResponse
+func (c *ClientWithResponses) ApproveEnrollmentRequestWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ApproveEnrollmentRequestResponse, error) {
+	rsp, err := c.ApproveEnrollmentRequestWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseApproveEnrollmentRequestResponse(rsp)
+}
+
+func (c *ClientWithResponses) ApproveEnrollmentRequestWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ApproveEnrollmentRequestJSONRequestBody, reqEditors ...RequestEditorFn) (*ApproveEnrollmentRequestResponse, error) {
+	rsp, err := c.ApproveEnrollmentRequest(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseApproveEnrollmentRequestResponse(rsp)
+}
+
+// GetEnrollmentRequestStatusWithResponse request returning *GetEnrollmentRequestStatusResponse
+func (c *ClientWithResponses) GetEnrollmentRequestStatusWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetEnrollmentRequestStatusResponse, error) {
+	rsp, err := c.GetEnrollmentRequestStatus(ctx, orgID, name, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetEnrollmentRequestStatusResponse(rsp)
+}
+
+// PatchEnrollmentRequestStatusWithBodyWithResponse request with arbitrary body returning *PatchEnrollmentRequestStatusResponse
+func (c *ClientWithResponses) PatchEnrollmentRequestStatusWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestStatusResponse, error) {
+	rsp, err := c.PatchEnrollmentRequestStatusWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchEnrollmentRequestStatusResponse(rsp)
+}
+
+func (c *ClientWithResponses) PatchEnrollmentRequestStatusWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchEnrollmentRequestStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchEnrollmentRequestStatusResponse, error) {
+	rsp, err := c.PatchEnrollmentRequestStatusWithApplicationJSONPatchPlusJSONBody(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchEnrollmentRequestStatusResponse(rsp)
+}
+
+// ReplaceEnrollmentRequestStatusWithBodyWithResponse request with arbitrary body returning *ReplaceEnrollmentRequestStatusResponse
+func (c *ClientWithResponses) ReplaceEnrollmentRequestStatusWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestStatusResponse, error) {
+	rsp, err := c.ReplaceEnrollmentRequestStatusWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceEnrollmentRequestStatusResponse(rsp)
+}
+
+func (c *ClientWithResponses) ReplaceEnrollmentRequestStatusWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceEnrollmentRequestStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceEnrollmentRequestStatusResponse, error) {
+	rsp, err := c.ReplaceEnrollmentRequestStatus(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceEnrollmentRequestStatusResponse(rsp)
+}
+
+// ListEventsWithResponse request returning *ListEventsResponse
+func (c *ClientWithResponses) ListEventsWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListEventsParams, reqEditors ...RequestEditorFn) (*ListEventsResponse, error) {
+	rsp, err := c.ListEvents(ctx, orgID, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListEventsResponse(rsp)
+}
+
+// ListFleetsWithResponse request returning *ListFleetsResponse
+func (c *ClientWithResponses) ListFleetsWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListFleetsParams, reqEditors ...RequestEditorFn) (*ListFleetsResponse, error) {
+	rsp, err := c.ListFleets(ctx, orgID, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListFleetsResponse(rsp)
+}
+
+// CreateFleetWithBodyWithResponse request with arbitrary body returning *CreateFleetResponse
+func (c *ClientWithResponses) CreateFleetWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateFleetResponse, error) {
+	rsp, err := c.CreateFleetWithBody(ctx, orgID, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateFleetResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateFleetWithResponse(ctx context.Context, orgID openapi_types.UUID, body CreateFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateFleetResponse, error) {
+	rsp, err := c.CreateFleet(ctx, orgID, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateFleetResponse(rsp)
+}
+
+// ListTemplateVersionsWithResponse request returning *ListTemplateVersionsResponse
+func (c *ClientWithResponses) ListTemplateVersionsWithResponse(ctx context.Context, orgID openapi_types.UUID, fleet string, params *ListTemplateVersionsParams, reqEditors ...RequestEditorFn) (*ListTemplateVersionsResponse, error) {
+	rsp, err := c.ListTemplateVersions(ctx, orgID, fleet, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListTemplateVersionsResponse(rsp)
+}
+
+// DeleteTemplateVersionWithResponse request returning *DeleteTemplateVersionResponse
+func (c *ClientWithResponses) DeleteTemplateVersionWithResponse(ctx context.Context, orgID openapi_types.UUID, fleet string, name string, reqEditors ...RequestEditorFn) (*DeleteTemplateVersionResponse, error) {
+	rsp, err := c.DeleteTemplateVersion(ctx, orgID, fleet, name, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteTemplateVersionResponse(rsp)
+}
+
+// GetTemplateVersionWithResponse request returning *GetTemplateVersionResponse
+func (c *ClientWithResponses) GetTemplateVersionWithResponse(ctx context.Context, orgID openapi_types.UUID, fleet string, name string, reqEditors ...RequestEditorFn) (*GetTemplateVersionResponse, error) {
+	rsp, err := c.GetTemplateVersion(ctx, orgID, fleet, name, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetTemplateVersionResponse(rsp)
+}
+
+// DeleteFleetWithResponse request returning *DeleteFleetResponse
+func (c *ClientWithResponses) DeleteFleetWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*DeleteFleetResponse, error) {
+	rsp, err := c.DeleteFleet(ctx, orgID, name, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteFleetResponse(rsp)
+}
+
+// GetFleetWithResponse request returning *GetFleetResponse
+func (c *ClientWithResponses) GetFleetWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, params *GetFleetParams, reqEditors ...RequestEditorFn) (*GetFleetResponse, error) {
+	rsp, err := c.GetFleet(ctx, orgID, name, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetFleetResponse(rsp)
+}
+
+// PatchFleetWithBodyWithResponse request with arbitrary body returning *PatchFleetResponse
+func (c *ClientWithResponses) PatchFleetWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchFleetResponse, error) {
+	rsp, err := c.PatchFleetWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchFleetResponse(rsp)
+}
+
+func (c *ClientWithResponses) PatchFleetWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchFleetApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchFleetResponse, error) {
+	rsp, err := c.PatchFleetWithApplicationJSONPatchPlusJSONBody(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchFleetResponse(rsp)
+}
+
+// ReplaceFleetWithBodyWithResponse request with arbitrary body returning *ReplaceFleetResponse
+func (c *ClientWithResponses) ReplaceFleetWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceFleetResponse, error) {
+	rsp, err := c.ReplaceFleetWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceFleetResponse(rsp)
+}
+
+func (c *ClientWithResponses) ReplaceFleetWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceFleetJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceFleetResponse, error) {
+	rsp, err := c.ReplaceFleet(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceFleetResponse(rsp)
+}
+
+// GetFleetStatusWithResponse request returning *GetFleetStatusResponse
+func (c *ClientWithResponses) GetFleetStatusWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetFleetStatusResponse, error) {
+	rsp, err := c.GetFleetStatus(ctx, orgID, name, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetFleetStatusResponse(rsp)
+}
+
+// PatchFleetStatusWithBodyWithResponse request with arbitrary body returning *PatchFleetStatusResponse
+func (c *ClientWithResponses) PatchFleetStatusWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchFleetStatusResponse, error) {
+	rsp, err := c.PatchFleetStatusWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchFleetStatusResponse(rsp)
+}
+
+func (c *ClientWithResponses) PatchFleetStatusWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchFleetStatusApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchFleetStatusResponse, error) {
+	rsp, err := c.PatchFleetStatusWithApplicationJSONPatchPlusJSONBody(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePatchFleetStatusResponse(rsp)
+}
+
+// ReplaceFleetStatusWithBodyWithResponse request with arbitrary body returning *ReplaceFleetStatusResponse
+func (c *ClientWithResponses) ReplaceFleetStatusWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceFleetStatusResponse, error) {
+	rsp, err := c.ReplaceFleetStatusWithBody(ctx, orgID, name, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceFleetStatusResponse(rsp)
+}
+
+func (c *ClientWithResponses) ReplaceFleetStatusWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceFleetStatusJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceFleetStatusResponse, error) {
+	rsp, err := c.ReplaceFleetStatus(ctx, orgID, name, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceFleetStatusResponse(rsp)
+}
+
+// ListLabelsWithResponse request returning *ListLabelsResponse
+func (c *ClientWithResponses) ListLabelsWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListLabelsParams, reqEditors ...RequestEditorFn) (*ListLabelsResponse, error) {
+	rsp, err := c.ListLabels(ctx, orgID, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListLabelsResponse(rsp)
+}
+
 // ListRepositoriesWithResponse request returning *ListRepositoriesResponse
-func (c *ClientWithResponses) ListRepositoriesWithResponse(ctx context.Context, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*ListRepositoriesResponse, error) {
-	rsp, err := c.ListRepositories(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ListRepositoriesWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*ListRepositoriesResponse, error) {
+	rsp, err := c.ListRepositories(ctx, orgID, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -7070,16 +7456,16 @@ func (c *ClientWithResponses) ListRepositoriesWithResponse(ctx context.Context, 
 }
 
 // CreateRepositoryWithBodyWithResponse request with arbitrary body returning *CreateRepositoryResponse
-func (c *ClientWithResponses) CreateRepositoryWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRepositoryResponse, error) {
-	rsp, err := c.CreateRepositoryWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateRepositoryWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRepositoryResponse, error) {
+	rsp, err := c.CreateRepositoryWithBody(ctx, orgID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateRepositoryResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateRepositoryWithResponse(ctx context.Context, body CreateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRepositoryResponse, error) {
-	rsp, err := c.CreateRepository(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateRepositoryWithResponse(ctx context.Context, orgID openapi_types.UUID, body CreateRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRepositoryResponse, error) {
+	rsp, err := c.CreateRepository(ctx, orgID, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -7087,8 +7473,8 @@ func (c *ClientWithResponses) CreateRepositoryWithResponse(ctx context.Context, 
 }
 
 // DeleteRepositoryWithResponse request returning *DeleteRepositoryResponse
-func (c *ClientWithResponses) DeleteRepositoryWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*DeleteRepositoryResponse, error) {
-	rsp, err := c.DeleteRepository(ctx, name, reqEditors...)
+func (c *ClientWithResponses) DeleteRepositoryWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*DeleteRepositoryResponse, error) {
+	rsp, err := c.DeleteRepository(ctx, orgID, name, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -7096,8 +7482,8 @@ func (c *ClientWithResponses) DeleteRepositoryWithResponse(ctx context.Context, 
 }
 
 // GetRepositoryWithResponse request returning *GetRepositoryResponse
-func (c *ClientWithResponses) GetRepositoryWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetRepositoryResponse, error) {
-	rsp, err := c.GetRepository(ctx, name, reqEditors...)
+func (c *ClientWithResponses) GetRepositoryWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetRepositoryResponse, error) {
+	rsp, err := c.GetRepository(ctx, orgID, name, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -7105,16 +7491,16 @@ func (c *ClientWithResponses) GetRepositoryWithResponse(ctx context.Context, nam
 }
 
 // PatchRepositoryWithBodyWithResponse request with arbitrary body returning *PatchRepositoryResponse
-func (c *ClientWithResponses) PatchRepositoryWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchRepositoryResponse, error) {
-	rsp, err := c.PatchRepositoryWithBody(ctx, name, contentType, body, reqEditors...)
+func (c *ClientWithResponses) PatchRepositoryWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchRepositoryResponse, error) {
+	rsp, err := c.PatchRepositoryWithBody(ctx, orgID, name, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParsePatchRepositoryResponse(rsp)
 }
 
-func (c *ClientWithResponses) PatchRepositoryWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchRepositoryApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchRepositoryResponse, error) {
-	rsp, err := c.PatchRepositoryWithApplicationJSONPatchPlusJSONBody(ctx, name, body, reqEditors...)
+func (c *ClientWithResponses) PatchRepositoryWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchRepositoryApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchRepositoryResponse, error) {
+	rsp, err := c.PatchRepositoryWithApplicationJSONPatchPlusJSONBody(ctx, orgID, name, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -7122,16 +7508,16 @@ func (c *ClientWithResponses) PatchRepositoryWithApplicationJSONPatchPlusJSONBod
 }
 
 // ReplaceRepositoryWithBodyWithResponse request with arbitrary body returning *ReplaceRepositoryResponse
-func (c *ClientWithResponses) ReplaceRepositoryWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceRepositoryResponse, error) {
-	rsp, err := c.ReplaceRepositoryWithBody(ctx, name, contentType, body, reqEditors...)
+func (c *ClientWithResponses) ReplaceRepositoryWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceRepositoryResponse, error) {
+	rsp, err := c.ReplaceRepositoryWithBody(ctx, orgID, name, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseReplaceRepositoryResponse(rsp)
 }
 
-func (c *ClientWithResponses) ReplaceRepositoryWithResponse(ctx context.Context, name string, body ReplaceRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceRepositoryResponse, error) {
-	rsp, err := c.ReplaceRepository(ctx, name, body, reqEditors...)
+func (c *ClientWithResponses) ReplaceRepositoryWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceRepositoryJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceRepositoryResponse, error) {
+	rsp, err := c.ReplaceRepository(ctx, orgID, name, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -7139,8 +7525,8 @@ func (c *ClientWithResponses) ReplaceRepositoryWithResponse(ctx context.Context,
 }
 
 // ListResourceSyncsWithResponse request returning *ListResourceSyncsResponse
-func (c *ClientWithResponses) ListResourceSyncsWithResponse(ctx context.Context, params *ListResourceSyncsParams, reqEditors ...RequestEditorFn) (*ListResourceSyncsResponse, error) {
-	rsp, err := c.ListResourceSyncs(ctx, params, reqEditors...)
+func (c *ClientWithResponses) ListResourceSyncsWithResponse(ctx context.Context, orgID openapi_types.UUID, params *ListResourceSyncsParams, reqEditors ...RequestEditorFn) (*ListResourceSyncsResponse, error) {
+	rsp, err := c.ListResourceSyncs(ctx, orgID, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -7148,16 +7534,16 @@ func (c *ClientWithResponses) ListResourceSyncsWithResponse(ctx context.Context,
 }
 
 // CreateResourceSyncWithBodyWithResponse request with arbitrary body returning *CreateResourceSyncResponse
-func (c *ClientWithResponses) CreateResourceSyncWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResourceSyncResponse, error) {
-	rsp, err := c.CreateResourceSyncWithBody(ctx, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateResourceSyncWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResourceSyncResponse, error) {
+	rsp, err := c.CreateResourceSyncWithBody(ctx, orgID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseCreateResourceSyncResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateResourceSyncWithResponse(ctx context.Context, body CreateResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResourceSyncResponse, error) {
-	rsp, err := c.CreateResourceSync(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateResourceSyncWithResponse(ctx context.Context, orgID openapi_types.UUID, body CreateResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResourceSyncResponse, error) {
+	rsp, err := c.CreateResourceSync(ctx, orgID, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -7165,8 +7551,8 @@ func (c *ClientWithResponses) CreateResourceSyncWithResponse(ctx context.Context
 }
 
 // DeleteResourceSyncWithResponse request returning *DeleteResourceSyncResponse
-func (c *ClientWithResponses) DeleteResourceSyncWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*DeleteResourceSyncResponse, error) {
-	rsp, err := c.DeleteResourceSync(ctx, name, reqEditors...)
+func (c *ClientWithResponses) DeleteResourceSyncWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*DeleteResourceSyncResponse, error) {
+	rsp, err := c.DeleteResourceSync(ctx, orgID, name, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -7174,8 +7560,8 @@ func (c *ClientWithResponses) DeleteResourceSyncWithResponse(ctx context.Context
 }
 
 // GetResourceSyncWithResponse request returning *GetResourceSyncResponse
-func (c *ClientWithResponses) GetResourceSyncWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*GetResourceSyncResponse, error) {
-	rsp, err := c.GetResourceSync(ctx, name, reqEditors...)
+func (c *ClientWithResponses) GetResourceSyncWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, reqEditors ...RequestEditorFn) (*GetResourceSyncResponse, error) {
+	rsp, err := c.GetResourceSync(ctx, orgID, name, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -7183,16 +7569,16 @@ func (c *ClientWithResponses) GetResourceSyncWithResponse(ctx context.Context, n
 }
 
 // PatchResourceSyncWithBodyWithResponse request with arbitrary body returning *PatchResourceSyncResponse
-func (c *ClientWithResponses) PatchResourceSyncWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchResourceSyncResponse, error) {
-	rsp, err := c.PatchResourceSyncWithBody(ctx, name, contentType, body, reqEditors...)
+func (c *ClientWithResponses) PatchResourceSyncWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchResourceSyncResponse, error) {
+	rsp, err := c.PatchResourceSyncWithBody(ctx, orgID, name, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParsePatchResourceSyncResponse(rsp)
 }
 
-func (c *ClientWithResponses) PatchResourceSyncWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, name string, body PatchResourceSyncApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchResourceSyncResponse, error) {
-	rsp, err := c.PatchResourceSyncWithApplicationJSONPatchPlusJSONBody(ctx, name, body, reqEditors...)
+func (c *ClientWithResponses) PatchResourceSyncWithApplicationJSONPatchPlusJSONBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body PatchResourceSyncApplicationJSONPatchPlusJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchResourceSyncResponse, error) {
+	rsp, err := c.PatchResourceSyncWithApplicationJSONPatchPlusJSONBody(ctx, orgID, name, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -7200,16 +7586,16 @@ func (c *ClientWithResponses) PatchResourceSyncWithApplicationJSONPatchPlusJSONB
 }
 
 // ReplaceResourceSyncWithBodyWithResponse request with arbitrary body returning *ReplaceResourceSyncResponse
-func (c *ClientWithResponses) ReplaceResourceSyncWithBodyWithResponse(ctx context.Context, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceResourceSyncResponse, error) {
-	rsp, err := c.ReplaceResourceSyncWithBody(ctx, name, contentType, body, reqEditors...)
+func (c *ClientWithResponses) ReplaceResourceSyncWithBodyWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceResourceSyncResponse, error) {
+	rsp, err := c.ReplaceResourceSyncWithBody(ctx, orgID, name, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return ParseReplaceResourceSyncResponse(rsp)
 }
 
-func (c *ClientWithResponses) ReplaceResourceSyncWithResponse(ctx context.Context, name string, body ReplaceResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceResourceSyncResponse, error) {
-	rsp, err := c.ReplaceResourceSync(ctx, name, body, reqEditors...)
+func (c *ClientWithResponses) ReplaceResourceSyncWithResponse(ctx context.Context, orgID openapi_types.UUID, name string, body ReplaceResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceResourceSyncResponse, error) {
+	rsp, err := c.ReplaceResourceSync(ctx, orgID, name, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -7315,6 +7701,84 @@ func ParseAuthValidateResponse(rsp *http.Response) (*AuthValidateResponse, error
 			return nil, err
 		}
 		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseListOrganizationsResponse parses an HTTP response from a ListOrganizationsWithResponse call
+func ParseListOrganizationsResponse(rsp *http.Response) (*ListOrganizationsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListOrganizationsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OrganizationList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateOrganizationResponse parses an HTTP response from a CreateOrganizationWithResponse call
+func ParseCreateOrganizationResponse(rsp *http.Response) (*CreateOrganizationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateOrganizationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Organization
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseReplaceOrganizationResponse parses an HTTP response from a ReplaceOrganizationWithResponse call
+func ParseReplaceOrganizationResponse(rsp *http.Response) (*ReplaceOrganizationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ReplaceOrganizationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Organization
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
 
 	}
 
@@ -9882,84 +10346,6 @@ func ParseListLabelsResponse(rsp *http.Response) (*ListLabelsResponse, error) {
 			return nil, err
 		}
 		response.JSON503 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseListOrganizationsResponse parses an HTTP response from a ListOrganizationsWithResponse call
-func ParseListOrganizationsResponse(rsp *http.Response) (*ListOrganizationsResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ListOrganizationsResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest OrganizationList
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseCreateOrganizationResponse parses an HTTP response from a CreateOrganizationWithResponse call
-func ParseCreateOrganizationResponse(rsp *http.Response) (*CreateOrganizationResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &CreateOrganizationResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest Organization
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseReplaceOrganizationResponse parses an HTTP response from a ReplaceOrganizationWithResponse call
-func ParseReplaceOrganizationResponse(rsp *http.Response) (*ReplaceOrganizationResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ReplaceOrganizationResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest Organization
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
 
 	}
 
