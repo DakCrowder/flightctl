@@ -10,22 +10,21 @@ import (
 	"github.com/google/uuid"
 )
 
-// OrganizationGetter defines the interface for retrieving organizations
 type OrganizationGetter interface {
 	Get(ctx context.Context, orgID uuid.UUID) (*api.Organization, error)
 }
 
 // BasicOrgAuth is an AuthZ provider that validates organization access
 // It checks if the organization in the request context exists in the database
-type BasicOrgAuth struct {
+type BasicOrgAuthz struct {
 	orgGetter OrganizationGetter
 }
 
-func NewBasicOrgAuth(orgGetter OrganizationGetter) *BasicOrgAuth {
-	return &BasicOrgAuth{orgGetter: orgGetter}
+func NewBasicOrgAuthz(orgGetter OrganizationGetter) *BasicOrgAuthz {
+	return &BasicOrgAuthz{orgGetter: orgGetter}
 }
 
-func (a *BasicOrgAuth) CheckPermission(ctx context.Context, resource string, op string) (bool, error) {
+func (a *BasicOrgAuthz) CheckPermission(ctx context.Context, resource string, op string) (bool, error) {
 	orgID, ok := util.GetOrgIdFromContext(ctx)
 	if !ok {
 		return false, flterrors.ErrInvalidOrganizationID

@@ -103,7 +103,7 @@ func TestBasicOrgAuth_CheckPermission(t *testing.T) {
 			ctx := tt.setupContext()
 			orgGetter := tt.setupOrgGetter(ctrl)
 
-			auth := NewBasicOrgAuth(orgGetter)
+			auth := NewBasicOrgAuthz(orgGetter)
 
 			result, err := auth.CheckPermission(ctx, "devices", "list")
 

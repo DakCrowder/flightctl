@@ -125,7 +125,7 @@ func InitAuth(cfg *config.Config, log logrus.FieldLogger, store store.Store) err
 		log.Warnln("Auth disabled")
 		configuredAuthType = AuthTypeNil
 		if store != nil {
-			authZ = authz.NewBasicOrgAuth(store.Organization())
+			authZ = authz.NewBasicOrgAuthz(store.Organization())
 		} else {
 			return errors.New("no store provided")
 		}
