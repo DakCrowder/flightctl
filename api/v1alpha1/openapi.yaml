@@ -3125,13 +3125,74 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Status'
+  /api/v1/organizations:
+    get:
+      tags:
+        - organization
+      summary: List organizations
+      description: Retrieve all organizations.
+      operationId: listOrganizations
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationList'
+    post:
+      tags:
+        - organization
+      summary: Create organization
+      description: Create a new organization.
+      operationId: createOrganization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Organization'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+  /api/v1/organizations/{orgID}:
+    put:
+      tags:
+        - organization
+      summary: Update organization
+      description: Update an organization
+      operationId: replaceOrganization
+      parameters:
+        - name: orgID
+          in: path
+          description: The ID of the organization to update.
+          required: true
+          format: uuid
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Organization'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
   /api/v1/users/me/organizations:
     get:
       tags:
         - organization
       summary: List organizations
       description: Retrieves a list of organizations a user is a member of.
-      operationId: listOrganizations
+      operationId: listUserOrganizations
       responses:
         '200':
           description: OK

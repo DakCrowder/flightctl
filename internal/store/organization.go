@@ -14,6 +14,8 @@ import (
 type Organization interface {
 	InitialMigration(ctx context.Context) error
 
+	Create(ctx context.Context, resource *api.Organization) (*api.Organization, error)
+	Update(ctx context.Context, orgID uuid.UUID, resource *api.Organization) (*api.Organization, api.ResourceUpdatedDetails, error)
 	List(ctx context.Context) (*api.OrganizationList, error)
 	Get(ctx context.Context, orgID uuid.UUID) (*api.Organization, error)
 }
@@ -47,6 +49,64 @@ func (s *OrganizationStore) InitialMigration(ctx context.Context) error {
 	})
 
 	return nil
+}
+
+func (s *OrganizationStore) Create(ctx context.Context, resource *api.Organization) (*api.Organization, error) {
+	if resource == nil {
+		return nil, errors.New("resource cannot be nil")
+	}
+
+	organization := &model.Organization{
+		ID:          uuid.New(),
+		DisplayName: *resource.DisplayName,
+	}
+
+	db := s.getDB(ctx)
+	result := db.Create(organization)
+	if result.Error != nil {
+		return nil, ErrorFromGormError(result.Error)
+	}
+
+	return organization.ToApiResource()
+}
+
+func (s *OrganizationStore) Update(ctx context.Context, orgID uuid.UUID, resource *api.Organization) (*api.Organization, api.ResourceUpdatedDetails, error) {
+	if resource == nil {
+		return nil, api.ResourceUpdatedDetails{}, errors.New("resource cannot be nil")
+	}
+
+	var existingOrganization model.Organization
+	db := s.getDB(ctx)
+	result := db.Where("id = ?", orgID).First(&existingOrganization)
+	if result.Error != nil {
+		return nil, api.ResourceUpdatedDetails{}, ErrorFromGormError(result.Error)
+	}
+
+	// Currently only the display name can be updated
+	var updatedFields []api.ResourceUpdatedDetailsUpdatedFields
+	if existingOrganization.DisplayName != *resource.DisplayName {
+		updatedFields = append(updatedFields, "displayName")
+		existingOrganization.DisplayName = *resource.DisplayName
+	} else {
+		// NOOP - nothing to update
+		return resource, api.ResourceUpdatedDetails{}, nil
+	}
+
+	result = db.Save(&existingOrganization)
+	if result.Error != nil {
+		return nil, api.ResourceUpdatedDetails{}, ErrorFromGormError(result.Error)
+	}
+
+	updatedResource, err := existingOrganization.ToApiResource()
+	if err != nil {
+		return nil, api.ResourceUpdatedDetails{}, err
+	}
+
+	details := api.ResourceUpdatedDetails{
+		UpdatedFields: updatedFields,
+	}
+
+	return updatedResource, details, nil
 }
 
 func (s *OrganizationStore) List(ctx context.Context) (*api.OrganizationList, error) {

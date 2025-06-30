@@ -267,6 +267,19 @@ type ClientInterface interface {
 	// ListLabels request
 	ListLabels(ctx context.Context, params *ListLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ListOrganizations request
+	ListOrganizations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateOrganizationWithBody request with any body
+	CreateOrganizationWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateOrganization(ctx context.Context, body CreateOrganizationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ReplaceOrganizationWithBody request with any body
+	ReplaceOrganizationWithBody(ctx context.Context, orgID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ReplaceOrganization(ctx context.Context, orgID string, body ReplaceOrganizationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ListRepositories request
 	ListRepositories(ctx context.Context, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -315,8 +328,8 @@ type ClientInterface interface {
 
 	ReplaceResourceSync(ctx context.Context, name string, body ReplaceResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// ListOrganizations request
-	ListOrganizations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// ListUserOrganizations request
+	ListUserOrganizations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetVersion request
 	GetVersion(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -1114,6 +1127,66 @@ func (c *Client) ListLabels(ctx context.Context, params *ListLabelsParams, reqEd
 	return c.Client.Do(req)
 }
 
+func (c *Client) ListOrganizations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListOrganizationsRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateOrganizationWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateOrganizationRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateOrganization(ctx context.Context, body CreateOrganizationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateOrganizationRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceOrganizationWithBody(ctx context.Context, orgID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceOrganizationRequestWithBody(c.Server, orgID, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ReplaceOrganization(ctx context.Context, orgID string, body ReplaceOrganizationJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReplaceOrganizationRequest(c.Server, orgID, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) ListRepositories(ctx context.Context, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListRepositoriesRequest(c.Server, params)
 	if err != nil {
@@ -1330,8 +1403,8 @@ func (c *Client) ReplaceResourceSync(ctx context.Context, name string, body Repl
 	return c.Client.Do(req)
 }
 
-func (c *Client) ListOrganizations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListOrganizationsRequest(c.Server)
+func (c *Client) ListUserOrganizations(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListUserOrganizationsRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -3679,6 +3752,120 @@ func NewListLabelsRequest(server string, params *ListLabelsParams) (*http.Reques
 	return req, nil
 }
 
+// NewListOrganizationsRequest generates requests for ListOrganizations
+func NewListOrganizationsRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreateOrganizationRequest calls the generic CreateOrganization builder with application/json body
+func NewCreateOrganizationRequest(server string, body CreateOrganizationJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateOrganizationRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreateOrganizationRequestWithBody generates requests for CreateOrganization with any type of body
+func NewCreateOrganizationRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewReplaceOrganizationRequest calls the generic ReplaceOrganization builder with application/json body
+func NewReplaceOrganizationRequest(server string, orgID string, body ReplaceOrganizationJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewReplaceOrganizationRequestWithBody(server, orgID, "application/json", bodyReader)
+}
+
+// NewReplaceOrganizationRequestWithBody generates requests for ReplaceOrganization with any type of body
+func NewReplaceOrganizationRequestWithBody(server string, orgID string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "orgID", runtime.ParamLocationPath, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/api/v1/organizations/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewListRepositoriesRequest generates requests for ListRepositories
 func NewListRepositoriesRequest(server string, params *ListRepositoriesParams) (*http.Request, error) {
 	var err error
@@ -4277,8 +4464,8 @@ func NewReplaceResourceSyncRequestWithBody(server string, name string, contentTy
 	return req, nil
 }
 
-// NewListOrganizationsRequest generates requests for ListOrganizations
-func NewListOrganizationsRequest(server string) (*http.Request, error) {
+// NewListUserOrganizationsRequest generates requests for ListUserOrganizations
+func NewListUserOrganizationsRequest(server string) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -4551,6 +4738,19 @@ type ClientWithResponsesInterface interface {
 	// ListLabelsWithResponse request
 	ListLabelsWithResponse(ctx context.Context, params *ListLabelsParams, reqEditors ...RequestEditorFn) (*ListLabelsResponse, error)
 
+	// ListOrganizationsWithResponse request
+	ListOrganizationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListOrganizationsResponse, error)
+
+	// CreateOrganizationWithBodyWithResponse request with any body
+	CreateOrganizationWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateOrganizationResponse, error)
+
+	CreateOrganizationWithResponse(ctx context.Context, body CreateOrganizationJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateOrganizationResponse, error)
+
+	// ReplaceOrganizationWithBodyWithResponse request with any body
+	ReplaceOrganizationWithBodyWithResponse(ctx context.Context, orgID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceOrganizationResponse, error)
+
+	ReplaceOrganizationWithResponse(ctx context.Context, orgID string, body ReplaceOrganizationJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceOrganizationResponse, error)
+
 	// ListRepositoriesWithResponse request
 	ListRepositoriesWithResponse(ctx context.Context, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*ListRepositoriesResponse, error)
 
@@ -4599,8 +4799,8 @@ type ClientWithResponsesInterface interface {
 
 	ReplaceResourceSyncWithResponse(ctx context.Context, name string, body ReplaceResourceSyncJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceResourceSyncResponse, error)
 
-	// ListOrganizationsWithResponse request
-	ListOrganizationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListOrganizationsResponse, error)
+	// ListUserOrganizationsWithResponse request
+	ListUserOrganizationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListUserOrganizationsResponse, error)
 
 	// GetVersionWithResponse request
 	GetVersionWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetVersionResponse, error)
@@ -5808,6 +6008,72 @@ func (r ListLabelsResponse) StatusCode() int {
 	return 0
 }
 
+type ListOrganizationsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OrganizationList
+}
+
+// Status returns HTTPResponse.Status
+func (r ListOrganizationsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListOrganizationsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type CreateOrganizationResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Organization
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateOrganizationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateOrganizationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ReplaceOrganizationResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Organization
+}
+
+// Status returns HTTPResponse.Status
+func (r ReplaceOrganizationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ReplaceOrganizationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ListRepositoriesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -6132,14 +6398,14 @@ func (r ReplaceResourceSyncResponse) StatusCode() int {
 	return 0
 }
 
-type ListOrganizationsResponse struct {
+type ListUserOrganizationsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *OrganizationList
 }
 
 // Status returns HTTPResponse.Status
-func (r ListOrganizationsResponse) Status() string {
+func (r ListUserOrganizationsResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -6147,7 +6413,7 @@ func (r ListOrganizationsResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ListOrganizationsResponse) StatusCode() int {
+func (r ListUserOrganizationsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -6751,6 +7017,49 @@ func (c *ClientWithResponses) ListLabelsWithResponse(ctx context.Context, params
 	return ParseListLabelsResponse(rsp)
 }
 
+// ListOrganizationsWithResponse request returning *ListOrganizationsResponse
+func (c *ClientWithResponses) ListOrganizationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListOrganizationsResponse, error) {
+	rsp, err := c.ListOrganizations(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListOrganizationsResponse(rsp)
+}
+
+// CreateOrganizationWithBodyWithResponse request with arbitrary body returning *CreateOrganizationResponse
+func (c *ClientWithResponses) CreateOrganizationWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateOrganizationResponse, error) {
+	rsp, err := c.CreateOrganizationWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateOrganizationResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateOrganizationWithResponse(ctx context.Context, body CreateOrganizationJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateOrganizationResponse, error) {
+	rsp, err := c.CreateOrganization(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreateOrganizationResponse(rsp)
+}
+
+// ReplaceOrganizationWithBodyWithResponse request with arbitrary body returning *ReplaceOrganizationResponse
+func (c *ClientWithResponses) ReplaceOrganizationWithBodyWithResponse(ctx context.Context, orgID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceOrganizationResponse, error) {
+	rsp, err := c.ReplaceOrganizationWithBody(ctx, orgID, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceOrganizationResponse(rsp)
+}
+
+func (c *ClientWithResponses) ReplaceOrganizationWithResponse(ctx context.Context, orgID string, body ReplaceOrganizationJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceOrganizationResponse, error) {
+	rsp, err := c.ReplaceOrganization(ctx, orgID, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReplaceOrganizationResponse(rsp)
+}
+
 // ListRepositoriesWithResponse request returning *ListRepositoriesResponse
 func (c *ClientWithResponses) ListRepositoriesWithResponse(ctx context.Context, params *ListRepositoriesParams, reqEditors ...RequestEditorFn) (*ListRepositoriesResponse, error) {
 	rsp, err := c.ListRepositories(ctx, params, reqEditors...)
@@ -6907,13 +7216,13 @@ func (c *ClientWithResponses) ReplaceResourceSyncWithResponse(ctx context.Contex
 	return ParseReplaceResourceSyncResponse(rsp)
 }
 
-// ListOrganizationsWithResponse request returning *ListOrganizationsResponse
-func (c *ClientWithResponses) ListOrganizationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListOrganizationsResponse, error) {
-	rsp, err := c.ListOrganizations(ctx, reqEditors...)
+// ListUserOrganizationsWithResponse request returning *ListUserOrganizationsResponse
+func (c *ClientWithResponses) ListUserOrganizationsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListUserOrganizationsResponse, error) {
+	rsp, err := c.ListUserOrganizations(ctx, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseListOrganizationsResponse(rsp)
+	return ParseListUserOrganizationsResponse(rsp)
 }
 
 // GetVersionWithResponse request returning *GetVersionResponse
@@ -9579,6 +9888,84 @@ func ParseListLabelsResponse(rsp *http.Response) (*ListLabelsResponse, error) {
 	return response, nil
 }
 
+// ParseListOrganizationsResponse parses an HTTP response from a ListOrganizationsWithResponse call
+func ParseListOrganizationsResponse(rsp *http.Response) (*ListOrganizationsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListOrganizationsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OrganizationList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateOrganizationResponse parses an HTTP response from a CreateOrganizationWithResponse call
+func ParseCreateOrganizationResponse(rsp *http.Response) (*CreateOrganizationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateOrganizationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Organization
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseReplaceOrganizationResponse parses an HTTP response from a ReplaceOrganizationWithResponse call
+func ParseReplaceOrganizationResponse(rsp *http.Response) (*ReplaceOrganizationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ReplaceOrganizationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Organization
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseListRepositoriesResponse parses an HTTP response from a ListRepositoriesWithResponse call
 func ParseListRepositoriesResponse(rsp *http.Response) (*ListRepositoriesResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -10311,15 +10698,15 @@ func ParseReplaceResourceSyncResponse(rsp *http.Response) (*ReplaceResourceSyncR
 	return response, nil
 }
 
-// ParseListOrganizationsResponse parses an HTTP response from a ListOrganizationsWithResponse call
-func ParseListOrganizationsResponse(rsp *http.Response) (*ListOrganizationsResponse, error) {
+// ParseListUserOrganizationsResponse parses an HTTP response from a ListUserOrganizationsWithResponse call
+func ParseListUserOrganizationsResponse(rsp *http.Response) (*ListUserOrganizationsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ListOrganizationsResponse{
+	response := &ListUserOrganizationsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

@@ -552,3 +552,21 @@ func (t *TracedService) ListOrganizations(ctx context.Context) (*api.Organizatio
 	endSpan(span, st)
 	return resp, st
 }
+func (t *TracedService) ListUserOrganizations(ctx context.Context) (*api.OrganizationList, api.Status) {
+	ctx, span := startSpan(ctx, "ListUserOrganizations")
+	resp, st := t.inner.ListUserOrganizations(ctx)
+	endSpan(span, st)
+	return resp, st
+}
+func (t *TracedService) CreateOrganization(ctx context.Context, org api.Organization) (*api.Organization, api.Status) {
+	ctx, span := startSpan(ctx, "CreateOrganization")
+	resp, st := t.inner.CreateOrganization(ctx, org)
+	endSpan(span, st)
+	return resp, st
+}
+func (t *TracedService) ReplaceOrganization(ctx context.Context, orgID string, org api.Organization) (*api.Organization, api.Status) {
+	ctx, span := startSpan(ctx, "ReplaceOrganization")
+	resp, st := t.inner.ReplaceOrganization(ctx, orgID, org)
+	endSpan(span, st)
+	return resp, st
+}

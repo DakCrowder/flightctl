@@ -112,4 +112,7 @@ type Service interface {
 
 	// Organization
 	ListOrganizations(ctx context.Context) (*api.OrganizationList, api.Status)
+	ListUserOrganizations(ctx context.Context) (*api.OrganizationList, api.Status)
+	CreateOrganization(ctx context.Context, org api.Organization) (*api.Organization, api.Status)
+	ReplaceOrganization(ctx context.Context, orgID string, org api.Organization) (*api.Organization, api.Status)
 }
