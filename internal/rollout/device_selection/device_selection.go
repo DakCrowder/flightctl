@@ -8,6 +8,7 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/service"
+	"github.com/flightctl/flightctl/internal/store"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"github.com/sirupsen/logrus"
@@ -86,10 +87,10 @@ func cleanupRollout(ctx context.Context, fleet *api.Fleet, serviceHandler servic
 		return false, nil
 	}
 
-	if status := serviceHandler.UnmarkDevicesRolloutSelection(ctx, fleetName); status.Code != http.StatusOK {
+	if status := serviceHandler.UnmarkDevicesRolloutSelection(ctx, store.NullOrgId, fleetName); status.Code != http.StatusOK {
 		return false, service.ApiStatusToErr(status)
 	}
-	if status := serviceHandler.UpdateFleetAnnotations(ctx, fleetName, nil, annotationsToDelete); status.Code != http.StatusOK {
+	if status := serviceHandler.UpdateFleetAnnotations(ctx, store.NullOrgId, fleetName, nil, annotationsToDelete); status.Code != http.StatusOK {
 		return false, service.ApiStatusToErr(status)
 	}
 	return true, nil

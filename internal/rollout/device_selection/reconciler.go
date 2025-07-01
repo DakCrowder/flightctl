@@ -161,7 +161,7 @@ func (r *reconciler) Reconcile(ctx context.Context) {
 	// Get all relevant fleets
 	orgId := store.NullOrgId
 
-	fleetList, status := r.serviceHandler.ListFleetRolloutDeviceSelection(ctx)
+	fleetList, status := r.serviceHandler.ListFleetRolloutDeviceSelection(ctx, orgId)
 	if status.Code != http.StatusOK {
 		r.log.WithError(service.ApiStatusToErr(status)).Error("ListRolloutDeviceSelection")
 		return
