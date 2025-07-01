@@ -21,6 +21,7 @@ import (
 	apiClient "github.com/flightctl/flightctl/internal/api/client"
 	"github.com/flightctl/flightctl/internal/client"
 	"github.com/flightctl/flightctl/internal/config"
+	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/util"
 	flightlog "github.com/flightctl/flightctl/pkg/log"
 	"github.com/flightctl/flightctl/pkg/version"
@@ -308,6 +309,7 @@ func approveAgent(ctx context.Context, log *logrus.Logger, serviceClient *apiCli
 		}
 		resp, err := serviceClient.ApproveEnrollmentRequestWithResponse(
 			ctx,
+			store.NullOrgId,
 			enrollmentId,
 			v1alpha1.EnrollmentRequestApproval{
 				Approved: true,

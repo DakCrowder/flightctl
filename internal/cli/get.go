@@ -178,9 +178,9 @@ func (o *GetOptions) Run(ctx context.Context, args []string) error { //nolint:go
 	}
 	switch {
 	case kind == DeviceKind && len(name) > 0 && !o.Rendered:
-		response, err = c.GetDeviceWithResponse(ctx, name)
+		response, err = c.GetDeviceWithResponse(ctx, o.GetCurrentOrganizationID(), name)
 	case kind == DeviceKind && len(name) > 0 && o.Rendered:
-		response, err = c.GetRenderedDeviceWithResponse(ctx, name, &api.GetRenderedDeviceParams{})
+		response, err = c.GetRenderedDeviceWithResponse(ctx, o.GetCurrentOrganizationID(), name, &api.GetRenderedDeviceParams{})
 	case kind == DeviceKind && len(name) == 0:
 		params := api.ListDevicesParams{
 			LabelSelector: util.ToPtrWithNilDefault(o.LabelSelector),
@@ -189,9 +189,9 @@ func (o *GetOptions) Run(ctx context.Context, args []string) error { //nolint:go
 			Continue:      util.ToPtrWithNilDefault(o.Continue),
 			SummaryOnly:   lo.ToPtr(o.SummaryOnly),
 		}
-		response, err = c.ListDevicesWithResponse(ctx, &params)
+		response, err = c.ListDevicesWithResponse(ctx, o.GetCurrentOrganizationID(), &params)
 	case kind == EnrollmentRequestKind && len(name) > 0:
-		response, err = c.GetEnrollmentRequestWithResponse(ctx, name)
+		response, err = c.GetEnrollmentRequestWithResponse(ctx, o.GetCurrentOrganizationID(), name)
 	case kind == EnrollmentRequestKind && len(name) == 0:
 		params := api.ListEnrollmentRequestsParams{
 			LabelSelector: util.ToPtrWithNilDefault(o.LabelSelector),
@@ -199,12 +199,12 @@ func (o *GetOptions) Run(ctx context.Context, args []string) error { //nolint:go
 			Limit:         util.ToPtrWithNilDefault(o.Limit),
 			Continue:      util.ToPtrWithNilDefault(o.Continue),
 		}
-		response, err = c.ListEnrollmentRequestsWithResponse(ctx, &params)
+		response, err = c.ListEnrollmentRequestsWithResponse(ctx, o.GetCurrentOrganizationID(), &params)
 	case kind == FleetKind && len(name) > 0:
 		params := api.GetFleetParams{
 			AddDevicesSummary: util.ToPtrWithNilDefault(o.Summary),
 		}
-		response, err = c.GetFleetWithResponse(ctx, name, &params)
+		response, err = c.GetFleetWithResponse(ctx, o.GetCurrentOrganizationID(), name, &params)
 	case kind == FleetKind && len(name) == 0:
 		params := api.ListFleetsParams{
 			LabelSelector:     util.ToPtrWithNilDefault(o.LabelSelector),
@@ -213,9 +213,9 @@ func (o *GetOptions) Run(ctx context.Context, args []string) error { //nolint:go
 			Continue:          util.ToPtrWithNilDefault(o.Continue),
 			AddDevicesSummary: util.ToPtrWithNilDefault(o.Summary),
 		}
-		response, err = c.ListFleetsWithResponse(ctx, &params)
+		response, err = c.ListFleetsWithResponse(ctx, o.GetCurrentOrganizationID(), &params)
 	case kind == TemplateVersionKind && len(name) > 0:
-		response, err = c.GetTemplateVersionWithResponse(ctx, o.FleetName, name)
+		response, err = c.GetTemplateVersionWithResponse(ctx, o.GetCurrentOrganizationID(), o.FleetName, name)
 	case kind == TemplateVersionKind && len(name) == 0:
 		params := api.ListTemplateVersionsParams{
 			LabelSelector: util.ToPtrWithNilDefault(o.LabelSelector),
@@ -223,9 +223,9 @@ func (o *GetOptions) Run(ctx context.Context, args []string) error { //nolint:go
 			Limit:         util.ToPtrWithNilDefault(o.Limit),
 			Continue:      util.ToPtrWithNilDefault(o.Continue),
 		}
-		response, err = c.ListTemplateVersionsWithResponse(ctx, o.FleetName, &params)
+		response, err = c.ListTemplateVersionsWithResponse(ctx, o.GetCurrentOrganizationID(), o.FleetName, &params)
 	case kind == RepositoryKind && len(name) > 0:
-		response, err = c.GetRepositoryWithResponse(ctx, name)
+		response, err = c.GetRepositoryWithResponse(ctx, o.GetCurrentOrganizationID(), name)
 	case kind == RepositoryKind && len(name) == 0:
 		params := api.ListRepositoriesParams{
 			LabelSelector: util.ToPtrWithNilDefault(o.LabelSelector),
@@ -233,9 +233,9 @@ func (o *GetOptions) Run(ctx context.Context, args []string) error { //nolint:go
 			Limit:         util.ToPtrWithNilDefault(o.Limit),
 			Continue:      util.ToPtrWithNilDefault(o.Continue),
 		}
-		response, err = c.ListRepositoriesWithResponse(ctx, &params)
+		response, err = c.ListRepositoriesWithResponse(ctx, o.GetCurrentOrganizationID(), &params)
 	case kind == ResourceSyncKind && len(name) > 0:
-		response, err = c.GetResourceSyncWithResponse(ctx, name)
+		response, err = c.GetResourceSyncWithResponse(ctx, o.GetCurrentOrganizationID(), name)
 	case kind == ResourceSyncKind && len(name) == 0:
 		params := api.ListResourceSyncsParams{
 			LabelSelector: util.ToPtrWithNilDefault(o.LabelSelector),
@@ -243,9 +243,9 @@ func (o *GetOptions) Run(ctx context.Context, args []string) error { //nolint:go
 			Limit:         util.ToPtrWithNilDefault(o.Limit),
 			Continue:      util.ToPtrWithNilDefault(o.Continue),
 		}
-		response, err = c.ListResourceSyncsWithResponse(ctx, &params)
+		response, err = c.ListResourceSyncsWithResponse(ctx, o.GetCurrentOrganizationID(), &params)
 	case kind == CertificateSigningRequestKind && len(name) > 0:
-		response, err = c.GetCertificateSigningRequestWithResponse(ctx, name)
+		response, err = c.GetCertificateSigningRequestWithResponse(ctx, o.GetCurrentOrganizationID(), name)
 	case kind == CertificateSigningRequestKind && len(name) == 0:
 		params := api.ListCertificateSigningRequestsParams{
 			LabelSelector: util.ToPtrWithNilDefault(o.LabelSelector),
@@ -253,14 +253,14 @@ func (o *GetOptions) Run(ctx context.Context, args []string) error { //nolint:go
 			Limit:         util.ToPtrWithNilDefault(o.Limit),
 			Continue:      util.ToPtrWithNilDefault(o.Continue),
 		}
-		response, err = c.ListCertificateSigningRequestsWithResponse(ctx, &params)
+		response, err = c.ListCertificateSigningRequestsWithResponse(ctx, o.GetCurrentOrganizationID(), &params)
 	case kind == EventKind:
 		params := api.ListEventsParams{
 			FieldSelector: util.ToPtrWithNilDefault(o.FieldSelector),
 			Limit:         util.ToPtrWithNilDefault(o.Limit),
 			Continue:      util.ToPtrWithNilDefault(o.Continue),
 		}
-		response, err = c.ListEventsWithResponse(ctx, &params)
+		response, err = c.ListEventsWithResponse(ctx, o.GetCurrentOrganizationID(), &params)
 	default:
 		return fmt.Errorf("unsupported resource kind: %s", kind)
 	}

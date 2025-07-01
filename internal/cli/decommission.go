@@ -110,7 +110,7 @@ func (o *DecommissionOptions) Run(ctx context.Context, args []string) error {
 	default:
 		body = api.DeviceDecommission{Target: "Unenroll"}
 	}
-	response, err := c.DecommissionDeviceWithResponse(ctx, name, body)
+	response, err := c.DecommissionDeviceWithResponse(ctx, o.GetCurrentOrganizationID(), name, body)
 	if err != nil {
 		return fmt.Errorf("decommissioning device %s: %w", name, err)
 	}

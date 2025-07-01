@@ -187,7 +187,7 @@ func (o *CertificateOptions) Run(ctx context.Context, args []string) error {
 	var currentCsr *api.CertificateSigningRequest
 	err = wait.PollUntilContextTimeout(ctx, time.Second, 2*time.Minute, false, func(ctx context.Context) (bool, error) {
 		fmt.Fprint(os.Stderr, ".")
-		currentCsr, err = getCsr(csrName, c, ctx)
+		currentCsr, err = getCsr(csrName, c, ctx, o.GetCurrentOrganizationID())
 		if err != nil {
 			return false, fmt.Errorf("reading CSR %q: %w", ctx.Value("name"), err)
 		}
@@ -203,7 +203,7 @@ func (o *CertificateOptions) Run(ctx context.Context, args []string) error {
 	}
 
 	// get URIs and other data from enrollmentconfig API
-	response, err := c.GetEnrollmentConfigWithResponse(ctx, nil)
+	response, err := c.GetEnrollmentConfigWithResponse(ctx, o.GetCurrentOrganizationID(), nil)
 	if err != nil {
 		return fmt.Errorf("getting enrollment config: %w", err)
 	}
@@ -250,7 +250,7 @@ func (o *CertificateOptions) submitCsrWithRetries(ctx context.Context, c *apicli
 		}
 
 		fmt.Fprintf(os.Stderr, "Submitting certificate signing request %q...", csrName)
-		response, err := c.CreateCertificateSigningRequestWithBodyWithResponse(ctx, "application/json", bytes.NewReader(csrResourceJSON))
+		response, err := c.CreateCertificateSigningRequestWithBodyWithResponse(ctx, o.GetCurrentOrganizationID(), "application/json", bytes.NewReader(csrResourceJSON))
 		if err != nil {
 			return "", fmt.Errorf("submitting CSR: %w", err)
 		}
@@ -327,8 +327,8 @@ func createCsr(o *CertificateOptions, name string, priv crypto.PrivateKey) ([]by
 	return csrResourceJSON, nil
 }
 
-func getCsr(name string, c *apiclient.ClientWithResponses, ctx context.Context) (*api.CertificateSigningRequest, error) {
-	response, err := c.GetCertificateSigningRequestWithResponse(ctx, name)
+func getCsr(name string, c *apiclient.ClientWithResponses, ctx context.Context, orgID uuid.UUID) (*api.CertificateSigningRequest, error) {
+	response, err := c.GetCertificateSigningRequestWithResponse(ctx, orgID, name)
 	if err != nil {
 		return nil, err
 	}

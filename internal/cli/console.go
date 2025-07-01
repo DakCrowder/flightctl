@@ -350,7 +350,7 @@ func (o *ConsoleOptions) emitUpgradeFailureError(ctx context.Context, name strin
 		fmt.Fprintf(os.Stderr, "error creating client: %v\n", err)
 		return
 	}
-	response, err := c.GetDeviceWithResponse(ctx, name)
+	response, err := c.GetDeviceWithResponse(ctx, o.GetCurrentOrganizationID(), name)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error getting device %s: %v\n", name, err)
 		return

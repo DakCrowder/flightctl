@@ -152,19 +152,19 @@ func (o *DeleteOptions) deleteOne(ctx context.Context, c *apiclient.ClientWithRe
 
 	switch kind {
 	case DeviceKind:
-		response, err = c.DeleteDeviceWithResponse(ctx, name)
+		response, err = c.DeleteDeviceWithResponse(ctx, o.GetCurrentOrganizationID(), name)
 	case EnrollmentRequestKind:
-		response, err = c.DeleteEnrollmentRequestWithResponse(ctx, name)
+		response, err = c.DeleteEnrollmentRequestWithResponse(ctx, o.GetCurrentOrganizationID(), name)
 	case FleetKind:
-		response, err = c.DeleteFleetWithResponse(ctx, name)
+		response, err = c.DeleteFleetWithResponse(ctx, o.GetCurrentOrganizationID(), name)
 	case TemplateVersionKind:
-		response, err = c.DeleteTemplateVersionWithResponse(ctx, o.FleetName, name)
+		response, err = c.DeleteTemplateVersionWithResponse(ctx, o.GetCurrentOrganizationID(), o.FleetName, name)
 	case RepositoryKind:
-		response, err = c.DeleteRepositoryWithResponse(ctx, name)
+		response, err = c.DeleteRepositoryWithResponse(ctx, o.GetCurrentOrganizationID(), name)
 	case ResourceSyncKind:
-		response, err = c.DeleteResourceSyncWithResponse(ctx, name)
+		response, err = c.DeleteResourceSyncWithResponse(ctx, o.GetCurrentOrganizationID(), name)
 	case CertificateSigningRequestKind:
-		response, err = c.DeleteCertificateSigningRequestWithResponse(ctx, name)
+		response, err = c.DeleteCertificateSigningRequestWithResponse(ctx, o.GetCurrentOrganizationID(), name)
 	default:
 		return nil, fmt.Errorf("unsupported resource kind: %s", kind)
 	}

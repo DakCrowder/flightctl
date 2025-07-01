@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/flightctl/flightctl/internal/store"
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -68,6 +70,11 @@ func (o *GlobalOptions) WithTimeout(ctx context.Context) (context.Context, conte
 		return context.WithTimeout(ctx, time.Duration(o.RequestTimeout)*time.Second)
 	}
 	return ctx, func() {}
+}
+
+// TODO(DakCrowder): Update to pull from passed argument or config file
+func (o *GlobalOptions) GetCurrentOrganizationID() uuid.UUID {
+	return store.NullOrgId
 }
 
 func ConfigFilePath(context string) string {

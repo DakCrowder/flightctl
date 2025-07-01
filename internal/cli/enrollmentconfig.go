@@ -85,7 +85,7 @@ func (o *EnrollmentConfigOptions) Run(ctx context.Context, args []string) error 
 	if len(args) > 0 {
 		params.Csr = &args[0]
 	}
-	response, err := c.GetEnrollmentConfigWithResponse(ctx, params)
+	response, err := c.GetEnrollmentConfigWithResponse(ctx, o.GetCurrentOrganizationID(), params)
 	if err != nil {
 		return err
 	}

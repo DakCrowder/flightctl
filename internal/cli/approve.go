@@ -111,9 +111,9 @@ func (o *ApproveOptions) Run(ctx context.Context, args []string) error {
 			Approved: true,
 			Labels:   &labels,
 		}
-		response, err = c.ApproveEnrollmentRequest(ctx, name, approval)
+		response, err = c.ApproveEnrollmentRequest(ctx, o.GetCurrentOrganizationID(), name, approval)
 	case kind == CertificateSigningRequestKind:
-		getResponse, err = c.GetCertificateSigningRequestWithResponse(ctx, name)
+		getResponse, err = c.GetCertificateSigningRequestWithResponse(ctx, o.GetCurrentOrganizationID(), name)
 		if err != nil {
 			return fmt.Errorf("getting certificate signing request: %w", err)
 		}
@@ -136,7 +136,7 @@ func (o *ApproveOptions) Run(ctx context.Context, args []string) error {
 		})
 		api.RemoveStatusCondition(&csr.Status.Conditions, api.CertificateSigningRequestDenied)
 		api.RemoveStatusCondition(&csr.Status.Conditions, api.CertificateSigningRequestFailed)
-		response, err = c.UpdateCertificateSigningRequestApproval(ctx, name, *csr)
+		response, err = c.UpdateCertificateSigningRequestApproval(ctx, o.GetCurrentOrganizationID(), name, *csr)
 	default:
 		return fmt.Errorf("unsupported resource kind: %s", kind)
 	}

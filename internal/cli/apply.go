@@ -112,7 +112,7 @@ func (o *ApplyOptions) Run(ctx context.Context, args []string) error {
 	for _, filename := range o.Filenames {
 		switch {
 		case filename == "-":
-			errs = append(errs, applyFromReader(ctx, c, "<stdin>", os.Stdin, o.DryRun)...)
+			errs = append(errs, applyFromReader(ctx, c, "<stdin>", os.Stdin, o.DryRun, o)...)
 		default:
 			expandedFilenames, err := expandIfFilePattern(filename)
 			if err != nil {
@@ -150,7 +150,7 @@ func (o *ApplyOptions) Run(ctx context.Context, args []string) error {
 						return nil
 					}
 					defer r.Close()
-					errs = append(errs, applyFromReader(ctx, c, path, r, o.DryRun)...)
+					errs = append(errs, applyFromReader(ctx, c, path, r, o.DryRun, o)...)
 					return nil
 				})
 				if err != nil {
@@ -164,7 +164,7 @@ func (o *ApplyOptions) Run(ctx context.Context, args []string) error {
 
 type genericResource map[string]interface{}
 
-func applyFromReader(ctx context.Context, client *apiclient.ClientWithResponses, filename string, r io.Reader, dryRun bool) []error {
+func applyFromReader(ctx context.Context, client *apiclient.ClientWithResponses, filename string, r io.Reader, dryRun bool, options *ApplyOptions) []error {
 	decoder := yamlutil.NewYAMLOrJSONDecoder(r, 100)
 	resources := []genericResource{}
 
@@ -215,42 +215,42 @@ func applyFromReader(ctx context.Context, client *apiclient.ClientWithResponses,
 		switch strings.ToLower(kind) {
 		case DeviceKind:
 			var response *apiclient.ReplaceDeviceResponse
-			response, err = client.ReplaceDeviceWithBodyWithResponse(ctx, resourceName, "application/json", bytes.NewReader(buf))
+			response, err = client.ReplaceDeviceWithBodyWithResponse(ctx, options.GetCurrentOrganizationID(), resourceName, "application/json", bytes.NewReader(buf))
 			if response != nil {
 				httpResponse = response.HTTPResponse
 				message = string(response.Body)
 			}
 		case EnrollmentRequestKind:
 			var response *apiclient.ReplaceEnrollmentRequestResponse
-			response, err = client.ReplaceEnrollmentRequestWithBodyWithResponse(ctx, resourceName, "application/json", bytes.NewReader(buf))
+			response, err = client.ReplaceEnrollmentRequestWithBodyWithResponse(ctx, options.GetCurrentOrganizationID(), resourceName, "application/json", bytes.NewReader(buf))
 			if response != nil {
 				httpResponse = response.HTTPResponse
 				message = string(response.Body)
 			}
 		case FleetKind:
 			var response *apiclient.ReplaceFleetResponse
-			response, err = client.ReplaceFleetWithBodyWithResponse(ctx, resourceName, "application/json", bytes.NewReader(buf))
+			response, err = client.ReplaceFleetWithBodyWithResponse(ctx, options.GetCurrentOrganizationID(), resourceName, "application/json", bytes.NewReader(buf))
 			if response != nil {
 				httpResponse = response.HTTPResponse
 				message = string(response.Body)
 			}
 		case RepositoryKind:
 			var response *apiclient.ReplaceRepositoryResponse
-			response, err = client.ReplaceRepositoryWithBodyWithResponse(ctx, resourceName, "application/json", bytes.NewReader(buf))
+			response, err = client.ReplaceRepositoryWithBodyWithResponse(ctx, options.GetCurrentOrganizationID(), resourceName, "application/json", bytes.NewReader(buf))
 			if response != nil {
 				httpResponse = response.HTTPResponse
 				message = string(response.Body)
 			}
 		case ResourceSyncKind:
 			var response *apiclient.ReplaceResourceSyncResponse
-			response, err = client.ReplaceResourceSyncWithBodyWithResponse(ctx, resourceName, "application/json", bytes.NewReader(buf))
+			response, err = client.ReplaceResourceSyncWithBodyWithResponse(ctx, options.GetCurrentOrganizationID(), resourceName, "application/json", bytes.NewReader(buf))
 			if response != nil {
 				httpResponse = response.HTTPResponse
 				message = string(response.Body)
 			}
 		case CertificateSigningRequestKind:
 			var response *apiclient.ReplaceCertificateSigningRequestResponse
-			response, err = client.ReplaceCertificateSigningRequestWithBodyWithResponse(ctx, resourceName, "application/json", bytes.NewReader(buf))
+			response, err = client.ReplaceCertificateSigningRequestWithBodyWithResponse(ctx, options.GetCurrentOrganizationID(), resourceName, "application/json", bytes.NewReader(buf))
 			if response != nil {
 				httpResponse = response.HTTPResponse
 				message = string(response.Body)
