@@ -8,6 +8,7 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/service"
+	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/tasks_client"
 	"github.com/flightctl/flightctl/internal/util"
 	"github.com/flightctl/flightctl/pkg/k8sclient"
@@ -42,7 +43,7 @@ func NewFleetValidateLogic(callbackManager tasks_client.CallbackManager, log log
 }
 
 func (t *FleetValidateLogic) CreateNewTemplateVersionIfFleetValid(ctx context.Context) error {
-	fleet, status := t.serviceHandler.GetFleet(ctx, t.resourceRef.Name, api.GetFleetParams{})
+	fleet, status := t.serviceHandler.GetFleet(ctx, store.NullOrgId, t.resourceRef.Name, api.GetFleetParams{})
 	if status.Code != http.StatusOK {
 		return fmt.Errorf("failed getting fleet %s/%s: %s", t.resourceRef.OrgID, t.resourceRef.Name, status.Message)
 	}
@@ -52,7 +53,7 @@ func (t *FleetValidateLogic) CreateNewTemplateVersionIfFleetValid(ctx context.Co
 
 	// Set the many-to-many relationship with the repos (we do this even if the validation failed so that we will
 	// validate the fleet again if the repository is updated, and then it might be fixed).
-	status = t.serviceHandler.OverwriteFleetRepositoryRefs(ctx, *fleet.Metadata.Name, referencedRepos...)
+	status = t.serviceHandler.OverwriteFleetRepositoryRefs(ctx, store.NullOrgId, *fleet.Metadata.Name, referencedRepos...)
 	if status.Code != http.StatusOK {
 		return fmt.Errorf("setting repository references: %s", status.Message)
 	}
@@ -78,7 +79,7 @@ func (t *FleetValidateLogic) CreateNewTemplateVersionIfFleetValid(ctx context.Co
 	}
 
 	immediateRollout := fleet.Spec.RolloutPolicy == nil || fleet.Spec.RolloutPolicy.DeviceSelection == nil
-	tv, status := t.serviceHandler.CreateTemplateVersion(ctx, templateVersion, immediateRollout)
+	tv, status := t.serviceHandler.CreateTemplateVersion(ctx, store.NullOrgId, templateVersion, immediateRollout)
 	if status.Code != http.StatusCreated {
 		return t.setStatus(ctx, fmt.Errorf("creating templateVersion for valid fleet: %s", status.Message))
 	}
@@ -86,7 +87,7 @@ func (t *FleetValidateLogic) CreateNewTemplateVersionIfFleetValid(ctx context.Co
 	annotations := map[string]string{
 		api.FleetAnnotationTemplateVersion: *tv.Metadata.Name,
 	}
-	status = t.serviceHandler.UpdateFleetAnnotations(ctx, *fleet.Metadata.Name, annotations, nil)
+	status = t.serviceHandler.UpdateFleetAnnotations(ctx, store.NullOrgId, *fleet.Metadata.Name, annotations, nil)
 	if status.Code != http.StatusOK {
 		return t.setStatus(ctx, fmt.Errorf("setting fleet annotation with newly-created templateVersion: %s", status.Message))
 	}
@@ -106,7 +107,7 @@ func (t *FleetValidateLogic) setStatus(ctx context.Context, validationErr error)
 		condition.Message = validationErr.Error()
 	}
 
-	status := t.serviceHandler.UpdateFleetConditions(ctx, t.resourceRef.Name, []api.Condition{condition})
+	status := t.serviceHandler.UpdateFleetConditions(ctx, store.NullOrgId, t.resourceRef.Name, []api.Condition{condition})
 	if status.Code != http.StatusOK {
 		t.log.Errorf("Failed setting condition for fleet %s/%s: %s", t.resourceRef.OrgID, t.resourceRef.Name, status.Message)
 	}
@@ -176,7 +177,7 @@ func (t *FleetValidateLogic) validateGitConfig(ctx context.Context, configItem *
 		return nil, nil, fmt.Errorf("%w: failed getting config item as GitConfigProviderSpec: %w", ErrUnknownConfigName, err)
 	}
 
-	repo, status := t.serviceHandler.GetRepository(ctx, gitSpec.GitRef.Repository)
+	repo, status := t.serviceHandler.GetRepository(ctx, store.NullOrgId, gitSpec.GitRef.Repository)
 	if status.Code != http.StatusOK {
 		return &gitSpec.Name, &gitSpec.GitRef.Repository, fmt.Errorf("failed fetching specified Repository definition %s/%s: %s", t.resourceRef.OrgID, gitSpec.GitRef.Repository, status.Message)
 	}
@@ -220,7 +221,7 @@ func (t *FleetValidateLogic) validateHttpProviderConfig(ctx context.Context, con
 		return nil, nil, fmt.Errorf("%w: failed getting config item as HttpConfigProviderSpec: %w", ErrUnknownConfigName, err)
 	}
 
-	repo, status := t.serviceHandler.GetRepository(ctx, httpConfigProviderSpec.HttpRef.Repository)
+	repo, status := t.serviceHandler.GetRepository(ctx, store.NullOrgId, httpConfigProviderSpec.HttpRef.Repository)
 	if status.Code != http.StatusOK {
 		return &httpConfigProviderSpec.Name, &httpConfigProviderSpec.HttpRef.Repository, fmt.Errorf("failed fetching specified Repository definition %s/%s: %s", t.resourceRef.OrgID, httpConfigProviderSpec.HttpRef.Repository, status.Message)
 	}

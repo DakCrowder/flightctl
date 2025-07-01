@@ -8,6 +8,7 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/service"
+	"github.com/flightctl/flightctl/internal/store"
 	"github.com/samber/lo"
 	"github.com/sirupsen/logrus"
 )
@@ -39,7 +40,7 @@ func (t *DeviceDisconnected) Poll(ctx context.Context) {
 
 	listParams := api.ListDevicesParams{Limit: lo.ToPtr(int32(ItemsPerPage))}
 	for {
-		devices, status := t.serviceHandler.ListDevices(ctx, listParams, nil)
+		devices, status := t.serviceHandler.ListDevices(ctx, store.NullOrgId, listParams, nil)
 		if status.Code != http.StatusOK {
 			t.log.WithError(service.ApiStatusToErr(status)).Error("failed to list devices")
 			return
@@ -47,7 +48,7 @@ func (t *DeviceDisconnected) Poll(ctx context.Context) {
 
 		var batch []string
 		for _, device := range devices.Items {
-			changed := t.serviceHandler.UpdateServiceSideDeviceStatus(ctx, device)
+			changed := t.serviceHandler.UpdateServiceSideDeviceStatus(ctx, store.NullOrgId, device)
 			if changed {
 				batch = append(batch, *device.Metadata.Name)
 			}
@@ -55,7 +56,7 @@ func (t *DeviceDisconnected) Poll(ctx context.Context) {
 
 		t.log.Infof("Updating %d devices to unknown status", len(batch))
 		// TODO: This is MVP and needs to be properly evaluated for performance and race conditions
-		if status := t.serviceHandler.UpdateDeviceSummaryStatusBatch(ctx, batch, api.DeviceSummaryStatusUnknown, statusInfoMessage); status.Code != http.StatusOK {
+		if status := t.serviceHandler.UpdateDeviceSummaryStatusBatch(ctx, store.NullOrgId, batch, api.DeviceSummaryStatusUnknown, statusInfoMessage); status.Code != http.StatusOK {
 			t.log.WithError(service.ApiStatusToErr(status)).Error("failed to update device summary status")
 			return
 		}

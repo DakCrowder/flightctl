@@ -13,6 +13,7 @@ import (
 	"github.com/flightctl/flightctl/internal/consts"
 	"github.com/flightctl/flightctl/internal/rollout"
 	"github.com/flightctl/flightctl/internal/service"
+	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/store/selector"
 	"github.com/flightctl/flightctl/internal/tasks_client"
 	"github.com/flightctl/flightctl/internal/util"
@@ -68,13 +69,13 @@ func (f *FleetRolloutsLogic) SetItemsPerPage(items int) {
 }
 
 func (f FleetRolloutsLogic) RolloutFleet(ctx context.Context) error {
-	fleet, status := f.serviceHandler.GetFleet(ctx, f.resourceRef.Name, api.GetFleetParams{})
+	fleet, status := f.serviceHandler.GetFleet(ctx, store.NullOrgId, f.resourceRef.Name, api.GetFleetParams{})
 	if status.Code != http.StatusOK {
 		return fmt.Errorf("failed to get fleet %s/%s: %s", f.resourceRef.OrgID, f.resourceRef.Name, status.Message)
 	}
 	f.log.Infof("Rolling out fleet %s/%s", f.resourceRef.OrgID, f.resourceRef.Name)
 
-	templateVersion, status := f.serviceHandler.GetLatestTemplateVersion(ctx, f.resourceRef.Name)
+	templateVersion, status := f.serviceHandler.GetLatestTemplateVersion(ctx, store.NullOrgId, f.resourceRef.Name)
 	if status.Code != http.StatusOK {
 		return fmt.Errorf("failed to get templateVersion: %s", status.Message)
 	}
@@ -104,7 +105,7 @@ func (f FleetRolloutsLogic) RolloutFleet(ctx context.Context) error {
 	delayDeviceRender := fleet.Spec.RolloutPolicy != nil && fleet.Spec.RolloutPolicy.DisruptionBudget != nil
 
 	for {
-		devices, status := f.serviceHandler.ListDevices(ctx, listParams, annotationSelector)
+		devices, status := f.serviceHandler.ListDevices(ctx, store.NullOrgId, listParams, annotationSelector)
 		if status.Code != http.StatusOK {
 			// TODO: Retry when we have a mechanism that allows it
 			return fmt.Errorf("failed fetching devices: %s", status.Message)
@@ -137,7 +138,7 @@ func (f FleetRolloutsLogic) RolloutFleet(ctx context.Context) error {
 func (f FleetRolloutsLogic) RolloutDevice(ctx context.Context) error {
 	f.log.Infof("Rolling out device %s/%s", f.resourceRef.OrgID, f.resourceRef.Name)
 
-	device, status := f.serviceHandler.GetDevice(ctx, f.resourceRef.Name)
+	device, status := f.serviceHandler.GetDevice(ctx, store.NullOrgId, f.resourceRef.Name)
 	if status.Code != http.StatusOK {
 		return fmt.Errorf("failed to get device: %s", status.Message)
 	}
@@ -159,12 +160,12 @@ func (f FleetRolloutsLogic) RolloutDevice(ctx context.Context) error {
 	}
 	f.owner = *device.Metadata.Owner
 
-	templateVersion, status := f.serviceHandler.GetLatestTemplateVersion(ctx, ownerName)
+	templateVersion, status := f.serviceHandler.GetLatestTemplateVersion(ctx, store.NullOrgId, ownerName)
 	if status.Code != http.StatusOK {
 		return fmt.Errorf("failed to get templateVersion: %s", status.Message)
 	}
 
-	fleet, status := f.serviceHandler.GetFleet(ctx, ownerName, api.GetFleetParams{})
+	fleet, status := f.serviceHandler.GetFleet(ctx, store.NullOrgId, ownerName, api.GetFleetParams{})
 	if status.Code != http.StatusOK {
 		return fmt.Errorf("failed to get fleet: %s", status.Message)
 	}
@@ -211,7 +212,7 @@ func (f FleetRolloutsLogic) updateDeviceToFleetTemplate(ctx context.Context, dev
 		annotations := map[string]string{
 			api.DeviceAnnotationLastRolloutError: errors.Join(errs...).Error(),
 		}
-		status := f.serviceHandler.UpdateDeviceAnnotations(ctx, *device.Metadata.Name, annotations, nil)
+		status := f.serviceHandler.UpdateDeviceAnnotations(ctx, store.NullOrgId, *device.Metadata.Name, annotations, nil)
 		if status.Code != http.StatusOK {
 			errs = append(errs, service.ApiStatusToErr(status))
 		}
@@ -246,7 +247,7 @@ func (f FleetRolloutsLogic) updateDeviceToFleetTemplate(ctx context.Context, dev
 	annotations := map[string]string{
 		api.DeviceAnnotationTemplateVersion: *templateVersion.Metadata.Name,
 	}
-	status := f.serviceHandler.UpdateDeviceAnnotations(ctx, *device.Metadata.Name, annotations, []string{api.DeviceAnnotationLastRolloutError})
+	status := f.serviceHandler.UpdateDeviceAnnotations(ctx, store.NullOrgId, *device.Metadata.Name, annotations, []string{api.DeviceAnnotationLastRolloutError})
 	if status.Code != http.StatusOK {
 		return fmt.Errorf("failed updating templateVersion annotation: %s", status.Message)
 	}
@@ -591,10 +592,10 @@ func (f FleetRolloutsLogic) updateDeviceInStore(ctx context.Context, device *api
 		}
 		device.Spec = newDeviceSpec
 		newCtx := context.WithValue(ctx, consts.DelayDeviceRenderCtxKey, delayDeviceRender)
-		_, status = f.serviceHandler.ReplaceDevice(newCtx, *device.Metadata.Name, *device, nil)
+		_, status = f.serviceHandler.ReplaceDevice(newCtx, store.NullOrgId, *device.Metadata.Name, *device, nil)
 		if status.Code != http.StatusOK {
 			if status.Code == http.StatusConflict {
-				device, status = f.serviceHandler.GetDevice(ctx, *device.Metadata.Name)
+				device, status = f.serviceHandler.GetDevice(ctx, store.NullOrgId, *device.Metadata.Name)
 				if status.Code != http.StatusOK {
 					return fmt.Errorf("the device changed before we could update it, and we failed to fetch it again: %s", status.Message)
 				}

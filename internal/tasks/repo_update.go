@@ -7,6 +7,7 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/service"
+	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/tasks_client"
 	"github.com/samber/lo"
 	"github.com/sirupsen/logrus"
@@ -44,7 +45,7 @@ func NewRepositoryUpdateLogic(callbackManager tasks_client.CallbackManager, log 
 }
 
 func (t *RepositoryUpdateLogic) HandleRepositoryUpdate(ctx context.Context) error {
-	fleets, status := t.serviceHandler.GetRepositoryFleetReferences(ctx, t.resourceRef.Name)
+	fleets, status := t.serviceHandler.GetRepositoryFleetReferences(ctx, store.NullOrgId, t.resourceRef.Name)
 	if status.Code != http.StatusOK {
 		return fmt.Errorf("fetching fleets: %s", status.Message)
 	}
@@ -53,7 +54,7 @@ func (t *RepositoryUpdateLogic) HandleRepositoryUpdate(ctx context.Context) erro
 		t.callbackManager.FleetSourceUpdated(ctx, t.resourceRef.OrgID, *fleet.Metadata.Name)
 	}
 
-	devices, status := t.serviceHandler.GetRepositoryDeviceReferences(ctx, t.resourceRef.Name)
+	devices, status := t.serviceHandler.GetRepositoryDeviceReferences(ctx, store.NullOrgId, t.resourceRef.Name)
 	if status.Code != http.StatusOK {
 		return fmt.Errorf("fetching devices: %s", status.Message)
 	}
@@ -68,7 +69,7 @@ func (t *RepositoryUpdateLogic) HandleRepositoryUpdate(ctx context.Context) erro
 func (t *RepositoryUpdateLogic) HandleAllRepositoriesDeleted(ctx context.Context, log logrus.FieldLogger) error {
 	fleetListParams := api.ListFleetsParams{Limit: lo.ToPtr(int32(ItemsPerPage))}
 	for {
-		fleets, status := t.serviceHandler.ListFleets(ctx, fleetListParams)
+		fleets, status := t.serviceHandler.ListFleets(ctx, store.NullOrgId, fleetListParams)
 		if status.Code != http.StatusOK {
 			return fmt.Errorf("fetching fleets: %s", status.Message)
 		}
@@ -93,7 +94,7 @@ func (t *RepositoryUpdateLogic) HandleAllRepositoriesDeleted(ctx context.Context
 
 	devListParams := api.ListDevicesParams{Limit: lo.ToPtr(int32(ItemsPerPage))}
 	for {
-		devices, status := t.serviceHandler.ListDevices(ctx, devListParams, nil)
+		devices, status := t.serviceHandler.ListDevices(ctx, store.NullOrgId, devListParams, nil)
 		if status.Code != http.StatusOK {
 			return fmt.Errorf("fetching devices: %s", status.Message)
 		}

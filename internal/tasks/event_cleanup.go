@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/flightctl/flightctl/internal/service"
+	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/util"
 	"github.com/sirupsen/logrus"
 )
@@ -36,7 +37,7 @@ func (t *EventCleanup) Poll(ctx context.Context) {
 	defer cancel()
 
 	cutoffTime := time.Now().Add(-time.Duration(t.retentionPeriod))
-	numDeleted, status := t.serviceHandler.DeleteEventsOlderThan(ctx, cutoffTime)
+	numDeleted, status := t.serviceHandler.DeleteEventsOlderThan(ctx, store.NullOrgId, cutoffTime)
 	if status.Code != http.StatusOK {
 		t.log.Errorf("failed to clean up events: %s", status.Message)
 		return

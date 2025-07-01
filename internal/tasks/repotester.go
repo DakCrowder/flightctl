@@ -6,6 +6,7 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/service"
+	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/pkg/log"
 	"github.com/flightctl/flightctl/pkg/reqid"
 	"github.com/go-chi/chi/v5/middleware"
@@ -44,7 +45,7 @@ func (r *RepoTester) TestRepositories(ctx context.Context) {
 	continueToken := (*string)(nil)
 
 	for {
-		repositories, status := r.serviceHandler.ListRepositories(ctx, api.ListRepositoriesParams{
+		repositories, status := r.serviceHandler.ListRepositories(ctx, store.NullOrgId, api.ListRepositoriesParams{
 			Limit:    &limit,
 			Continue: continueToken,
 		})
@@ -144,6 +145,6 @@ func (r *RepoTester) SetAccessCondition(ctx context.Context, repository *api.Rep
 		// Nothing to do
 		return nil
 	}
-	_, status := r.serviceHandler.ReplaceRepositoryStatus(ctx, *repository.Metadata.Name, *repository)
+	_, status := r.serviceHandler.ReplaceRepositoryStatus(ctx, store.NullOrgId, *repository.Metadata.Name, *repository)
 	return service.ApiStatusToErr(status)
 }

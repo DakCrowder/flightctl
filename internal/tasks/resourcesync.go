@@ -12,6 +12,7 @@ import (
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/flterrors"
 	"github.com/flightctl/flightctl/internal/service"
+	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/tasks_client"
 	"github.com/flightctl/flightctl/internal/util"
 	"github.com/flightctl/flightctl/pkg/log"
@@ -54,7 +55,7 @@ func (r *ResourceSync) Poll(ctx context.Context) {
 	continueToken := (*string)(nil)
 
 	for {
-		resourcesyncs, status := r.serviceHandler.ListResourceSyncs(ctx, api.ListResourceSyncsParams{
+		resourcesyncs, status := r.serviceHandler.ListResourceSyncs(ctx, store.NullOrgId, api.ListResourceSyncsParams{
 			Limit:    &limit,
 			Continue: continueToken,
 		})
@@ -80,7 +81,7 @@ func (r *ResourceSync) Poll(ctx context.Context) {
 func (r *ResourceSync) run(ctx context.Context, log logrus.FieldLogger, rs *api.ResourceSync) error {
 	defer r.updateResourceSyncStatus(ctx, rs)
 	reponame := rs.Spec.Repository
-	repo, status := r.serviceHandler.GetRepository(ctx, reponame)
+	repo, status := r.serviceHandler.GetRepository(ctx, store.NullOrgId, reponame)
 	err := service.ApiStatusToErr(status)
 	api.SetStatusConditionByError(&rs.Status.Conditions, api.ResourceSyncAccessible, "accessible", "repository resource not found", err)
 	if err != nil {
@@ -112,7 +113,7 @@ func (r *ResourceSync) run(ctx context.Context, log logrus.FieldLogger, rs *api.
 		FieldSelector: lo.ToPtr(fmt.Sprintf("metadata.owner=%s", *owner)),
 	}
 	for {
-		listRes, status := r.serviceHandler.ListFleets(ctx, listParams)
+		listRes, status := r.serviceHandler.ListFleets(ctx, store.NullOrgId, listParams)
 		if status.Code != http.StatusOK {
 			err := fmt.Errorf("resourcesync/%s: failed to list owned fleets. error: %s", *rs.Metadata.Name, status.Message)
 			log.Errorf("%e", err)
@@ -135,7 +136,7 @@ func (r *ResourceSync) run(ctx context.Context, log logrus.FieldLogger, rs *api.
 	if len(fleetsToRemove) > 0 {
 		r.log.Infof("resourcesync/%s: found #%d fleets to remove. removing\n", *rs.Metadata.Name, len(fleetsToRemove))
 		for _, fleetToRemove := range fleetsToRemove {
-			status := r.serviceHandler.DeleteFleet(ctx, fleetToRemove)
+			status := r.serviceHandler.DeleteFleet(ctx, store.NullOrgId, fleetToRemove)
 			if status.Code != http.StatusOK {
 				log.Errorf("resourcesync/%s: failed to remove old fleet %s. error: %s", *rs.Metadata.Name, fleetToRemove, status.Message)
 				return service.ApiStatusToErr(status)
@@ -155,7 +156,7 @@ func (r *ResourceSync) run(ctx context.Context, log logrus.FieldLogger, rs *api.
 func (r *ResourceSync) createOrUpdateMultiple(ctx context.Context, resources ...*api.Fleet) error {
 	var errs []error
 	for _, resource := range resources {
-		_, status := r.serviceHandler.ReplaceFleet(ctx, *resource.Metadata.Name, *resource)
+		_, status := r.serviceHandler.ReplaceFleet(ctx, store.NullOrgId, *resource.Metadata.Name, *resource)
 		if status.Code != http.StatusOK && status.Code != http.StatusCreated {
 			if status.Message == flterrors.ErrUpdatingResourceWithOwnerNotAllowed.Error() {
 				errs = append(errs, errors.New("one or more fleets are managed by a different resource"))
@@ -348,7 +349,7 @@ func (r ResourceSync) parseFleets(resources []genericResourceMap, owner *string)
 }
 
 func (r *ResourceSync) updateResourceSyncStatus(ctx context.Context, rs *api.ResourceSync) {
-	_, status := r.serviceHandler.ReplaceResourceSyncStatus(ctx, *rs.Metadata.Name, *rs)
+	_, status := r.serviceHandler.ReplaceResourceSyncStatus(ctx, store.NullOrgId, *rs.Metadata.Name, *rs)
 	if status.Code != http.StatusOK {
 		r.log.Errorf("Failed to update resourcesync status for %s: %s", *rs.Metadata.Name, status.Message)
 	}
