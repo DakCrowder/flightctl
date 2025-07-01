@@ -11,6 +11,7 @@ import (
 	"github.com/flightctl/flightctl/internal/consts"
 	"github.com/flightctl/flightctl/internal/flterrors"
 	"github.com/flightctl/flightctl/internal/service"
+	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/util"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
@@ -58,7 +59,7 @@ func (m *ConsoleSessionManager) modifyAnnotations(ctx context.Context, deviceNam
 		newValue string
 	)
 	for i := 0; i != 10; i++ {
-		device, status := m.serviceHandler.GetDevice(ctx, deviceName)
+		device, status := m.serviceHandler.GetDevice(ctx, store.NullOrgId, deviceName)
 		if status.Code != http.StatusOK {
 			return service.ApiStatusToErr(status)
 		}
@@ -75,7 +76,7 @@ func (m *ConsoleSessionManager) modifyAnnotations(ctx context.Context, deviceNam
 		}
 		(*device.Metadata.Annotations)[api.DeviceAnnotationRenderedVersion] = nextRenderedVersion
 		m.log.Infof("About to save annotations %+v", *device.Metadata.Annotations)
-		_, err = m.serviceHandler.UpdateDevice(context.WithValue(ctx, consts.InternalRequestCtxKey, true), deviceName, *device, nil)
+		_, err = m.serviceHandler.UpdateDevice(context.WithValue(ctx, consts.InternalRequestCtxKey, true), store.NullOrgId, deviceName, *device, []string{})
 		if !errors.Is(err, flterrors.ErrResourceVersionConflict) {
 			break
 		}
@@ -141,7 +142,7 @@ func (m *ConsoleSessionManager) StartSession(ctx context.Context, orgId uuid.UUI
 		ProtocolCh: make(chan string),
 	}
 	// we should move this to a separate table in the database
-	if _, status := m.serviceHandler.GetDevice(ctx, deviceName); status.Code != http.StatusOK {
+	if _, status := m.serviceHandler.GetDevice(ctx, store.NullOrgId, deviceName); status.Code != http.StatusOK {
 		return nil, service.ApiStatusToErr(status)
 	}
 
