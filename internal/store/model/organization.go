@@ -10,18 +10,25 @@ import (
 type Organization struct {
 	ID uuid.UUID `gorm:"type:uuid;primaryKey"`
 
-	// Human readable name shown to users
-	DisplayName string `gorm:"not null"`
+	// Unique external identifier for the organization
+	ExternalID string `gorm:"uniqueIndex"`
+
+	// Source of the external ID (e.g., "aap", "oidc")
+	ExternalIDSource string
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
 func NewOrganizationFromApiResource(resource *api.Organization) (*Organization, error) {
-	return &Organization{
-		ID:          *resource.Id,
-		DisplayName: *resource.DisplayName,
-	}, nil
+	org := &Organization{
+		ID: *resource.Id,
+	}
+	
+	// ExternalID and ExternalIDSource would need to be set from the API resource
+	// if they were added to the API spec
+	
+	return org, nil
 }
 
 func (o *Organization) ToApiResource(opts ...APIResourceOption) (*api.Organization, error) {
@@ -30,8 +37,9 @@ func (o *Organization) ToApiResource(opts ...APIResourceOption) (*api.Organizati
 	}
 
 	return &api.Organization{
-		Id:          &o.ID,
-		DisplayName: &o.DisplayName,
+		Id: &o.ID,
+		// ExternalID and ExternalIDSource would need to be added to the API resource
+		// if they were added to the API spec
 	}, nil
 }
 

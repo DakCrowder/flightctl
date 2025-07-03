@@ -111,8 +111,5 @@ type Service interface {
 	DeleteEventsOlderThan(ctx context.Context, cutoffTime time.Time) (int64, api.Status)
 
 	// Organization
-	ListOrganizations(ctx context.Context) (*api.OrganizationList, api.Status)
 	ListUserOrganizations(ctx context.Context) (*api.OrganizationList, api.Status)
-	CreateOrganization(ctx context.Context, org api.Organization) (*api.Organization, api.Status)
-	ReplaceOrganization(ctx context.Context, orgID string, org api.Organization) (*api.Organization, api.Status)
 }
