@@ -119,19 +119,25 @@ func initAAPAuth(cfg *config.Config, log logrus.FieldLogger) error {
 	return nil
 }
 
+func initNilAuth(cfg *config.Config, log logrus.FieldLogger, store store.Store) error {
+	log.Warnln("Auth disabled")
+	configuredAuthType = AuthTypeNil
+	authN = NilAuth{}
+	if store != nil {
+		authZ = authz.NewBasicOrgAuthz(store.Organization())
+	} else {
+		return errors.New("no store provided")
+	}
+	return nil
+}
+
 func InitAuth(cfg *config.Config, log logrus.FieldLogger, store store.Store) error {
 	value, exists := os.LookupEnv(DisableAuthEnvKey)
+	var err error
 	if exists && value != "" {
-		log.Warnln("Auth disabled")
 		configuredAuthType = AuthTypeNil
-		if store != nil {
-			authZ = authz.NewBasicOrgAuthz(store.Organization())
-		} else {
-			return errors.New("no store provided")
-		}
-		authN = NilAuth{}
+		err = initNilAuth(cfg, log, store)
 	} else if cfg.Auth != nil {
-		var err error
 		if cfg.Auth.K8s != nil {
 			configuredAuthType = AuthTypeK8s
 			err = initK8sAuth(cfg, log)
@@ -142,12 +148,11 @@ func InitAuth(cfg *config.Config, log logrus.FieldLogger, store store.Store) err
 			configuredAuthType = AuthTypeAAP
 			err = initAAPAuth(cfg, log)
 		}
-
-		if err != nil {
-			return err
-		}
 	}
 
+	if err != nil {
+		return err
+	}
 	if authN == nil {
 		return errors.New("no authN provider defined")
 	}
