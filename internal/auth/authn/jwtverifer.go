@@ -68,8 +68,47 @@ func (j JWTAuth) ValidateToken(ctx context.Context, token string) error {
 }
 
 func (j JWTAuth) GetIdentity(ctx context.Context, token string) (*common.Identity, error) {
-	// TODO return filled identity information
-	return &common.Identity{}, nil
+	client := &http.Client{Transport: &http.Transport{
+		TLSClientConfig: j.clientTlsConfig,
+	}}
+	jwkSet, err := jwk.Fetch(ctx, j.jwksUri, jwk.WithHTTPClient(client))
+	if err != nil {
+		return nil, err
+	}
+
+	tok, err := jwt.Parse([]byte(token), jwt.WithKeySet(jwkSet), jwt.WithValidate(true))
+	if err != nil {
+		return nil, err
+	}
+
+	claims, err := tok.AsMap(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	identity := &common.Identity{}
+
+	if preferredUsername, ok := claims["preferred_username"].(string); ok {
+		identity.Username = preferredUsername
+	}
+
+	if sub, ok := claims["sub"].(string); ok {
+		identity.UID = sub
+	}
+
+	if orgClaim, ok := claims["organization"].(map[string]interface{}); ok {
+		organizations := make(map[string]bool)
+		for _, orgData := range orgClaim {
+			if orgInfo, ok := orgData.(map[string]interface{}); ok {
+				if orgID, ok := orgInfo["id"].(string); ok {
+					organizations[orgID] = true
+				}
+			}
+		}
+		identity.Organizations = organizations
+	}
+
+	return identity, nil
 }
 
 func (j JWTAuth) GetAuthConfig() common.AuthConfig {

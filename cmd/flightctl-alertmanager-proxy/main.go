@@ -27,6 +27,7 @@ import (
 	"github.com/flightctl/flightctl/internal/auth/common"
 	"github.com/flightctl/flightctl/internal/config"
 	"github.com/flightctl/flightctl/internal/crypto"
+	"github.com/flightctl/flightctl/internal/store"
 	fclog "github.com/flightctl/flightctl/pkg/log"
 	"github.com/sirupsen/logrus"
 )
@@ -194,8 +195,18 @@ func main() {
 		logger.Fatalf("failed creating TLS config: %v", err)
 	}
 
+	// Initialize data store
+	logger.Println("Initializing data store")
+	db, err := store.InitDB(cfg, logger)
+	if err != nil {
+		logger.Fatalf("initializing data store: %v", err)
+	}
+
+	store := store.NewStore(db, logger.WithField("pkg", "store"))
+	defer store.Close()
+
 	// Initialize auth system
-	if err := auth.InitAuth(cfg, logger); err != nil {
+	if err := auth.InitAuth(cfg, logger, store); err != nil {
 		logger.Fatalf("Failed to initialize auth: %v", err)
 	}
 

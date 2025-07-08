@@ -5351,6 +5351,9 @@ components:
           type: string
           format: uuid
           description: The unique identifier for the organization.
+        externalId:
+          type: string
+          description: The external identifier for the organization.
         displayName:
           type: string
           description: Human readable name shown to users.

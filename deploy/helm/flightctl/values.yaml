@@ -74,6 +74,8 @@ global:
     http: 80
   generateSecrets: true
   imagePullPolicy: IfNotPresent
+  organizations:
+    enabled: false
 
 
 ## @section Component specific parameters

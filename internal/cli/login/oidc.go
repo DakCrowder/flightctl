@@ -15,6 +15,7 @@ type OIDCDirectResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	ExpiresIn    *int64 `json:"expires_in"` // ExpiresIn in seconds
+	Scope        string `json:"scope"`
 }
 
 type OIDC struct {
@@ -45,7 +46,7 @@ func (o OIDC) getOIDCClient(callback string) (*osincli.Client, error) {
 		TokenUrl:           oauthServerResponse.TokenEndpoint,
 		ErrorsInStatusCode: true,
 		RedirectUrl:        callback,
-		Scope:              "openid",
+		Scope:              "openid organization:*",
 	}
 
 	client, err := osincli.NewClient(config)
@@ -73,6 +74,7 @@ func (o OIDC) authHeadless(username, password string) (AuthInfo, error) {
 	param.Add("username", username)
 	param.Add("password", password)
 	param.Add("grant_type", "password")
+	param.Add("scope", "openid organization:*")
 	payload := bytes.NewBufferString(param.Encode())
 
 	req, err := http.NewRequest(http.MethodPost, oauthResponse.TokenEndpoint, payload)

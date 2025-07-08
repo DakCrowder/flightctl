@@ -1494,6 +1494,9 @@ type Organization struct {
 	// DisplayName Human readable name shown to users.
 	DisplayName *string `json:"displayName,omitempty"`
 
+	// ExternalId The external identifier for the organization.
+	ExternalId *string `json:"externalId,omitempty"`
+
 	// Id The unique identifier for the organization.
 	Id *openapi_types.UUID `json:"id,omitempty"`
 
