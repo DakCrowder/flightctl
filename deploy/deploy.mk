@@ -75,4 +75,25 @@ kill-alertmanager-proxy:
 show-podman-secret:
 	sudo podman secret inspect $(SECRET_NAME) --showsecret | jq '.[] | .SecretData'
 
+# Can set the image tag to a specific version by using the PACKIT_CURRENT_VERSION variable
+# which builds the rpm with the specified version.
+#
+# Example cmd:
+# PACKIT_CURRENT_VERSION=0.8.0 make services-container
+services-container: rpm
+	sudo podman build -t flightctl-services:latest -f test/scripts/services-images/Containerfile.services .
+
+run-services-container: services-container
+	sudo podman run -d --privileged --replace \
+	--name flightctl-services \
+	-p 443:443 \
+	-p 3443:3443 \
+	-p 8090:8090 \
+	localhost/flightctl-services:latest
+
+clean-services-container:
+	sudo podman stop flightctl-services || true
+	sudo podman rm flightctl-services || true
+	sudo podman rmi localhost/flightctl-services:latest || true
+
 .PHONY: deploy-db deploy cluster
