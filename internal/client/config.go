@@ -38,6 +38,9 @@ type Config struct {
 	Service  Service  `json:"service"`
 	AuthInfo AuthInfo `json:"authentication"`
 
+	// CurrentOrganization is the ID of the currently selected organization context
+	CurrentOrganization string `json:"current-organization,omitempty"`
+
 	// baseDir is used to resolve relative paths
 	// If baseDir is empty, the current working directory is used.
 	baseDir string `json:"-"`
@@ -96,7 +99,7 @@ func (c *Config) Equal(c2 *Config) bool {
 	if c == nil || c2 == nil {
 		return false
 	}
-	return c.Service.Equal(&c2.Service) && c.AuthInfo.Equal(&c2.AuthInfo)
+	return c.Service.Equal(&c2.Service) && c.AuthInfo.Equal(&c2.AuthInfo) && c.CurrentOrganization == c2.CurrentOrganization
 }
 
 func (s *Service) Equal(s2 *Service) bool {
@@ -138,10 +141,11 @@ func (c *Config) DeepCopy() *Config {
 		return nil
 	}
 	return &Config{
-		Service:     *c.Service.DeepCopy(),
-		AuthInfo:    *c.AuthInfo.DeepCopy(),
-		baseDir:     c.baseDir,
-		testRootDir: c.testRootDir,
+		Service:             *c.Service.DeepCopy(),
+		AuthInfo:            *c.AuthInfo.DeepCopy(),
+		CurrentOrganization: c.CurrentOrganization,
+		baseDir:             c.baseDir,
+		testRootDir:         c.testRootDir,
 	}
 }
 
@@ -559,4 +563,19 @@ func resolvePath(path string, baseDir string) string {
 		}
 	}
 	return path
+}
+
+// GetCurrentOrganization returns the current organization ID from the config
+func (c *Config) GetCurrentOrganization() string {
+	return c.CurrentOrganization
+}
+
+// SetCurrentOrganization sets the current organization ID in the config
+func (c *Config) SetCurrentOrganization(orgID string) {
+	c.CurrentOrganization = orgID
+}
+
+// HasOrganization returns true if the config has a current organization set
+func (c *Config) HasOrganization() bool {
+	return c.CurrentOrganization != ""
 }

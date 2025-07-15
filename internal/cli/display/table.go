@@ -72,6 +72,8 @@ func (f *TableFormatter) formatList(w *tabwriter.Writer, data interface{}, optio
 		return f.printCSRTable(w, data.(*apiclient.ListCertificateSigningRequestsResponse).JSON200.Items...)
 	case strings.EqualFold(options.Kind, api.EventKind):
 		return f.printEventsTable(w, data.(*apiclient.ListEventsResponse).JSON200.Items...)
+	case strings.EqualFold(options.Kind, api.OrganizationKind):
+		return f.printOrganizationsTable(w, data.(*apiclient.ListUserOrganizationsResponse).JSON200.Items...)
 	default:
 		return fmt.Errorf("unknown resource type %s", options.Kind)
 	}
@@ -346,6 +348,17 @@ func (f *TableFormatter) printEventsTable(w *tabwriter.Writer, events ...api.Eve
 			e.InvolvedObject.Name,
 			string(e.Type),
 			e.Message,
+		)
+	}
+	return nil
+}
+
+func (f *TableFormatter) printOrganizationsTable(w *tabwriter.Writer, organizations ...api.Organization) error {
+	f.printHeaderRowLn(w, "ID", "DISPLAY NAME")
+	for _, org := range organizations {
+		f.printTableRowLn(w,
+			org.Id.String(),
+			org.DisplayName,
 		)
 	}
 	return nil

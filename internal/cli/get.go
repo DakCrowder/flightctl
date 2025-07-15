@@ -141,6 +141,12 @@ func (o *GetOptions) Validate(args []string) error {
 	if kind == EventKind && len(name) > 0 {
 		return fmt.Errorf("you cannot get a single event")
 	}
+	if kind == OrganizationKind && len(name) > 0 {
+		return fmt.Errorf("you cannot get a single organization")
+	}
+	if kind == OrganizationKind && (len(o.LabelSelector) > 0 || len(o.FieldSelector) > 0 || o.Limit > 0 || len(o.Continue) > 0) {
+		return fmt.Errorf("organizations do not support selectors, limit, or continue parameters")
+	}
 	if o.Limit < 0 {
 		return fmt.Errorf("limit must be greater than 0")
 	}
@@ -348,6 +354,8 @@ func (o *GetOptions) getResourceList(ctx context.Context, c *apiclient.ClientWit
 			Continue:      util.ToPtrWithNilDefault(o.Continue),
 		}
 		return c.ListEventsWithResponse(ctx, &params)
+	case OrganizationKind:
+		return c.ListUserOrganizationsWithResponse(ctx)
 	default:
 		return nil, fmt.Errorf("unsupported resource kind: %s", kind)
 	}

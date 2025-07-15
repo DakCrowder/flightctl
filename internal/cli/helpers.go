@@ -22,6 +22,7 @@ const (
 	TemplateVersionKind           = "templateversion"
 	CertificateSigningRequestKind = "certificatesigningrequest"
 	EventKind                     = "event"
+	OrganizationKind              = "organization"
 )
 
 var (
@@ -34,6 +35,7 @@ var (
 		TemplateVersionKind:           "templateversions",
 		CertificateSigningRequestKind: "certificatesigningrequests",
 		EventKind:                     "events",
+		OrganizationKind:              "organizations",
 	}
 
 	shortnameKinds = map[string]string{
@@ -45,6 +47,7 @@ var (
 		TemplateVersionKind:           "tv",
 		CertificateSigningRequestKind: "csr",
 		EventKind:                     "ev",
+		OrganizationKind:              "orgs",
 	}
 )
 
