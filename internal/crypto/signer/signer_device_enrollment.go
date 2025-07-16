@@ -77,6 +77,8 @@ func (s *SignerDeviceEnrollment) Sign(ctx context.Context, request api.Certifica
 	}
 	csr.Subject.CommonName = desired
 
+	// TODO: how does org id work in the context of this file?
+
 	expirySeconds := signerDeviceEnrollmentExpiryDays * 24 * 60 * 60
 	if request.Spec.ExpirationSeconds != nil && *request.Spec.ExpirationSeconds < expirySeconds {
 		expirySeconds = *request.Spec.ExpirationSeconds
@@ -86,7 +88,7 @@ func (s *SignerDeviceEnrollment) Sign(ctx context.Context, request api.Certifica
 		ctx,
 		csr,
 		int(expirySeconds),
-		WithExtension(OIDOrgID, NullOrgId.String()),
+		WithExtension(OIDOrgID, orgID.String()),
 		WithExtension(OIDDeviceFingerprint, csr.Subject.CommonName),
 	)
 }

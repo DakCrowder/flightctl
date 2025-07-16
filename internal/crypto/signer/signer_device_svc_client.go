@@ -7,6 +7,7 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	fccrypto "github.com/flightctl/flightctl/pkg/crypto"
+	"github.com/google/uuid"
 )
 
 const signerDeviceSvcClientExpiryDays int32 = 7
@@ -73,6 +74,21 @@ func (s *SignerDeviceSvcClient) Sign(ctx context.Context, request api.Certificat
 	}
 	fingerprint := cert.Subject.CommonName[lastHyphen+1:]
 
+	peerCertificate, err := PeerCertificateFromCtx(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("peer certificate is required for service client certificate signing: %w", err)
+	}
+
+	orgIDStr, err := fccrypto.GetExtensionValue(peerCertificate, OIDOrgID)
+	if err != nil {
+		return nil, fmt.Errorf("organization ID extension not found in peer certificate for service client certificate: %w", err)
+	}
+
+	orgID, err := uuid.Parse(orgIDStr)
+	if err != nil {
+		return nil, fmt.Errorf("invalid organization ID format in peer certificate for service client certificate: %w", err)
+	}
+
 	expirySeconds := signerDeviceSvcClientExpiryDays * 24 * 60 * 60
 	if request.Spec.ExpirationSeconds != nil && *request.Spec.ExpirationSeconds < expirySeconds {
 		expirySeconds = *request.Spec.ExpirationSeconds
@@ -82,7 +98,7 @@ func (s *SignerDeviceSvcClient) Sign(ctx context.Context, request api.Certificat
 		ctx,
 		cert,
 		int(expirySeconds),
-		WithExtension(OIDOrgID, NullOrgId.String()),
+		WithExtension(OIDOrgID, orgID.String()),
 		WithExtension(OIDDeviceFingerprint, fingerprint),
 	)
 }
