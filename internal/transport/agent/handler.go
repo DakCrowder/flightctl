@@ -15,6 +15,8 @@ import (
 	"github.com/flightctl/flightctl/internal/service"
 	"github.com/flightctl/flightctl/internal/transport"
 	"github.com/flightctl/flightctl/internal/util"
+	fccrypto "github.com/flightctl/flightctl/pkg/crypto"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -68,6 +70,27 @@ func ValidateEnrollmentAccessFromContext(ctx context.Context, ca *crypto.CAClien
 	return nil
 }
 
+// ExtractOrgIDFromCertificate extracts the organization ID from the peer certificate
+// and adds it to the context for the service handler
+func ExtractOrgIDFromCertificate(ctx context.Context, ca *crypto.CAClient, log logrus.FieldLogger) (context.Context, error) {
+	peerCertificate, err := ca.PeerCertificateFromCtx(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get peer certificate from context: %w", err)
+	}
+
+	orgIDStr, err := fccrypto.GetExtensionValue(peerCertificate, signer.OIDOrgID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to extract organization ID from certificate: %w", err)
+	}
+
+	orgID, err := uuid.Parse(orgIDStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse organization ID from certificate: %w", err)
+	}
+
+	return util.WithOrganizationID(ctx, orgID), nil
+}
+
 func NewAgentTransportHandler(serviceHandler service.Service, ca *crypto.CAClient, log logrus.FieldLogger) *AgentTransportHandler {
 	return &AgentTransportHandler{serviceHandler: serviceHandler, ca: ca, log: log}
 }
@@ -83,6 +106,17 @@ func (s *AgentTransportHandler) GetRenderedDevice(w http.ResponseWriter, r *http
 		return
 	}
 
+<<<<<<< HEAD
+=======
+	ctx, err := ExtractOrgIDFromCertificate(r.Context(), s.ca, s.log)
+	if err != nil {
+		s.log.Warnf("failed to extract organization ID from certificate: %v", err)
+		status := api.StatusUnauthorized(http.StatusText(http.StatusUnauthorized))
+		transport.SetResponse(w, status, status)
+		return
+	}
+
+>>>>>>> f922cf26 (NO-ISSUE: Pull org identifier out of incoming device certificates)
 	body, status := s.serviceHandler.GetRenderedDevice(ctx, fingerprint, params)
 	transport.SetResponse(w, body, status)
 }
@@ -104,6 +138,17 @@ func (s *AgentTransportHandler) ReplaceDeviceStatus(w http.ResponseWriter, r *ht
 		return
 	}
 
+<<<<<<< HEAD
+=======
+	ctx, err := ExtractOrgIDFromCertificate(r.Context(), s.ca, s.log)
+	if err != nil {
+		s.log.Warnf("failed to extract organization ID from certificate: %v", err)
+		status := api.StatusUnauthorized(http.StatusText(http.StatusUnauthorized))
+		transport.SetResponse(w, status, status)
+		return
+	}
+
+>>>>>>> f922cf26 (NO-ISSUE: Pull org identifier out of incoming device certificates)
 	body, status := s.serviceHandler.ReplaceDeviceStatus(ctx, fingerprint, device)
 	transport.SetResponse(w, body, status)
 }
@@ -125,6 +170,17 @@ func (s *AgentTransportHandler) PatchDeviceStatus(w http.ResponseWriter, r *http
 		return
 	}
 
+<<<<<<< HEAD
+=======
+	ctx, err := ExtractOrgIDFromCertificate(r.Context(), s.ca, s.log)
+	if err != nil {
+		s.log.Warnf("failed to extract organization ID from certificate: %v", err)
+		status := api.StatusUnauthorized(http.StatusText(http.StatusUnauthorized))
+		transport.SetResponse(w, status, status)
+		return
+	}
+
+>>>>>>> f922cf26 (NO-ISSUE: Pull org identifier out of incoming device certificates)
 	body, status := s.serviceHandler.PatchDeviceStatus(ctx, fingerprint, patch)
 	transport.SetResponse(w, body, status)
 }
@@ -145,6 +201,17 @@ func (s *AgentTransportHandler) CreateEnrollmentRequest(w http.ResponseWriter, r
 		return
 	}
 
+<<<<<<< HEAD
+=======
+	ctx, err := ExtractOrgIDFromCertificate(r.Context(), s.ca, s.log)
+	if err != nil {
+		s.log.Warnf("failed to extract organization ID from certificate: %v", err)
+		status := api.StatusUnauthorized(http.StatusText(http.StatusUnauthorized))
+		transport.SetResponse(w, status, status)
+		return
+	}
+
+>>>>>>> f922cf26 (NO-ISSUE: Pull org identifier out of incoming device certificates)
 	body, status := s.serviceHandler.CreateEnrollmentRequest(ctx, er)
 	transport.SetResponse(w, body, status)
 }
@@ -159,6 +226,17 @@ func (s *AgentTransportHandler) GetEnrollmentRequest(w http.ResponseWriter, r *h
 		return
 	}
 
+<<<<<<< HEAD
+=======
+	ctx, err := ExtractOrgIDFromCertificate(r.Context(), s.ca, s.log)
+	if err != nil {
+		s.log.Warnf("failed to extract organization ID from certificate: %v", err)
+		status := api.StatusUnauthorized(http.StatusText(http.StatusUnauthorized))
+		transport.SetResponse(w, status, status)
+		return
+	}
+
+>>>>>>> f922cf26 (NO-ISSUE: Pull org identifier out of incoming device certificates)
 	body, status := s.serviceHandler.GetEnrollmentRequest(ctx, name)
 	transport.SetResponse(w, body, status)
 }
@@ -174,7 +252,15 @@ func (s *AgentTransportHandler) CreateCertificateSigningRequest(w http.ResponseW
 		return
 	}
 
-	device, st := s.serviceHandler.GetDevice(ctx, fingerprint)
+	ctxWithOrg, err := ExtractOrgIDFromCertificate(ctx, s.ca, s.log)
+	if err != nil {
+		s.log.Warnf("failed to extract organization ID from certificate: %v", err)
+		status := api.StatusUnauthorized(http.StatusText(http.StatusUnauthorized))
+		transport.SetResponse(w, status, status)
+		return
+	}
+
+	device, st := s.serviceHandler.GetDevice(ctxWithOrg, fingerprint)
 	if st.Code != http.StatusOK {
 		status := api.StatusUnauthorized(http.StatusText(http.StatusUnauthorized))
 		transport.SetResponse(w, status, status)
@@ -199,7 +285,7 @@ func (s *AgentTransportHandler) CreateCertificateSigningRequest(w http.ResponseW
 	request.Status = nil
 	service.NilOutManagedObjectMetaProperties(&request.Metadata)
 	request.Metadata.Owner = util.SetResourceOwner(api.DeviceKind, fingerprint)
-	csr, status := s.serviceHandler.CreateCertificateSigningRequest(context.WithValue(ctx, consts.InternalRequestCtxKey, true), request)
+	csr, status := s.serviceHandler.CreateCertificateSigningRequest(context.WithValue(ctxWithOrg, consts.InternalRequestCtxKey, true), request)
 	if status.Code != http.StatusCreated && status.Code != http.StatusOK {
 		transport.SetResponse(w, status, status)
 		return
@@ -207,7 +293,7 @@ func (s *AgentTransportHandler) CreateCertificateSigningRequest(w http.ResponseW
 
 	// auto approve for DeviceSvcClientSignerName if it pass the signer verification we're good
 	if csr.Spec.SignerName == s.ca.Cfg.DeviceSvcClientSignerName {
-		if _, status := s.autoApprove(ctx, csr); status.Code != http.StatusOK {
+		if _, status := s.autoApprove(ctxWithOrg, csr); status.Code != http.StatusOK {
 			status := api.StatusInternalServerError(http.StatusText(http.StatusInternalServerError))
 			transport.SetResponse(w, status, status)
 			return
@@ -227,7 +313,15 @@ func (s *AgentTransportHandler) GetCertificateSigningRequest(w http.ResponseWrit
 		return
 	}
 
-	csr, status := s.serviceHandler.GetCertificateSigningRequest(ctx, name)
+	ctxWithOrg, err := ExtractOrgIDFromCertificate(ctx, s.ca, s.log)
+	if err != nil {
+		s.log.Warnf("failed to extract organization ID from certificate: %v", err)
+		status := api.StatusUnauthorized(http.StatusText(http.StatusUnauthorized))
+		transport.SetResponse(w, status, status)
+		return
+	}
+
+	csr, status := s.serviceHandler.GetCertificateSigningRequest(ctxWithOrg, name)
 	if status.Code != http.StatusOK {
 		transport.SetResponse(w, csr, status)
 		return
