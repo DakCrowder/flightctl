@@ -28,6 +28,9 @@ func dispatchTasks(serviceHandler service.Service, callbackManager tasks_client.
 		ctx, span := instrumentation.StartSpan(ctx, "flightctl/tasks", reference.TaskName)
 		defer span.End()
 
+		// Add orgID to context
+		ctx = context.WithValue(ctx, consts.OrganizationIDCtxKey, reference.OrgID)
+
 		span.SetAttributes(
 			attribute.String("reference.task_name", reference.TaskName),
 			attribute.String("reference.op", reference.Op),

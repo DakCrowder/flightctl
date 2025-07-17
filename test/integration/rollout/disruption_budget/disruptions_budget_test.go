@@ -11,11 +11,13 @@ import (
 	"github.com/flightctl/flightctl/internal/rollout/disruption_budget"
 	"github.com/flightctl/flightctl/internal/service"
 	"github.com/flightctl/flightctl/internal/store"
+	"github.com/flightctl/flightctl/internal/store/model"
 	"github.com/flightctl/flightctl/internal/tasks_client"
 	"github.com/flightctl/flightctl/internal/util"
 	flightlog "github.com/flightctl/flightctl/pkg/log"
 	"github.com/flightctl/flightctl/pkg/queues"
 	testutil "github.com/flightctl/flightctl/test/util"
+	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/samber/lo"
@@ -72,6 +74,9 @@ var _ = Describe("Rollout disruption budget test", func() {
 			MinAvailable:   minAvailable,
 		}
 	}
+
+	orgId := uuid.New()
+
 	createTestFleet := func(name string, d *api.DisruptionBudget) *api.Fleet {
 
 		fleet := &api.Fleet{
@@ -85,7 +90,7 @@ var _ = Describe("Rollout disruption budget test", func() {
 			},
 		}
 
-		f, err := storeInst.Fleet().Create(ctx, store.NullOrgId, fleet, nil)
+		f, err := storeInst.Fleet().Create(ctx, orgId, fleet, nil)
 		Expect(err).ToNot(HaveOccurred())
 		return f
 	}
@@ -99,13 +104,13 @@ var _ = Describe("Rollout disruption budget test", func() {
 			Spec:   api.TemplateVersionSpec{Fleet: ownerName},
 			Status: &api.TemplateVersionStatus{},
 		}
-		tv, err := storeInst.TemplateVersion().Create(ctx, store.NullOrgId, &templateVersion, nil)
+		tv, err := storeInst.TemplateVersion().Create(ctx, orgId, &templateVersion, nil)
 		Expect(err).ToNot(HaveOccurred())
 		tvName = *tv.Metadata.Name
 		annotations := map[string]string{
 			api.FleetAnnotationTemplateVersion: *tv.Metadata.Name,
 		}
-		Expect(storeInst.Fleet().UpdateAnnotations(ctx, store.NullOrgId, FleetName, annotations, nil)).ToNot(HaveOccurred())
+		Expect(storeInst.Fleet().UpdateAnnotations(ctx, orgId, FleetName, annotations, nil)).ToNot(HaveOccurred())
 	}
 	var (
 		labels1 = map[string]string{
@@ -119,13 +124,13 @@ var _ = Describe("Rollout disruption budget test", func() {
 	)
 	updateDeviceLabels := func(device *api.Device, labels map[string]string) {
 		device.Metadata.Labels = &labels
-		_, _, err := storeInst.Device().Update(ctx, store.NullOrgId, device, nil, false, nil, nil)
+		_, _, err := storeInst.Device().Update(ctx, orgId, device, nil, false, nil, nil)
 		Expect(err).ToNot(HaveOccurred())
 	}
 
 	setLabels := func(labels []map[string]string, numToSet []int) {
 		Expect(labels).To(HaveLen(len(numToSet)))
-		devices, err := storeInst.Device().List(ctx, store.NullOrgId, store.ListParams{})
+		devices, err := storeInst.Device().List(ctx, orgId, store.ListParams{})
 		Expect(err).ToNot(HaveOccurred())
 		Expect(len(devices.Items)).To(BeNumerically(">=", lo.Sum(numToSet)))
 		offset := 0
@@ -139,7 +144,7 @@ var _ = Describe("Rollout disruption budget test", func() {
 
 	equalLabels := func(l map[string]string) equalLabelsMatcher {
 		return func(name string) bool {
-			device, err := storeInst.Device().Get(ctx, store.NullOrgId, name)
+			device, err := storeInst.Device().Get(ctx, orgId, name)
 			Expect(err).ToNot(HaveOccurred())
 			return reflect.DeepEqual(lo.FromPtr(device.Metadata.Labels), l)
 		}
@@ -156,6 +161,9 @@ var _ = Describe("Rollout disruption budget test", func() {
 		kvStore, err := kvstore.NewKVStore(ctx, log, "localhost", 6379, "adminpass")
 		Expect(err).ToNot(HaveOccurred())
 		serviceHandler = service.NewServiceHandler(storeInst, mockCallbackManager, kvStore, nil, log, "", "")
+
+		storeInst.Organization().Create(ctx, &model.Organization{ID: orgId})
+		ctx = util.WithOrganizationID(ctx, orgId)
 	})
 	AfterEach(func() {
 		store.DeleteTestDB(ctx, log, cfg, storeInst, dbName)
@@ -166,13 +174,13 @@ var _ = Describe("Rollout disruption budget test", func() {
 			_ = createTestFleet(FleetName, d)
 			createTestTemplateVersion(FleetName)
 			if numDevices > 0 {
-				testutil.CreateTestDevices(ctx, numDevices, storeInst.Device(), store.NullOrgId, util.SetResourceOwner(api.FleetKind, FleetName), false)
-				devices, err := storeInst.Device().List(ctx, store.NullOrgId, store.ListParams{})
+				testutil.CreateTestDevices(ctx, numDevices, storeInst.Device(), orgId, util.SetResourceOwner(api.FleetKind, FleetName), false)
+				devices, err := storeInst.Device().List(ctx, orgId, store.ListParams{})
 				Expect(err).ToNot(HaveOccurred())
 				for i := range devices.Items {
 					d := devices.Items[i]
 					d.Status.Summary.Status = "Online"
-					_, err = storeInst.Device().UpdateStatus(ctx, store.NullOrgId, &d)
+					_, err = storeInst.Device().UpdateStatus(ctx, orgId, &d)
 					Expect(err).ToNot(HaveOccurred())
 					annotations := make(map[string]string)
 					if annotateTv {
@@ -182,9 +190,9 @@ var _ = Describe("Rollout disruption budget test", func() {
 						annotations[api.DeviceAnnotationRenderedTemplateVersion] = tvName
 					}
 					annotations[api.DeviceAnnotationRenderedVersion] = "5"
-					Expect(storeInst.Device().UpdateAnnotations(ctx, store.NullOrgId, lo.FromPtr(d.Metadata.Name), annotations, nil)).ToNot(HaveOccurred())
+					Expect(storeInst.Device().UpdateAnnotations(ctx, orgId, lo.FromPtr(d.Metadata.Name), annotations, nil)).ToNot(HaveOccurred())
 					d.Status.Config.RenderedVersion = "5"
-					_, err = storeInst.Device().UpdateStatus(ctx, store.NullOrgId, &d)
+					_, err = storeInst.Device().UpdateStatus(ctx, orgId, &d)
 					Expect(err).ToNot(HaveOccurred())
 				}
 			}

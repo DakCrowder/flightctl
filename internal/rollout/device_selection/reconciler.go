@@ -6,8 +6,8 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/service"
-	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/tasks_client"
+	"github.com/flightctl/flightctl/internal/util"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"github.com/sirupsen/logrus"
@@ -158,8 +158,11 @@ func (r *reconciler) reconcileFleet(ctx context.Context, orgId uuid.UUID, fleet 
 }
 
 func (r *reconciler) Reconcile(ctx context.Context) {
-	// Get all relevant fleets
-	orgId := store.NullOrgId
+	orgId, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		r.log.Error("No orgID found in context")
+		return
+	}
 
 	fleetList, status := r.serviceHandler.ListFleetRolloutDeviceSelection(ctx)
 	if status.Code != http.StatusOK {
