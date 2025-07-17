@@ -15,6 +15,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	defaultWorkerPoolSize = 20
+)
+
 type Server struct {
 	cfg   *config.Config
 	log   logrus.FieldLogger
@@ -57,8 +61,21 @@ func (s *Server) Run(ctx context.Context) error {
 	callbackManager := tasks_client.NewCallbackManager(publisher, s.log)
 	serviceHandler := service.WrapWithTracing(service.NewServiceHandler(s.store, callbackManager, kvStore, nil, s.log, "", ""))
 
-	workerFactory := NewDefaultWorkerFactory(s.cfg, s.log, s.store, queuesProvider, kvStore)
-	orgManager := NewOrganizationManager(serviceHandler, s.log, workerFactory)
+	serviceProvider, err := NewDefaultServiceProvider(s.cfg, s.log, s.store, queuesProvider, kvStore)
+	if err != nil {
+		return err
+	}
+
+	taskQueue := NewTaskQueue()
+
+	// Create worker pool with configurable number of workers (default to 20)
+	numWorkers := defaultWorkerPoolSize
+	if s.cfg.Periodic != nil && s.cfg.Periodic.WorkerPoolSize > 0 {
+		numWorkers = s.cfg.Periodic.WorkerPoolSize
+	}
+	workerPool := NewWorkerPool(numWorkers, taskQueue, serviceProvider, s.log)
+
+	orgManager := NewOrganizationManager(serviceHandler, s.log, taskQueue, workerPool)
 	go orgManager.Start(ctx)
 
 	sigShutdown := make(chan os.Signal, 1)

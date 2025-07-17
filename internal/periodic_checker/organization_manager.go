@@ -2,55 +2,54 @@ package periodic
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
-	"github.com/flightctl/flightctl/pkg/thread"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
-// OrganizationManager manages the lifecycle of organizations and their associated worker threads
+type TaskQueueInterface interface {
+	Push(task *Task)
+	Pop(ctx context.Context) (*Task, error)
+	RemoveOrganization(orgID uuid.UUID)
+	Close()
+}
+
+type WorkerPoolInterface interface {
+	Start(ctx context.Context)
+	Stop()
+}
+
 type OrganizationManager struct {
 	orgService    OrganizationService
 	log           logrus.FieldLogger
 	mu            sync.RWMutex
-	organizations map[uuid.UUID]*OrganizationWorkers
-	workerFactory WorkerFactory
+	organizations map[uuid.UUID]bool // Track which organizations are registered
+	taskQueue     TaskQueueInterface
+	workerPool    WorkerPoolInterface
 }
 
-// OrganizationWorkers holds all worker threads for a single organization
-type OrganizationWorkers struct {
-	orgId                        uuid.UUID
-	repoTesterThread             *thread.Thread
-	resourceSyncThread           *thread.Thread
-	deviceDisconnectedThread     *thread.Thread
-	rolloutDeviceSelectionThread *thread.Thread
-	disruptionBudgetThread       *thread.Thread
-	eventCleanupThread           *thread.Thread
-	cancel                       context.CancelFunc
-}
-
-type WorkerFactory interface {
-	CreateWorkers(ctx context.Context, orgId uuid.UUID) (*OrganizationWorkers, error)
-}
-
-// OrganizationService abstracts the organization listing functionality
 type OrganizationService interface {
 	ListOrganizations(ctx context.Context) (*api.OrganizationList, api.Status)
 }
 
-func NewOrganizationManager(orgService OrganizationService, log logrus.FieldLogger, workerFactory WorkerFactory) *OrganizationManager {
+func NewOrganizationManager(orgService OrganizationService, log logrus.FieldLogger, taskQueue TaskQueueInterface, workerPool WorkerPoolInterface) *OrganizationManager {
 	return &OrganizationManager{
 		orgService:    orgService,
 		log:           log,
-		organizations: make(map[uuid.UUID]*OrganizationWorkers),
-		workerFactory: workerFactory,
+		organizations: make(map[uuid.UUID]bool),
+		taskQueue:     taskQueue,
+		workerPool:    workerPool,
 	}
 }
 
 func (om *OrganizationManager) Start(ctx context.Context) {
+	// Start the worker pool
+	om.workerPool.Start(ctx)
+
 	om.syncOrganizations(ctx)
 
 	// Update organizations every 5 minutes
@@ -81,7 +80,7 @@ func (om *OrganizationManager) syncOrganizations(ctx context.Context) {
 	// Track which organizations we've seen
 	seen := make(map[uuid.UUID]bool)
 
-	// Start workers for new organizations
+	// Register tasks for new organizations
 	for _, org := range orgList.Items {
 		orgId, err := uuid.Parse(*org.Metadata.Name)
 		if err != nil {
@@ -89,73 +88,61 @@ func (om *OrganizationManager) syncOrganizations(ctx context.Context) {
 			continue
 		}
 		seen[orgId] = true
-		if _, exists := om.organizations[orgId]; !exists {
-			om.log.Infof("Starting workers for organization %s", orgId)
-			if err := om.startOrganizationWorkers(ctx, orgId); err != nil {
-				om.log.Errorf("Failed to start workers for organization %s: %v", orgId, err)
+		if !om.organizations[orgId] {
+			om.log.Infof("Registering tasks for organization %s", orgId)
+			if err := om.registerOrganizationTasks(ctx, orgId); err != nil {
+				om.log.Errorf("Failed to register tasks for organization %s: %v", orgId, err)
+			} else {
+				om.organizations[orgId] = true
 			}
 		}
 	}
 
-	// Stop workers for removed organizations
-	for orgId, workers := range om.organizations {
+	// Remove tasks for deleted organizations
+	for orgId := range om.organizations {
 		if !seen[orgId] {
-			om.log.Infof("Stopping workers for organization %s", orgId)
-			om.stopOrganizationWorkers(orgId, workers)
+			om.log.Infof("Removing tasks for organization %s", orgId)
+			om.removeOrganizationTasks(orgId)
 			delete(om.organizations, orgId)
 		}
 	}
 }
 
-func (om *OrganizationManager) startOrganizationWorkers(ctx context.Context, orgId uuid.UUID) error {
-	orgCtx, cancel := context.WithCancel(ctx)
-
-	workers, err := om.workerFactory.CreateWorkers(orgCtx, orgId)
-	if err != nil {
-		cancel()
-		return err
+func (om *OrganizationManager) registerOrganizationTasks(ctx context.Context, orgId uuid.UUID) error {
+	taskTypes := []TaskType{
+		TaskTypeRepoTest,
+		TaskTypeResourceSync,
+		TaskTypeDeviceDisconnected,
+		TaskTypeRolloutDeviceSelection,
+		TaskTypeDisruptionBudget,
+		TaskTypeEventCleanup,
 	}
 
-	workers.cancel = cancel
-	om.organizations[orgId] = workers
+	for _, taskType := range taskTypes {
+		task := &Task{
+			ID:          fmt.Sprintf("%s-%s", orgId, taskType),
+			OrgID:       orgId,
+			Type:        taskType,
+			NextRunTime: time.Now(), // Start immediately
+			Interval:    TaskIntervals[taskType],
+		}
+		om.taskQueue.Push(task)
+	}
+
 	return nil
 }
 
-func (om *OrganizationManager) stopOrganizationWorkers(orgId uuid.UUID, workers *OrganizationWorkers) {
-	om.log.Infof("Stopping workers for organization %s", orgId)
-
-	// Cancel the context
-	if workers.cancel != nil {
-		workers.cancel()
-	}
-
-	// Stop all threads
-	if workers.repoTesterThread != nil {
-		workers.repoTesterThread.Stop()
-	}
-	if workers.resourceSyncThread != nil {
-		workers.resourceSyncThread.Stop()
-	}
-	if workers.deviceDisconnectedThread != nil {
-		workers.deviceDisconnectedThread.Stop()
-	}
-	if workers.rolloutDeviceSelectionThread != nil {
-		workers.rolloutDeviceSelectionThread.Stop()
-	}
-	if workers.disruptionBudgetThread != nil {
-		workers.disruptionBudgetThread.Stop()
-	}
-	if workers.eventCleanupThread != nil {
-		workers.eventCleanupThread.Stop()
-	}
+func (om *OrganizationManager) removeOrganizationTasks(orgId uuid.UUID) {
+	om.taskQueue.RemoveOrganization(orgId)
 }
 
 func (om *OrganizationManager) stopAll() {
 	om.mu.Lock()
 	defer om.mu.Unlock()
 
-	for orgId, workers := range om.organizations {
-		om.stopOrganizationWorkers(orgId, workers)
-	}
-	om.organizations = make(map[uuid.UUID]*OrganizationWorkers)
+	// Stop the worker pool
+	om.workerPool.Stop()
+
+	// Clear all organizations
+	om.organizations = make(map[uuid.UUID]bool)
 }

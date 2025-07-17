@@ -25,6 +25,7 @@ type Config struct {
 	Prometheus   *prometheusConfig   `json:"prometheus,omitempty"`
 	CA           *ca.Config          `json:"ca,omitempty"`
 	Tracing      *tracingConfig      `json:"tracing,omitempty"`
+	Periodic     *periodicConfig     `json:"periodic,omitempty"`
 }
 
 type dbConfig struct {
@@ -97,6 +98,10 @@ type oidcAuth struct {
 type aapAuth struct {
 	ApiUrl         string `json:"apiUrl,omitempty"`
 	ExternalApiUrl string `json:"externalApiUrl,omitempty"`
+}
+
+type periodicConfig struct {
+	WorkerPoolSize int `json:"workerPoolSize,omitempty"`
 }
 
 type prometheusConfig struct {
