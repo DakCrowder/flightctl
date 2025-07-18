@@ -4,7 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
+
 	api "github.com/flightctl/flightctl/api/v1alpha1"
+	"github.com/flightctl/flightctl/internal/util"
 	fccrypto "github.com/flightctl/flightctl/pkg/crypto"
 )
 
@@ -31,9 +34,14 @@ func (s *SignerDeviceEnrollment) Name() string {
 func (s *SignerDeviceEnrollment) Verify(ctx context.Context, request api.CertificateSigningRequest) error {
 	cfg := s.ca.Config()
 
+	orgIdFromCtx, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return fmt.Errorf("organization ID is required but not found in request context for device enrollment certificate")
+	}
+
 	// Check if the client presented a peer certificate during the mTLS handshake.
 	// If no peer certificate was presented, we allow the request to proceed without additional signer checks.
-	if _, err := PeerCertificateFromCtx(ctx); err == nil {
+	if peerCertificate, err := PeerCertificateFromCtx(ctx); err == nil {
 		signer := s.ca.PeerCertificateSignerFromCtx(ctx)
 
 		got := "<nil>"
@@ -45,6 +53,20 @@ func (s *SignerDeviceEnrollment) Verify(ctx context.Context, request api.Certifi
 		// This ensures only bootstrap client certificates can be used to perform device enrollment.
 		if signer == nil || signer.Name() != cfg.ClientBootstrapSignerName {
 			return fmt.Errorf("unexpected client certificate signer: expected %q, got %q", cfg.ClientBootstrapSignerName, got)
+		}
+
+		orgIDStr, err := fccrypto.GetExtensionValue(peerCertificate, OIDOrgID)
+		if err != nil {
+			return fmt.Errorf("organization ID extension not found in peer certificate: %w", err)
+		}
+
+		orgID, err := uuid.Parse(orgIDStr)
+		if err != nil {
+			return fmt.Errorf("invalid organization ID format in peer certificate: %w", err)
+		}
+
+		if orgID != orgIdFromCtx {
+			return fmt.Errorf("organization ID mismatch: peer certificate org ID is %q, context is %q", orgID, orgIdFromCtx)
 		}
 	}
 	return nil
@@ -77,7 +99,10 @@ func (s *SignerDeviceEnrollment) Sign(ctx context.Context, request api.Certifica
 	}
 	csr.Subject.CommonName = desired
 
-	// TODO: how does org id work in the context of this file?
+	orgID, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("organization ID is required but not found in request context for device enrollment certificate")
+	}
 
 	expirySeconds := signerDeviceEnrollmentExpiryDays * 24 * 60 * 60
 	if request.Spec.ExpirationSeconds != nil && *request.Spec.ExpirationSeconds < expirySeconds {

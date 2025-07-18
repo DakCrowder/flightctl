@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
+	"github.com/flightctl/flightctl/internal/util"
 	fccrypto "github.com/flightctl/flightctl/pkg/crypto"
 	"github.com/google/uuid"
 )
@@ -59,6 +60,25 @@ func (s *SignerDeviceSvcClient) Verify(ctx context.Context, request api.Certific
 		return fmt.Errorf("CSR CommonName %q does not end with device fingerprint suffix -%s", parsedCSR.Subject.CommonName, fingerprint)
 	}
 
+	orgIdFromCtx, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return fmt.Errorf("organization ID is required but not found in request context for device enrollment certificate")
+	}
+
+	orgIDStr, err := fccrypto.GetExtensionValue(peerCertificate, OIDOrgID)
+	if err != nil {
+		return fmt.Errorf("organization ID extension not found in peer certificate: %w", err)
+	}
+
+	orgID, err := uuid.Parse(orgIDStr)
+	if err != nil {
+		return fmt.Errorf("invalid organization ID format in peer certificate: %w", err)
+	}
+
+	if orgID != orgIdFromCtx {
+		return fmt.Errorf("organization ID mismatch: peer certificate org ID is %q, context is %q", orgID, orgIdFromCtx)
+	}
+
 	return nil
 }
 
@@ -74,19 +94,9 @@ func (s *SignerDeviceSvcClient) Sign(ctx context.Context, request api.Certificat
 	}
 	fingerprint := cert.Subject.CommonName[lastHyphen+1:]
 
-	peerCertificate, err := PeerCertificateFromCtx(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("peer certificate is required for service client certificate signing: %w", err)
-	}
-
-	orgIDStr, err := fccrypto.GetExtensionValue(peerCertificate, OIDOrgID)
-	if err != nil {
-		return nil, fmt.Errorf("organization ID extension not found in peer certificate for service client certificate: %w", err)
-	}
-
-	orgID, err := uuid.Parse(orgIDStr)
-	if err != nil {
-		return nil, fmt.Errorf("invalid organization ID format in peer certificate for service client certificate: %w", err)
+	orgID, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("organization ID is required but not found in request context for device enrollment certificate")
 	}
 
 	expirySeconds := signerDeviceSvcClientExpiryDays * 24 * 60 * 60

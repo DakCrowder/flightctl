@@ -6,7 +6,6 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/flterrors"
-	"github.com/flightctl/flightctl/internal/util"
 	"github.com/flightctl/flightctl/pkg/crypto"
 )
 
@@ -65,17 +64,12 @@ func (s *SignerClientBootstrap) Sign(ctx context.Context, request api.Certificat
 
 	csr.Subject.CommonName = BootstrapCNFromName(cfg, u)
 
-	orgID, ok := util.GetOrgIdFromContext(ctx)
-	if !ok {
-		return nil, fmt.Errorf("organization ID is required but not found in request context for bootstrap certificate")
-	}
-
 	expiry := DefaultEnrollmentCertExpirySeconds
 	if request.Spec.ExpirationSeconds != nil {
 		expiry = *request.Spec.ExpirationSeconds
 	}
 
-	certData, err := s.ca.IssueRequestedClientCertificate(ctx, csr, int(expiry), WithExtension(OIDOrgID, orgID.String()))
+	certData, err := s.ca.IssueRequestedClientCertificate(ctx, csr, int(expiry))
 	if err != nil {
 		return nil, err
 	}
