@@ -5,13 +5,16 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/flightctl/flightctl/internal/config"
 	"github.com/flightctl/flightctl/internal/kvstore"
 	"github.com/flightctl/flightctl/internal/service"
 	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/tasks_client"
+	"github.com/flightctl/flightctl/internal/tasks_runner"
 	"github.com/flightctl/flightctl/pkg/queues"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -61,21 +64,32 @@ func (s *Server) Run(ctx context.Context) error {
 	callbackManager := tasks_client.NewCallbackManager(publisher, s.log)
 	serviceHandler := service.WrapWithTracing(service.NewServiceHandler(s.store, callbackManager, kvStore, nil, s.log, "", ""))
 
-	serviceProvider, err := NewDefaultServiceProvider(s.cfg, s.log, s.store, queuesProvider, kvStore)
-	if err != nil {
-		return err
+	// Create service handler function for executors
+	serviceHandlerFunc := func(ctx context.Context, orgID uuid.UUID) (service.Service, error) {
+		return service.WrapWithTracing(service.NewServiceHandler(s.store, callbackManager, kvStore, nil, s.log, "", "")), nil
 	}
 
-	taskQueue := NewTaskQueue()
+	// Get event retention period from config
+	eventRetentionPeriod := time.Duration(s.cfg.Service.EventRetentionPeriod)
+
+	// Create executors with encapsulated dependencies
+	executors := CreateExecutors(serviceHandlerFunc, callbackManager, eventRetentionPeriod, s.log)
+
+	// Get task metadata
+	taskMetadata := GetTaskMetadata()
+
+	// Create task queue
+	taskQueue := tasks_runner.NewTaskQueue()
 
 	// Create worker pool with configurable number of workers (default to 20)
 	numWorkers := defaultWorkerPoolSize
 	if s.cfg.Periodic != nil && s.cfg.Periodic.WorkerPoolSize > 0 {
 		numWorkers = s.cfg.Periodic.WorkerPoolSize
 	}
-	workerPool := NewWorkerPool(numWorkers, taskQueue, serviceProvider, s.log)
+	workerPool := tasks_runner.NewWorkerPool(numWorkers, taskQueue, executors, s.log)
 
-	orgManager := NewOrganizationManager(serviceHandler, s.log, taskQueue, workerPool)
+	// Create organization manager
+	orgManager := tasks_runner.NewOrganizationManager(serviceHandler, s.log, taskQueue, workerPool, taskMetadata)
 	go orgManager.Start(ctx)
 
 	sigShutdown := make(chan os.Signal, 1)

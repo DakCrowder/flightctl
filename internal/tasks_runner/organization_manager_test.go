@@ -1,4 +1,4 @@
-package periodic_test
+package tasks_runner_test
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	periodic "github.com/flightctl/flightctl/internal/periodic_checker"
+	"github.com/flightctl/flightctl/internal/tasks_runner"
 	"github.com/flightctl/flightctl/pkg/log"
 	"github.com/google/uuid"
 )
@@ -23,18 +24,18 @@ func (s *TestService) ListOrganizations(ctx context.Context) (*api.OrganizationL
 
 type TestTaskQueue struct {
 	mu       sync.RWMutex
-	tasks    map[string]*periodic.Task
+	tasks    map[string]*tasks_runner.Task
 	orgTasks map[uuid.UUID][]string
 }
 
 func NewTestTaskQueue() *TestTaskQueue {
 	return &TestTaskQueue{
-		tasks:    make(map[string]*periodic.Task),
+		tasks:    make(map[string]*tasks_runner.Task),
 		orgTasks: make(map[uuid.UUID][]string),
 	}
 }
 
-func (q *TestTaskQueue) Push(task *periodic.Task) {
+func (q *TestTaskQueue) Push(task *tasks_runner.Task) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 
@@ -48,7 +49,7 @@ func (q *TestTaskQueue) Push(task *periodic.Task) {
 	q.orgTasks[task.OrgID] = append(q.orgTasks[task.OrgID], task.ID)
 }
 
-func (q *TestTaskQueue) Pop(ctx context.Context) (*periodic.Task, error) {
+func (q *TestTaskQueue) Pop(ctx context.Context) (*tasks_runner.Task, error) {
 	// For testing, we don't need to actually pop tasks
 	<-ctx.Done()
 	return nil, ctx.Err()
@@ -154,7 +155,8 @@ func TestManagerStartProcessesMultipleOrganizations(t *testing.T) {
 		status:        api.Status{Code: 200},
 	}
 
-	manager := periodic.NewOrganizationManager(orgService, log, taskQueue, workerPool)
+	taskMetadata := periodic.GetTaskMetadata()
+	manager := tasks_runner.NewOrganizationManager(orgService, log, taskQueue, workerPool, taskMetadata)
 
 	// Test by starting the manager briefly to trigger initial sync
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
@@ -185,7 +187,7 @@ func TestManagerStartProcessesMultipleOrganizations(t *testing.T) {
 	}
 
 	// Verify specific task IDs exist
-	expectedTaskTypes := []periodic.TaskType{
+	expectedTaskTypes := []tasks_runner.TaskType{
 		periodic.TaskTypeRepoTest,
 		periodic.TaskTypeResourceSync,
 		periodic.TaskTypeDeviceDisconnected,
@@ -218,7 +220,8 @@ func TestManagerHandlesAPIError(t *testing.T) {
 		status:        api.Status{Code: 500, Message: "Internal server error"},
 	}
 
-	manager := periodic.NewOrganizationManager(orgService, log, taskQueue, workerPool)
+	taskMetadata := periodic.GetTaskMetadata()
+	manager := tasks_runner.NewOrganizationManager(orgService, log, taskQueue, workerPool, taskMetadata)
 
 	// Test by starting the manager briefly to trigger initial sync
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
@@ -267,7 +270,8 @@ func TestManagerRemovesTasksForDeletedOrganizations(t *testing.T) {
 		status:        api.Status{Code: 200},
 	}
 
-	manager := periodic.NewOrganizationManager(orgService, logger, taskQueue, workerPool)
+	taskMetadata := periodic.GetTaskMetadata()
+	manager := tasks_runner.NewOrganizationManager(orgService, logger, taskQueue, workerPool, taskMetadata)
 
 	// Start the manager with a longer timeout to allow for sync cycles
 	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Millisecond)
@@ -307,7 +311,8 @@ func TestManagerRemovesTasksForDeletedOrganizations(t *testing.T) {
 	ctx2, cancel2 := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancel2()
 
-	manager2 := periodic.NewOrganizationManager(orgService, logger, taskQueue, workerPool)
+	taskMetadata2 := periodic.GetTaskMetadata()
+	manager2 := tasks_runner.NewOrganizationManager(orgService, logger, taskQueue, workerPool, taskMetadata2)
 	go manager2.Start(ctx2)
 
 	// Wait for sync to complete
@@ -359,7 +364,8 @@ func TestManagerStopAllMethod(t *testing.T) {
 		status:        api.Status{Code: 200},
 	}
 
-	manager := periodic.NewOrganizationManager(orgService, logger, taskQueue, workerPool)
+	taskMetadata := periodic.GetTaskMetadata()
+	manager := tasks_runner.NewOrganizationManager(orgService, logger, taskQueue, workerPool, taskMetadata)
 
 	// Start the manager briefly to create organizations
 	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)

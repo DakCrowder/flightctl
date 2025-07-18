@@ -33,12 +33,12 @@ type Worker struct {
 }
 
 // NewWorkerPool creates a new worker pool
-func NewWorkerPool(numWorkers int, taskQueue *TaskQueue, log logrus.FieldLogger) *WorkerPool {
+func NewWorkerPool(numWorkers int, taskQueue *TaskQueue, executors map[TaskType]TaskExecutor, log logrus.FieldLogger) *WorkerPool {
 	return &WorkerPool{
 		numWorkers:    numWorkers,
 		taskQueue:     taskQueue,
 		log:           log,
-		taskExecutors: make(map[TaskType]TaskExecutor),
+		taskExecutors: executors,
 	}
 }
 
