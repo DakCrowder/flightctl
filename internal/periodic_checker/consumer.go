@@ -17,8 +17,20 @@ func consumeTasks() queues.ConsumeHandler {
 			return err
 		}
 
-		// TODO: Actually handle tasks
-		log.Infof("received periodic task %s for organization %s", reference.Type, reference.OrgID)
+		switch reference.Type {
+		case PeriodicTaskTypeRepositoryTester:
+			log.Infof("received %s task for organization %s", reference.Type, reference.OrgID)
+		case PeriodicTaskTypeResourceSync:
+			log.Infof("received %s task for organization %s", reference.Type, reference.OrgID)
+		case PeriodicTaskTypeDeviceDisconnected:
+			log.Infof("received periodic task %s for organization %s", reference.Type, reference.OrgID)
+		case PeriodicTaskTypeRolloutDeviceSelection:
+			log.Infof("received periodic task %s for organization %s", reference.Type, reference.OrgID)
+		case PeriodicTaskTypeDisruptionBudget:
+			log.Infof("received periodic task %s for organization %s", reference.Type, reference.OrgID)
+		case PeriodicTaskTypeEventCleanup:
+			log.Infof("received periodic task %s for organization %s", reference.Type, reference.OrgID)
+		}
 
 		return nil
 	}

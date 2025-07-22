@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/flightctl/flightctl/internal/config"
 	"github.com/flightctl/flightctl/internal/consts"
@@ -110,12 +109,8 @@ func (s *Server) Run(ctx context.Context) error {
 		return err
 	}
 
-	tasksMetadata := []PeriodicTaskMetadata{
-		{TaskType: PeriodicTaskTypeRepositoryTester, Interval: 10 * time.Second},
-	}
-
 	// Periodic task publisher
-	periodicTaskPublisher, err := NewPeriodicTaskPublisher(s.log, kvStore, serviceHandler, queuesProvider, tasksMetadata)
+	periodicTaskPublisher, err := NewPeriodicTaskPublisher(s.log, kvStore, serviceHandler, queuesProvider, periodicTasks)
 	if err != nil {
 		return err
 	}
