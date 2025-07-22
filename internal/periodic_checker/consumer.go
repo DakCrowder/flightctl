@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 
 	"github.com/flightctl/flightctl/internal/consts"
+	"github.com/flightctl/flightctl/internal/util"
 	"github.com/flightctl/flightctl/pkg/queues"
 	"github.com/sirupsen/logrus"
 )
 
-func consumeTasks() queues.ConsumeHandler {
+func consumeTasks(executors map[PeriodicTaskType]PeriodicTaskExecutor) queues.ConsumeHandler {
 	return func(ctx context.Context, payload []byte, log logrus.FieldLogger) error {
 		var reference PeriodicTaskReference
 		if err := json.Unmarshal(payload, &reference); err != nil {
@@ -17,20 +18,18 @@ func consumeTasks() queues.ConsumeHandler {
 			return err
 		}
 
-		switch reference.Type {
-		case PeriodicTaskTypeRepositoryTester:
-			log.Infof("received %s task for organization %s", reference.Type, reference.OrgID)
-		case PeriodicTaskTypeResourceSync:
-			log.Infof("received %s task for organization %s", reference.Type, reference.OrgID)
-		case PeriodicTaskTypeDeviceDisconnected:
-			log.Infof("received periodic task %s for organization %s", reference.Type, reference.OrgID)
-		case PeriodicTaskTypeRolloutDeviceSelection:
-			log.Infof("received periodic task %s for organization %s", reference.Type, reference.OrgID)
-		case PeriodicTaskTypeDisruptionBudget:
-			log.Infof("received periodic task %s for organization %s", reference.Type, reference.OrgID)
-		case PeriodicTaskTypeEventCleanup:
-			log.Infof("received periodic task %s for organization %s", reference.Type, reference.OrgID)
+		log.Infof("consuming %s task for organization %s", reference.Type, reference.OrgID)
+
+		executor, exists := executors[reference.Type]
+		if !exists {
+			log.Errorf("no executor found for task type %s", reference.Type)
+			return nil
 		}
+
+		// Add the orgID to the context
+		ctx = util.WithOrganizationID(ctx, reference.OrgID)
+
+		executor.Execute(ctx, log)
 
 		return nil
 	}
@@ -39,12 +38,14 @@ func consumeTasks() queues.ConsumeHandler {
 type PeriodicTaskConsumer struct {
 	queuesProvider queues.Provider
 	log            logrus.FieldLogger
+	executors      map[PeriodicTaskType]PeriodicTaskExecutor
 }
 
-func NewPeriodicTaskConsumer(queuesProvider queues.Provider, log logrus.FieldLogger) *PeriodicTaskConsumer {
+func NewPeriodicTaskConsumer(queuesProvider queues.Provider, log logrus.FieldLogger, executors map[PeriodicTaskType]PeriodicTaskExecutor) *PeriodicTaskConsumer {
 	return &PeriodicTaskConsumer{
 		queuesProvider: queuesProvider,
 		log:            log,
+		executors:      executors,
 	}
 }
 
@@ -54,7 +55,7 @@ func (c *PeriodicTaskConsumer) Start(ctx context.Context) error {
 		return err
 	}
 
-	if err = consumer.Consume(ctx, consumeTasks()); err != nil {
+	if err = consumer.Consume(ctx, consumeTasks(c.executors)); err != nil {
 		return err
 	}
 

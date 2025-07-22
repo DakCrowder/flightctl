@@ -117,6 +117,8 @@ func (p *PeriodicTaskPublisher) Start(ctx context.Context) {
 }
 
 func (p *PeriodicTaskPublisher) syncOrganizations(ctx context.Context) {
+	p.log.Info("Syncing organizations")
+
 	orgList, status := p.orgService.ListOrganizations(ctx)
 	if status.Code != 200 {
 		p.log.Errorf("Failed to list organizations: %v", status)
