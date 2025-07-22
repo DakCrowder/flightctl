@@ -2,9 +2,13 @@ package periodic
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"time"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
+	"github.com/flightctl/flightctl/internal/consts"
+	"github.com/flightctl/flightctl/internal/kvstore"
 	"github.com/flightctl/flightctl/pkg/queues"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -19,30 +23,80 @@ type PeriodicTaskPublisher struct {
 	log           logrus.FieldLogger
 	tasksMetadata []PeriodicTaskMetadata
 	orgService    OrganizationService
+	kvStore       kvstore.KVStore
 	organizations map[uuid.UUID]bool // Track which organizations are registered
 }
 
-func NewPeriodicTaskPublisher(publisher queues.Publisher, log logrus.FieldLogger, orgService OrganizationService, tasksMetadata []PeriodicTaskMetadata) *PeriodicTaskPublisher {
+func NewPeriodicTaskPublisher(log logrus.FieldLogger, kvStore kvstore.KVStore, orgService OrganizationService, queuesProvider queues.Provider, tasksMetadata []PeriodicTaskMetadata) (*PeriodicTaskPublisher, error) {
+	publisher, err := queuesProvider.NewPublisher(consts.PeriodicTaskQueue)
+	if err != nil {
+		log.WithError(err).Error("failed to create periodic task publisher")
+		return nil, err
+	}
 	return &PeriodicTaskPublisher{
 		publisher:     publisher,
 		log:           log,
 		orgService:    orgService,
+		kvStore:       kvStore,
 		tasksMetadata: tasksMetadata,
-	}
+	}, nil
 }
 
 func (p *PeriodicTaskPublisher) publishTasks(ctx context.Context) {
-	// TODO: Implement
+	for orgID, _ := range p.organizations {
+		for _, taskMetadata := range p.tasksMetadata {
+			taskKey := fmt.Sprintf("periodic_task:last_run:%s:%s", taskMetadata.TaskType, orgID)
+			lastRunBytes, err := p.kvStore.Get(ctx, taskKey)
+			if err != nil {
+				p.log.Errorf("Failed to get task %s: %v", taskKey, err)
+				continue
+			}
+			lastRun := PeriodicTaskLastRun{
+				LastRun: time.Unix(0, 0),
+			}
+
+			if err := json.Unmarshal(lastRunBytes, &lastRun); err != nil {
+				// Key may not exist on the first run, so log and proceed to publish task
+				p.log.Errorf("Failed to unmarshal task %s: %v", taskKey, err)
+			}
+
+			if lastRun.LastRun.Before(time.Now().Add(-taskMetadata.Interval)) {
+				p.publishTask(ctx, taskMetadata.TaskType, orgID)
+				lastRun.LastRun = time.Now()
+				lastRunJSON, err := json.Marshal(lastRun)
+				if err != nil {
+					p.log.Errorf("Failed to marshal last run: %v", err)
+					continue
+				}
+				if err := p.kvStore.Set(ctx, taskKey, lastRunJSON); err != nil {
+					p.log.Errorf("Failed to set last run: %v", err)
+					continue
+				}
+			}
+		}
+	}
 }
 
 func (p *PeriodicTaskPublisher) publishTask(ctx context.Context, taskType PeriodicTaskType, orgID uuid.UUID) {
-	// TODO: Implement
+	taskReference := PeriodicTaskReference{
+		Type:  taskType,
+		OrgID: orgID,
+	}
+
+	taskReferenceJSON, err := json.Marshal(taskReference)
+	if err != nil {
+		p.log.Errorf("Failed to marshal task reference: %v", err)
+		return
+	}
+
+	p.publisher.Publish(ctx, taskReferenceJSON)
 }
 
 func (p *PeriodicTaskPublisher) Start(ctx context.Context) {
 	p.syncOrganizations(ctx)
 
-	taskTicker := time.NewTicker(1 * time.Minute)
+	// Publish tasks every 5 seconds
+	taskTicker := time.NewTicker(5 * time.Second)
 	defer taskTicker.Stop()
 
 	// Update organizations every 5 minutes

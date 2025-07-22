@@ -21,3 +21,7 @@ type PeriodicTaskReference struct {
 	Type  PeriodicTaskType
 	OrgID uuid.UUID
 }
+
+type PeriodicTaskLastRun struct {
+	LastRun time.Time `json:"last_run"`
+}
