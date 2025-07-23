@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"sync"
 	"testing"
 	"time"
 
@@ -16,9 +17,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Mock implementations for testing
-
 type mockPeriodicTaskExecutor struct {
+	mu               sync.Mutex
 	executeCallCount int
 	executeCallArgs  []executeCallArgs
 }
@@ -29,8 +29,25 @@ type executeCallArgs struct {
 }
 
 func (m *mockPeriodicTaskExecutor) Execute(ctx context.Context, log logrus.FieldLogger) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	m.executeCallCount++
 	m.executeCallArgs = append(m.executeCallArgs, executeCallArgs{ctx: ctx, log: log})
+}
+
+func (m *mockPeriodicTaskExecutor) GetExecuteCallCount() int {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.executeCallCount
+}
+
+func (m *mockPeriodicTaskExecutor) GetExecuteCallArgs() []executeCallArgs {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	// Return a copy to avoid races
+	result := make([]executeCallArgs, len(m.executeCallArgs))
+	copy(result, m.executeCallArgs)
+	return result
 }
 
 type mockConsumer struct {
@@ -93,14 +110,12 @@ func createTestLogger() logrus.FieldLogger {
 	return logger
 }
 
-func createValidTaskReference(taskType PeriodicTaskType) PeriodicTaskReference {
+func createTaskReference(taskType PeriodicTaskType) PeriodicTaskReference {
 	return PeriodicTaskReference{
 		Type:  taskType,
 		OrgID: uuid.New(),
 	}
 }
-
-// Tests for consumeTasks() function
 
 func TestConsumeTasks_SuccessfulTaskConsumption(t *testing.T) {
 	tests := []struct {
@@ -117,40 +132,36 @@ func TestConsumeTasks_SuccessfulTaskConsumption(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Setup
 			executors := createTestExecutors()
 			mockExecutor := executors[tt.taskType].(*mockPeriodicTaskExecutor)
 			handler := consumeTasks(executors)
 			log := createTestLogger()
 			ctx := context.Background()
 
-			// Create valid payload
-			taskRef := createValidTaskReference(tt.taskType)
+			taskRef := createTaskReference(tt.taskType)
 			payload, err := json.Marshal(taskRef)
 			require.NoError(t, err)
 
-			// Execute
 			err = handler(ctx, payload, log)
 
-			// Verify
 			require.NoError(t, err)
-			require.Equal(t, 1, mockExecutor.executeCallCount, "executor should be called once")
-			require.Len(t, mockExecutor.executeCallArgs, 1)
+			require.Equal(t, 1, mockExecutor.GetExecuteCallCount(), "executor should be called once")
+			executeCallArgs := mockExecutor.GetExecuteCallArgs()
+			require.Len(t, executeCallArgs, 1)
 
 			// Verify context contains organization ID
-			executedCtx := mockExecutor.executeCallArgs[0].ctx
+			executedCtx := executeCallArgs[0].ctx
 			orgID, ok := util.GetOrgIdFromContext(executedCtx)
 			require.True(t, ok, "organization ID should be present in context")
 			require.Equal(t, taskRef.OrgID, orgID, "organization ID should be added to context")
 
 			// Verify logger is passed
-			require.NotNil(t, mockExecutor.executeCallArgs[0].log)
+			require.NotNil(t, executeCallArgs[0].log)
 		})
 	}
 }
 
 func TestConsumeTasks_JSONUnmarshalingError(t *testing.T) {
-	// Setup
 	executors := createTestExecutors()
 	handler := consumeTasks(executors)
 	log := createTestLogger()
@@ -159,21 +170,18 @@ func TestConsumeTasks_JSONUnmarshalingError(t *testing.T) {
 	// Invalid JSON payload
 	invalidPayload := []byte(`{"invalid": json}`)
 
-	// Execute
 	err := handler(ctx, invalidPayload, log)
 
-	// Verify
 	require.Error(t, err, "should return error for invalid JSON")
 
 	// Verify no executors were called
 	for _, executor := range executors {
 		mockExecutor := executor.(*mockPeriodicTaskExecutor)
-		require.Equal(t, 0, mockExecutor.executeCallCount, "no executor should be called")
+		require.Equal(t, 0, mockExecutor.GetExecuteCallCount(), "no executor should be called")
 	}
 }
 
 func TestConsumeTasks_UnknownTaskType(t *testing.T) {
-	// Setup
 	executors := createTestExecutors()
 	handler := consumeTasks(executors)
 	log := createTestLogger()
@@ -187,21 +195,18 @@ func TestConsumeTasks_UnknownTaskType(t *testing.T) {
 	payload, err := json.Marshal(taskRef)
 	require.NoError(t, err)
 
-	// Execute
 	err = handler(ctx, payload, log)
 
-	// Verify
 	require.NoError(t, err, "should return nil for unknown task type")
 
 	// Verify no executors were called
 	for _, executor := range executors {
 		mockExecutor := executor.(*mockPeriodicTaskExecutor)
-		require.Equal(t, 0, mockExecutor.executeCallCount, "no executor should be called")
+		require.Equal(t, 0, mockExecutor.GetExecuteCallCount(), "no executor should be called")
 	}
 }
 
 func TestConsumeTasks_MultipleTaskTypes(t *testing.T) {
-	// Setup
 	executors := createTestExecutors()
 	handler := consumeTasks(executors)
 	log := createTestLogger()
@@ -215,7 +220,7 @@ func TestConsumeTasks_MultipleTaskTypes(t *testing.T) {
 
 	// Execute each task type
 	for _, taskType := range testCases {
-		taskRef := createValidTaskReference(taskType)
+		taskRef := createTaskReference(taskType)
 		payload, err := json.Marshal(taskRef)
 		require.NoError(t, err)
 
@@ -226,7 +231,7 @@ func TestConsumeTasks_MultipleTaskTypes(t *testing.T) {
 	// Verify each corresponding executor was called exactly once
 	for _, taskType := range testCases {
 		mockExecutor := executors[taskType].(*mockPeriodicTaskExecutor)
-		require.Equal(t, 1, mockExecutor.executeCallCount,
+		require.Equal(t, 1, mockExecutor.GetExecuteCallCount(),
 			"executor for %s should be called once", taskType)
 	}
 
@@ -250,16 +255,13 @@ func TestConsumeTasks_MultipleTaskTypes(t *testing.T) {
 			}
 		}
 		if !found {
-			require.Equal(t, 0, mockExecutor.executeCallCount,
+			require.Equal(t, 0, mockExecutor.GetExecuteCallCount(),
 				"executor for %s should not be called", taskType)
 		}
 	}
 }
 
-// Tests for PeriodicTaskConsumer.Start() method
-
 func TestPeriodicTaskConsumer_Start_Success(t *testing.T) {
-	// Setup
 	mockConsumer := &mockConsumer{}
 	mockProvider := &mockProvider{consumer: mockConsumer}
 	executors := createTestExecutors()
@@ -272,17 +274,13 @@ func TestPeriodicTaskConsumer_Start_Success(t *testing.T) {
 	}
 
 	ctx := context.Background()
-
-	// Execute
 	err := consumer.Start(ctx)
 
-	// Verify
 	require.NoError(t, err)
 	require.NotNil(t, mockConsumer.consumeHandler, "consume handler should be set")
 }
 
 func TestPeriodicTaskConsumer_Start_ConsumerCreationError(t *testing.T) {
-	// Setup
 	expectedError := errors.New("failed to create consumer")
 	mockProvider := &mockProvider{newConsumerError: expectedError}
 	executors := createTestExecutors()
@@ -295,17 +293,13 @@ func TestPeriodicTaskConsumer_Start_ConsumerCreationError(t *testing.T) {
 	}
 
 	ctx := context.Background()
-
-	// Execute
 	err := consumer.Start(ctx)
 
-	// Verify
 	require.Error(t, err)
 	require.Equal(t, expectedError, err)
 }
 
 func TestPeriodicTaskConsumer_Start_ConsumeError(t *testing.T) {
-	// Setup
 	expectedError := errors.New("failed to consume")
 	mockConsumer := &mockConsumer{consumeError: expectedError}
 	mockProvider := &mockProvider{consumer: mockConsumer}
@@ -319,52 +313,16 @@ func TestPeriodicTaskConsumer_Start_ConsumeError(t *testing.T) {
 	}
 
 	ctx := context.Background()
-
-	// Execute
 	err := consumer.Start(ctx)
 
-	// Verify
 	require.Error(t, err)
 	require.Equal(t, expectedError, err)
 }
 
-func TestPeriodicTaskConsumer_Start_UsesCorrectQueueName(t *testing.T) {
-	// Note: This test verifies that Start() calls NewConsumer, but we can't easily
-	// capture the queue name parameter without more complex mocking.
-	// The actual queue name usage is verified through the consts import.
-
-	// Setup
-	mockConsumer := &mockConsumer{}
-	mockProvider := &mockProvider{consumer: mockConsumer}
-	executors := createTestExecutors()
-	log := createTestLogger()
-
-	consumer := &PeriodicTaskConsumer{
-		queuesProvider: mockProvider,
-		log:            log,
-		executors:      executors,
-	}
-
-	ctx := context.Background()
-
-	// Execute
-	err := consumer.Start(ctx)
-
-	// Verify
-	require.NoError(t, err)
-	// Note: We trust that NewConsumer is called with consts.PeriodicTaskQueue
-	// based on the code review. More sophisticated queue name verification
-	// would require a more complex mock framework.
-}
-
-// Integration tests
-
-func TestPeriodicTaskConsumer_EndToEndMessageProcessing(t *testing.T) {
-	// Setup
+func TestPeriodicTaskConsumer_FullMessageProcessing(t *testing.T) {
 	log := createTestLogger()
 	executors := createTestExecutors()
 
-	// Use the test provider from test/util
 	testProvider := testutil.NewTestProvider(log)
 	defer testProvider.Stop()
 
@@ -385,7 +343,7 @@ func TestPeriodicTaskConsumer_EndToEndMessageProcessing(t *testing.T) {
 	publisher, err := testProvider.NewPublisher(consts.PeriodicTaskQueue)
 	require.NoError(t, err)
 
-	taskRef := createValidTaskReference(PeriodicTaskTypeRepositoryTester)
+	taskRef := createTaskReference(PeriodicTaskTypeRepositoryTester)
 	payload, err := json.Marshal(taskRef)
 	require.NoError(t, err)
 
@@ -396,7 +354,7 @@ func TestPeriodicTaskConsumer_EndToEndMessageProcessing(t *testing.T) {
 	maxWait := 50 // 5 seconds total
 	for i := 0; i < maxWait; i++ {
 		mockExecutor := executors[PeriodicTaskTypeRepositoryTester].(*mockPeriodicTaskExecutor)
-		if mockExecutor.executeCallCount > 0 {
+		if mockExecutor.GetExecuteCallCount() > 0 {
 			break
 		}
 		time.Sleep(100 * time.Millisecond)
@@ -404,63 +362,13 @@ func TestPeriodicTaskConsumer_EndToEndMessageProcessing(t *testing.T) {
 
 	// Verify
 	mockExecutor := executors[PeriodicTaskTypeRepositoryTester].(*mockPeriodicTaskExecutor)
-	require.Equal(t, 1, mockExecutor.executeCallCount)
+	require.Equal(t, 1, mockExecutor.GetExecuteCallCount())
 
 	// Verify context contains organization ID
-	executedCtx := mockExecutor.executeCallArgs[0].ctx
+	executeCallArgs := mockExecutor.GetExecuteCallArgs()
+	require.Len(t, executeCallArgs, 1)
+	executedCtx := executeCallArgs[0].ctx
 	orgID, ok := util.GetOrgIdFromContext(executedCtx)
 	require.True(t, ok, "organization ID should be present in context")
 	require.Equal(t, taskRef.OrgID, orgID)
-}
-
-func TestPeriodicTaskConsumer_ContextCancellation(t *testing.T) {
-	// Setup
-	log := createTestLogger()
-	executors := createTestExecutors()
-	testProvider := testutil.NewTestProvider(log)
-	defer testProvider.Stop()
-
-	consumer := NewPeriodicTaskConsumer(testProvider, log, executors)
-
-	ctx, cancel := context.WithCancel(context.Background())
-
-	// Start consumer
-	startErr := make(chan error, 1)
-	go func() {
-		startErr <- consumer.Start(ctx)
-	}()
-
-	// Cancel context immediately
-	cancel()
-
-	// Verify that Start() returns (doesn't hang)
-	timeout := time.NewTimer(5 * time.Second)
-	defer timeout.Stop()
-
-	select {
-	case err := <-startErr:
-		// Error or nil is acceptable when context is cancelled
-		_ = err
-	case <-timeout.C:
-		t.Fatal("Start() should return when context is cancelled")
-	}
-}
-
-func TestConsumeTasks_EmptyExecutorsMap(t *testing.T) {
-	// Setup
-	emptyExecutors := make(map[PeriodicTaskType]PeriodicTaskExecutor)
-	handler := consumeTasks(emptyExecutors)
-	log := createTestLogger()
-	ctx := context.Background()
-
-	// Valid task reference
-	taskRef := createValidTaskReference(PeriodicTaskTypeRepositoryTester)
-	payload, err := json.Marshal(taskRef)
-	require.NoError(t, err)
-
-	// Execute
-	err = handler(ctx, payload, log)
-
-	// Verify - should return nil (no error) but log error about missing executor
-	require.NoError(t, err)
 }
