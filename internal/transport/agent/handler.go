@@ -106,9 +106,7 @@ func (s *AgentTransportHandler) GetRenderedDevice(w http.ResponseWriter, r *http
 		return
 	}
 
-<<<<<<< HEAD
-=======
-	ctx, err := ExtractOrgIDFromCertificate(r.Context(), s.ca, s.log)
+	ctx, err = ExtractOrgIDFromCertificate(r.Context(), s.ca, s.log)
 	if err != nil {
 		s.log.Warnf("failed to extract organization ID from certificate: %v", err)
 		status := api.StatusUnauthorized(http.StatusText(http.StatusUnauthorized))
@@ -116,7 +114,6 @@ func (s *AgentTransportHandler) GetRenderedDevice(w http.ResponseWriter, r *http
 		return
 	}
 
->>>>>>> f922cf26 (NO-ISSUE: Pull org identifier out of incoming device certificates)
 	body, status := s.serviceHandler.GetRenderedDevice(ctx, fingerprint, params)
 	transport.SetResponse(w, body, status)
 }
@@ -138,9 +135,7 @@ func (s *AgentTransportHandler) ReplaceDeviceStatus(w http.ResponseWriter, r *ht
 		return
 	}
 
-<<<<<<< HEAD
-=======
-	ctx, err := ExtractOrgIDFromCertificate(r.Context(), s.ca, s.log)
+	ctx, err = ExtractOrgIDFromCertificate(r.Context(), s.ca, s.log)
 	if err != nil {
 		s.log.Warnf("failed to extract organization ID from certificate: %v", err)
 		status := api.StatusUnauthorized(http.StatusText(http.StatusUnauthorized))
@@ -148,7 +143,6 @@ func (s *AgentTransportHandler) ReplaceDeviceStatus(w http.ResponseWriter, r *ht
 		return
 	}
 
->>>>>>> f922cf26 (NO-ISSUE: Pull org identifier out of incoming device certificates)
 	body, status := s.serviceHandler.ReplaceDeviceStatus(ctx, fingerprint, device)
 	transport.SetResponse(w, body, status)
 }
@@ -170,9 +164,7 @@ func (s *AgentTransportHandler) PatchDeviceStatus(w http.ResponseWriter, r *http
 		return
 	}
 
-<<<<<<< HEAD
-=======
-	ctx, err := ExtractOrgIDFromCertificate(r.Context(), s.ca, s.log)
+	ctx, err = ExtractOrgIDFromCertificate(r.Context(), s.ca, s.log)
 	if err != nil {
 		s.log.Warnf("failed to extract organization ID from certificate: %v", err)
 		status := api.StatusUnauthorized(http.StatusText(http.StatusUnauthorized))
@@ -180,7 +172,6 @@ func (s *AgentTransportHandler) PatchDeviceStatus(w http.ResponseWriter, r *http
 		return
 	}
 
->>>>>>> f922cf26 (NO-ISSUE: Pull org identifier out of incoming device certificates)
 	body, status := s.serviceHandler.PatchDeviceStatus(ctx, fingerprint, patch)
 	transport.SetResponse(w, body, status)
 }
@@ -201,8 +192,6 @@ func (s *AgentTransportHandler) CreateEnrollmentRequest(w http.ResponseWriter, r
 		return
 	}
 
-<<<<<<< HEAD
-=======
 	ctx, err := ExtractOrgIDFromCertificate(r.Context(), s.ca, s.log)
 	if err != nil {
 		s.log.Warnf("failed to extract organization ID from certificate: %v", err)
@@ -211,7 +200,6 @@ func (s *AgentTransportHandler) CreateEnrollmentRequest(w http.ResponseWriter, r
 		return
 	}
 
->>>>>>> f922cf26 (NO-ISSUE: Pull org identifier out of incoming device certificates)
 	body, status := s.serviceHandler.CreateEnrollmentRequest(ctx, er)
 	transport.SetResponse(w, body, status)
 }
@@ -226,8 +214,6 @@ func (s *AgentTransportHandler) GetEnrollmentRequest(w http.ResponseWriter, r *h
 		return
 	}
 
-<<<<<<< HEAD
-=======
 	ctx, err := ExtractOrgIDFromCertificate(r.Context(), s.ca, s.log)
 	if err != nil {
 		s.log.Warnf("failed to extract organization ID from certificate: %v", err)
@@ -236,7 +222,6 @@ func (s *AgentTransportHandler) GetEnrollmentRequest(w http.ResponseWriter, r *h
 		return
 	}
 
->>>>>>> f922cf26 (NO-ISSUE: Pull org identifier out of incoming device certificates)
 	body, status := s.serviceHandler.GetEnrollmentRequest(ctx, name)
 	transport.SetResponse(w, body, status)
 }

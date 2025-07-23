@@ -508,6 +508,7 @@ func TestEventEnrollmentRequestApproved(t *testing.T) {
 		Username: "bar",
 	}
 	ctx = context.WithValue(ctx, authcommon.IdentityCtxKey, &identity)
+	ctx = util.WithOrganizationID(ctx, uuid.New())
 	_, stat := serviceHandler.ApproveEnrollmentRequest(ctx, name, approval)
 	expectedEvents := []devicecommon.ResourceUpdate{
 		{Reason: api.EventReasonResourceCreated, Details: "EnrollmentRequest was created successfully."},

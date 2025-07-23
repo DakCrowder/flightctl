@@ -11,6 +11,7 @@ import (
 	"github.com/flightctl/flightctl/internal/service"
 	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/tasks_client"
+	"github.com/flightctl/flightctl/internal/util"
 	flightlog "github.com/flightctl/flightctl/pkg/log"
 	"github.com/flightctl/flightctl/pkg/queues"
 	testutil "github.com/flightctl/flightctl/test/util"
@@ -70,6 +71,9 @@ func (s *ServiceTestSuite) Setup() {
 	caCfg := ca.NewDefault(testDirPath)
 	s.caClient, _, err = icrypto.EnsureCA(caCfg)
 	Expect(err).ToNot(HaveOccurred())
+
+	// Add organization ID to context for use by the service handler
+	s.Ctx = util.WithOrganizationID(s.Ctx, store.NullOrgId)
 
 	s.Handler = service.NewServiceHandler(s.Store, s.cbMgr, kvStore, s.caClient, s.Log, "", "")
 }
