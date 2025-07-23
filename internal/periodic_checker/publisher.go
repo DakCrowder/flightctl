@@ -19,6 +19,11 @@ var (
 	DefaultOrgTickerInterval  = 5 * time.Minute
 )
 
+const (
+	// RedisKeyPeriodicTaskLastRun is the Redis key pattern for storing the last run time of periodic tasks
+	RedisKeyPeriodicTaskLastRun = "periodic_task:last_run:"
+)
+
 type OrganizationService interface {
 	ListOrganizations(ctx context.Context) (*api.OrganizationList, api.Status)
 }
@@ -56,7 +61,15 @@ func NewPeriodicTaskPublisher(log logrus.FieldLogger, kvStore kvstore.KVStore, o
 func (p *PeriodicTaskPublisher) publishTasks(ctx context.Context) {
 	for orgID, _ := range p.organizations {
 		for _, taskMetadata := range p.tasksMetadata {
-			taskKey := fmt.Sprintf("periodic_task:last_run:%s:%s", taskMetadata.TaskType, orgID)
+			// Check if context has been cancelled before processing each task
+			select {
+			case <-ctx.Done():
+				p.log.Info("Context cancelled, stopping task publishing")
+				return
+			default:
+			}
+
+			taskKey := fmt.Sprintf("%s%s:%s", RedisKeyPeriodicTaskLastRun, taskMetadata.TaskType, orgID)
 
 			// Default last run to 0 Unix time
 			lastRun := PeriodicTaskLastRun{

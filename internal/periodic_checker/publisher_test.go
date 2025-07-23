@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -419,7 +420,7 @@ func TestPeriodicTaskPublisher_publishTasks_WithExistingLastRun(t *testing.T) {
 	lastRunJSON, _ := json.Marshal(lastRun)
 
 	// Set up KV store with recent last run for first task
-	taskKey1 := "periodic_task:last_run:repository-tester:" + orgID.String()
+	taskKey1 := fmt.Sprintf("%s%s:%s", RedisKeyPeriodicTaskLastRun, PeriodicTaskTypeRepositoryTester, orgID.String())
 	mockKV.data[taskKey1] = lastRunJSON
 
 	ctx := context.Background()
@@ -451,8 +452,8 @@ func TestPeriodicTaskPublisher_publishTasks_WithOldLastRun(t *testing.T) {
 	lastRunJSON, _ := json.Marshal(lastRun)
 
 	// Set up KV store with old last run for both tasks
-	taskKey1 := "periodic_task:last_run:repository-tester:" + orgID.String()
-	taskKey2 := "periodic_task:last_run:resource-sync:" + orgID.String()
+	taskKey1 := fmt.Sprintf("%s%s:%s", RedisKeyPeriodicTaskLastRun, PeriodicTaskTypeRepositoryTester, orgID.String())
+	taskKey2 := fmt.Sprintf("%s%s:%s", RedisKeyPeriodicTaskLastRun, PeriodicTaskTypeResourceSync, orgID.String())
 	mockKV.data[taskKey1] = lastRunJSON
 	mockKV.data[taskKey2] = lastRunJSON
 
@@ -510,7 +511,7 @@ func TestPeriodicTaskPublisher_publishTasks_InvalidLastRunJSON(t *testing.T) {
 	orgID := uuid.New()
 	publisher.organizations[orgID] = true
 
-	taskKey1 := "periodic_task:last_run:repository-tester:" + orgID.String()
+	taskKey1 := fmt.Sprintf("%s%s:%s", RedisKeyPeriodicTaskLastRun, PeriodicTaskTypeRepositoryTester, orgID.String())
 	mockKV.data[taskKey1] = []byte("invalid json")
 
 	ctx := context.Background()
@@ -748,7 +749,7 @@ func TestPeriodicTaskPublisher_FullWorkflow_TimingBehavior(t *testing.T) {
 	oldTime := time.Now().Add(-5 * time.Minute)
 	lastRun := PeriodicTaskLastRun{LastRun: oldTime}
 	lastRunJSON, _ := json.Marshal(lastRun)
-	taskKey := "periodic_task:last_run:repository-tester:" + orgID.String()
+	taskKey := fmt.Sprintf("%s%s:%s", RedisKeyPeriodicTaskLastRun, PeriodicTaskTypeRepositoryTester, orgID.String())
 	mockKV.data[taskKey] = lastRunJSON
 
 	// Now should publish only the one with old last run
