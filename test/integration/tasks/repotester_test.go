@@ -19,7 +19,9 @@ import (
 	"github.com/flightctl/flightctl/internal/config/ca"
 	"github.com/flightctl/flightctl/internal/crypto"
 	"github.com/flightctl/flightctl/internal/tasks"
+	"github.com/flightctl/flightctl/internal/util"
 	"github.com/gliderlabs/ssh"
+	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 	gossh "golang.org/x/crypto/ssh"
@@ -55,6 +57,9 @@ func TestHttpsMTLSRepo(t *testing.T) {
 	serverCerts, _, err := ca.EnsureServerCertificate(ctx, filepath.Join(testDirPath, "server.crt"), filepath.Join(testDirPath, "server.key"), []string{"localhost"}, 1)
 	require.NoError(err)
 
+	// TODO this seems like an antipattern, there should be test utilities to generate other types of certs instead of using flightctls cert generation
+	// for spoofing an mTLS git repo
+	ctx = util.WithOrganizationID(ctx, uuid.New())
 	adminCert, _, err := ca.EnsureClientCertificate(ctx, filepath.Join(testDirPath, "client.crt"), filepath.Join(testDirPath, "client.key"), cfg.AdminCommonName, 1)
 	require.NoError(err)
 

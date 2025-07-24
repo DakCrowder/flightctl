@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"crypto"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -23,9 +24,11 @@ import (
 	"github.com/flightctl/flightctl/internal/client"
 	"github.com/flightctl/flightctl/internal/config"
 	"github.com/flightctl/flightctl/internal/util"
+	fccrypto "github.com/flightctl/flightctl/pkg/crypto"
 	flightlog "github.com/flightctl/flightctl/pkg/log"
 	"github.com/flightctl/flightctl/pkg/version"
 	testutil "github.com/flightctl/flightctl/test/util"
+	"github.com/samber/lo"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -138,6 +141,12 @@ func main() {
 	// Create simulator fleet configuration
 	if err := createSimulatorFleet(ctx, serviceClient, log); err != nil {
 		log.Warnf("Failed to create simulator fleet: %v", err)
+	}
+
+	// Provision shared bootstrap certificates
+	log.Infoln("provisioning shared bootstrap certificates")
+	if err := provisionSharedBootstrapCertificate(ctx, serviceClient, *dataDir, log); err != nil {
+		log.Fatalf("Failed to provision bootstrap certificates: %v", err)
 	}
 
 	agents, agentsFolders := createAgents(log, *numDevices, *initialDeviceIndex, agentConfigTemplate)
@@ -253,8 +262,16 @@ func createAgents(log *logrus.Logger, numDevices int, initialDeviceIndex int, ag
 		if err != nil {
 			log.Fatalf("Error setting environment variable: %v", err)
 		}
+		// Use shared bootstrap certificates for all devices
+		sharedCertDir := filepath.Join(agentConfigTemplate.DataDir, "shared-certs")
 		for _, filename := range []string{"ca.crt", "client-enrollment.crt", "client-enrollment.key"} {
-			if err := copyFile(filepath.Join(certDir, filename), filepath.Join(agentDir, agent_config.DefaultConfigDir, filename)); err != nil {
+			srcPath := filepath.Join(certDir, filename)
+			if filename != "ca.crt" {
+				// Use shared certificates for enrollment cert/key
+				srcPath = filepath.Join(sharedCertDir, filename)
+			}
+
+			if err := copyFile(srcPath, filepath.Join(agentDir, agent_config.DefaultConfigDir, filename)); err != nil {
 				log.Fatalf("copying %s: %v", filename, err)
 			}
 		}
@@ -427,4 +444,114 @@ func createSimulatorFleet(ctx context.Context, serviceClient *apiClient.ClientWi
 	}
 
 	return fmt.Errorf("failed to create fleet: status %d, body: %s", createResponse.HTTPResponse.StatusCode, string(createResponse.Body))
+}
+
+func provisionSharedBootstrapCertificate(ctx context.Context, serviceClient *apiClient.ClientWithResponses, dataDir string, log *logrus.Logger) error {
+	// Generate one key pair for all simulator devices
+	_, clientPrivateKey, err := fccrypto.NewKeyPair()
+	if err != nil {
+		return fmt.Errorf("error generating shared key pair: %w", err)
+	}
+
+	// Create CSR for shared bootstrap certificate
+	csrPEM, err := fccrypto.MakeCSR(clientPrivateKey.(crypto.Signer), "simulator-bootstrap")
+	if err != nil {
+		return fmt.Errorf("error creating CSR: %w", err)
+	}
+
+	// Submit CSR
+	csrName := "simulator-bootstrap"
+	csr := v1alpha1.CertificateSigningRequest{
+		ApiVersion: "v1alpha1",
+		Kind:       "CertificateSigningRequest",
+		Metadata: v1alpha1.ObjectMeta{
+			Name: lo.ToPtr(csrName),
+		},
+		Spec: v1alpha1.CertificateSigningRequestSpec{
+			Request:    csrPEM,
+			SignerName: "client-bootstrap",
+		},
+	}
+
+	log.Infof("Creating CSR for simulator bootstrap certificate")
+	createResp, err := serviceClient.CreateCertificateSigningRequestWithResponse(ctx, csr)
+	if err != nil {
+		return fmt.Errorf("failed to create CSR: %w", err)
+	}
+
+	if createResp.HTTPResponse.StatusCode != 201 {
+		return fmt.Errorf("failed to create CSR, status: %d", createResp.HTTPResponse.StatusCode)
+	}
+
+	// Approve the CSR immediately
+	approvedCSR := csr
+	approvedCSR.Status = &v1alpha1.CertificateSigningRequestStatus{
+		Conditions: []v1alpha1.Condition{{
+			Type:   v1alpha1.ConditionTypeCertificateSigningRequestApproved,
+			Status: v1alpha1.ConditionStatusTrue,
+			Reason: "SimulatorApproval",
+		}},
+	}
+
+	log.Infof("Approving CSR for simulator bootstrap certificate")
+	_, err = serviceClient.UpdateCertificateSigningRequestApprovalWithResponse(ctx, csrName, approvedCSR)
+	if err != nil {
+		return fmt.Errorf("failed to approve CSR: %w", err)
+	}
+
+	// Wait for signed certificate
+	log.Infof("Waiting for signed certificate")
+	certPEM, err := pollForSignedCertificate(ctx, serviceClient, csrName, log)
+	if err != nil {
+		return fmt.Errorf("failed to get signed certificate: %w", err)
+	}
+
+	// Save shared certificate and key in data directory
+	sharedCertDir := filepath.Join(dataDir, "shared-certs")
+	if err := os.MkdirAll(sharedCertDir, 0700); err != nil {
+		return fmt.Errorf("failed to create shared cert dir: %w", err)
+	}
+
+	certPath := filepath.Join(sharedCertDir, "client-enrollment.crt")
+	keyPath := filepath.Join(sharedCertDir, "client-enrollment.key")
+
+	if err := os.WriteFile(certPath, certPEM, 0600); err != nil {
+		return fmt.Errorf("failed to write certificate: %w", err)
+	}
+
+	if err := fccrypto.WriteKey(keyPath, clientPrivateKey); err != nil {
+		return fmt.Errorf("failed to write private key: %w", err)
+	}
+
+	log.Infof("Shared bootstrap certificate provisioned successfully")
+	return nil
+}
+
+func pollForSignedCertificate(ctx context.Context, serviceClient *apiClient.ClientWithResponses, csrName string, log *logrus.Logger) ([]byte, error) {
+	var certPEM []byte
+	err := wait.PollUntilContextTimeout(ctx, 1*time.Second, 30*time.Second, true, func(ctx context.Context) (bool, error) {
+		resp, err := serviceClient.GetCertificateSigningRequestWithResponse(ctx, csrName)
+		if err != nil {
+			log.Warnf("Error getting CSR %s: %v", csrName, err)
+			return false, nil // Continue polling
+		}
+
+		if resp.HTTPResponse.StatusCode != 200 {
+			log.Warnf("CSR %s not ready, status: %d", csrName, resp.HTTPResponse.StatusCode)
+			return false, nil // Continue polling
+		}
+
+		if resp.JSON200.Status == nil || resp.JSON200.Status.Certificate == nil {
+			log.Warnf("CSR %s not yet signed", csrName)
+			return false, nil // Continue polling
+		}
+
+		// Certificate is ready - it's already in PEM format
+		certPEM = *resp.JSON200.Status.Certificate
+
+		log.Infof("Certificate provisioned for CSR %s", csrName)
+		return true, nil
+	})
+
+	return certPEM, err
 }

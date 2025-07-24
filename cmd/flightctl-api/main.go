@@ -92,13 +92,6 @@ func main() {
 		}
 	}
 
-	clientCertFile := crypto.CertStorePath(cfg.CA.ClientBootstrapCertName+".crt", cfg.Service.CertStore)
-	clientKeyFile := crypto.CertStorePath(cfg.CA.ClientBootstrapCertName+".key", cfg.Service.CertStore)
-	_, _, err = ca.EnsureClientCertificate(ctx, clientCertFile, clientKeyFile, cfg.CA.ClientBootstrapCommonName, cfg.CA.ClientBootstrapValidityDays)
-	if err != nil {
-		log.Fatalf("ensuring bootstrap client cert: %v", err)
-	}
-
 	// also write out a client config file
 
 	caPemBytes, err := ca.GetCABundle()

@@ -11,6 +11,8 @@ import (
 	apiclient "github.com/flightctl/flightctl/internal/api/client"
 	"github.com/flightctl/flightctl/internal/config/ca"
 	"github.com/flightctl/flightctl/internal/crypto"
+	"github.com/flightctl/flightctl/internal/util"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -121,6 +123,8 @@ func TestClientConfig(t *testing.T) {
 			cfg := ca.NewDefault(testDirPath)
 			ca, _, err := crypto.EnsureCA(cfg)
 			require.NoError(err)
+
+			ctx = util.WithOrganizationID(ctx, uuid.New())
 			clientCert, _, err := ca.EnsureClientCertificate(ctx, filepath.Join(testDirPath, "client-enrollment.crt"), filepath.Join(testDirPath, "client-enrollment.key"), cfg.ClientBootstrapCertName, cfg.ClientBootstrapValidityDays)
 			require.NoError(err)
 

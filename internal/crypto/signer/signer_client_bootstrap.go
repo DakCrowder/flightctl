@@ -6,6 +6,7 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/flterrors"
+	"github.com/flightctl/flightctl/internal/util"
 	"github.com/flightctl/flightctl/pkg/crypto"
 )
 
@@ -34,6 +35,12 @@ func (s *SignerClientBootstrap) Verify(ctx context.Context, request api.Certific
 	if _, err := PeerCertificateFromCtx(ctx); err == nil {
 		return fmt.Errorf("bootstrap certificates cannot be requested using client certificates issued by the system")
 	}
+
+	_, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return fmt.Errorf("organization ID is required but not found in request context for bootstrap certificate")
+	}
+
 	return nil
 }
 
@@ -69,7 +76,12 @@ func (s *SignerClientBootstrap) Sign(ctx context.Context, request api.Certificat
 		expiry = *request.Spec.ExpirationSeconds
 	}
 
-	certData, err := s.ca.IssueRequestedClientCertificate(ctx, csr, int(expiry))
+	orgID, ok := util.GetOrgIdFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("organization ID is required but not found in request context for device bootstrap certificate")
+	}
+
+	certData, err := s.ca.IssueRequestedClientCertificate(ctx, csr, int(expiry), WithExtension(OIDOrgID, orgID.String()))
 	if err != nil {
 		return nil, err
 	}
