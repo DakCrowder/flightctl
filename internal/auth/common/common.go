@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	api "github.com/flightctl/flightctl/api/v1alpha1"
+	"github.com/google/uuid"
 )
 
 type ctxKeyAuthHeader string
@@ -34,8 +37,12 @@ type Identity struct {
 }
 
 type ExternalOrganization struct {
-	Id   string
+	ID   string
 	Name string
+}
+
+type OrganizationGetter interface {
+	GetOrganization(ctx context.Context, orgID uuid.UUID) (*api.Organization, api.Status)
 }
 
 func GetIdentity(ctx context.Context) (*Identity, error) {
