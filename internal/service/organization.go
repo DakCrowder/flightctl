@@ -5,13 +5,20 @@ import (
 	"fmt"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
+	"github.com/flightctl/flightctl/internal/auth/common"
 	"github.com/google/uuid"
 )
 
 var organizationApiVersion = fmt.Sprintf("%s/%s", api.APIGroup, api.OrganizationAPIVersion)
 
 func (h *ServiceHandler) ListOrganizations(ctx context.Context) (*api.OrganizationList, api.Status) {
-	orgs, err := h.store.Organization().List(ctx)
+	// TODO Change identity to be a different format
+	identity, err := common.GetIdentity(ctx)
+	if err != nil {
+		return nil, StoreErrorToApiStatus(err, false, api.OrganizationKind, nil)
+	}
+
+	orgs, err := h.store.Organization().ListAndCreateMissing(ctx, identity.Organizations)
 	status := StoreErrorToApiStatus(err, false, api.OrganizationKind, nil)
 	if err != nil {
 		return nil, status
