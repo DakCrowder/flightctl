@@ -27,9 +27,10 @@ type AuthConfig struct {
 }
 
 type Identity struct {
-	Username string
-	UID      string
-	Groups   []string
+	Username      string
+	UID           string
+	Groups        []string
+	Organizations []string
 }
 
 func GetIdentity(ctx context.Context) (*Identity, error) {
