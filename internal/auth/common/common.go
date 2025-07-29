@@ -30,7 +30,12 @@ type Identity struct {
 	Username      string
 	UID           string
 	Groups        []string
-	Organizations []string
+	Organizations []ExternalOrganization
+}
+
+type ExternalOrganization struct {
+	Id   string
+	Name string
 }
 
 func GetIdentity(ctx context.Context) (*Identity, error) {
