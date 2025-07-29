@@ -67,6 +67,7 @@ func CreateAuthNMiddleware(log logrus.FieldLogger) func(http.Handler) http.Handl
 			if err != nil {
 				log.WithError(err).Error("failed to get identity")
 			} else {
+				log.Infof("Test Identity: %+v", identity)
 				ctx = context.WithValue(ctx, common.IdentityCtxKey, identity)
 			}
 			next.ServeHTTP(w, r.WithContext(ctx))

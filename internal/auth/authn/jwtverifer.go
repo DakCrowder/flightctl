@@ -65,8 +65,49 @@ func (j JWTAuth) ValidateToken(ctx context.Context, token string) error {
 }
 
 func (j JWTAuth) GetIdentity(ctx context.Context, token string) (*common.Identity, error) {
-	// TODO return filled identity information
-	return &common.Identity{}, nil
+	// TODO: cache the jwk set
+	jwkSet, err := jwk.Fetch(ctx, j.jwksUri, jwk.WithHTTPClient(j.client))
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch JWK set: %w", err)
+	}
+
+	parsedToken, err := jwt.Parse([]byte(token), jwt.WithKeySet(jwkSet), jwt.WithValidate(true))
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse JWT token: %w", err)
+	}
+
+	identity := &common.Identity{}
+
+	if sub, exists := parsedToken.Get("sub"); exists {
+		if uid, ok := sub.(string); ok {
+			identity.UID = uid
+		}
+	}
+
+	if preferredUsername, exists := parsedToken.Get("preferred_username"); exists {
+		if username, ok := preferredUsername.(string); ok {
+			identity.Username = username
+		}
+	}
+
+	if orgClaim, exists := parsedToken.Get("organization"); exists {
+		if orgMap, ok := orgClaim.(map[string]interface{}); ok {
+			identity.Organizations = make([]common.ExternalOrganization, 0, len(orgMap))
+			for orgName, orgData := range orgMap {
+				extOrg := common.ExternalOrganization{Name: orgName}
+				if orgDetails, ok := orgData.(map[string]interface{}); ok {
+					if id, exists := orgDetails["id"]; exists {
+						if idStr, ok := id.(string); ok {
+							extOrg.Id = idStr
+						}
+					}
+				}
+				identity.Organizations = append(identity.Organizations, extOrg)
+			}
+		}
+	}
+
+	return identity, nil
 }
 
 func (j JWTAuth) GetAuthConfig() common.AuthConfig {
