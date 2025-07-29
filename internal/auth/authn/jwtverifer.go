@@ -98,7 +98,7 @@ func (j JWTAuth) GetIdentity(ctx context.Context, token string) (*common.Identit
 				if orgDetails, ok := orgData.(map[string]interface{}); ok {
 					if id, exists := orgDetails["id"]; exists {
 						if idStr, ok := id.(string); ok {
-							extOrg.Id = idStr
+							extOrg.ID = idStr
 						}
 					}
 				}
