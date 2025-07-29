@@ -11,6 +11,7 @@ import (
 	"github.com/flightctl/flightctl/internal/instrumentation/tracing"
 	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/store/selector"
+	"github.com/google/uuid"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
@@ -574,6 +575,12 @@ func (t *TracedService) GetDatabaseTime(ctx context.Context) (time.Time, api.Sta
 func (t *TracedService) ListOrganizations(ctx context.Context) (*api.OrganizationList, api.Status) {
 	ctx, span := startSpan(ctx, "ListOrganizations")
 	resp, st := t.inner.ListOrganizations(ctx)
+	endSpan(span, st)
+	return resp, st
+}
+func (t *TracedService) GetOrganization(ctx context.Context, orgID uuid.UUID) (*api.Organization, api.Status) {
+	ctx, span := startSpan(ctx, "GetOrganization")
+	resp, st := t.inner.GetOrganization(ctx, orgID)
 	endSpan(span, st)
 	return resp, st
 }

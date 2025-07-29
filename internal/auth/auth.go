@@ -96,11 +96,11 @@ func getTlsConfig(cfg *config.Config) *tls.Config {
 	return tlsConfig
 }
 
-func initOIDCAuth(cfg *config.Config, log logrus.FieldLogger) error {
+func initOIDCAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.OrganizationGetter) error {
 	oidcUrl := strings.TrimSuffix(cfg.Auth.OIDC.OIDCAuthority, "/")
 	externalOidcUrl := strings.TrimSuffix(cfg.Auth.OIDC.ExternalOIDCAuthority, "/")
 	log.Infof("OIDC auth enabled: %s", oidcUrl)
-	authZ = NilAuth{}
+	authZ = authz.OIDCAuthZ{OrgGetter: orgGetter}
 	var err error
 	authN, err = authn.NewJWTAuth(oidcUrl, externalOidcUrl, getTlsConfig(cfg))
 	if err != nil {
@@ -118,7 +118,7 @@ func initAAPAuth(cfg *config.Config, log logrus.FieldLogger) error {
 	return nil
 }
 
-func InitAuth(cfg *config.Config, log logrus.FieldLogger) error {
+func InitAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.OrganizationGetter) error {
 	value, exists := os.LookupEnv(DisableAuthEnvKey)
 	if exists && value != "" {
 		log.Warnln("Auth disabled")
@@ -132,7 +132,7 @@ func InitAuth(cfg *config.Config, log logrus.FieldLogger) error {
 			err = initK8sAuth(cfg, log)
 		} else if cfg.Auth.OIDC != nil {
 			configuredAuthType = AuthTypeOIDC
-			err = initOIDCAuth(cfg, log)
+			err = initOIDCAuth(cfg, log, orgGetter)
 		} else if cfg.Auth.AAP != nil {
 			configuredAuthType = AuthTypeAAP
 			err = initAAPAuth(cfg, log)

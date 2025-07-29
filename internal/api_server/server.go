@@ -165,7 +165,10 @@ func (s *Server) Run(ctx context.Context) error {
 		MultiErrorHandler: oapiMultiErrorHandler,
 	}
 
-	err = auth.InitAuth(s.cfg, s.log)
+	serviceHandler := service.WrapWithTracing(service.NewServiceHandler(
+		s.store, callbackManager, kvStore, s.ca, s.log, s.cfg.Service.BaseAgentEndpointUrl, s.cfg.Service.BaseUIUrl, s.cfg.Service.TPMCAPaths))
+
+	err = auth.InitAuth(s.cfg, s.log, serviceHandler)
 	if err != nil {
 		return fmt.Errorf("failed initializing auth: %w", err)
 	}
@@ -191,9 +194,6 @@ func (s *Server) Run(ctx context.Context) error {
 		middleware.Logger,
 		middleware.Recoverer,
 	)
-
-	serviceHandler := service.WrapWithTracing(service.NewServiceHandler(
-		s.store, callbackManager, kvStore, s.ca, s.log, s.cfg.Service.BaseAgentEndpointUrl, s.cfg.Service.BaseUIUrl, s.cfg.Service.TPMCAPaths))
 
 	// a group is a new mux copy, with its own copy of the middleware stack
 	// this one handles the OpenAPI handling of the service (excluding auth validate endpoint)

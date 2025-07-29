@@ -7,6 +7,7 @@ import (
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/store/selector"
+	"github.com/google/uuid"
 )
 
 type Service interface {
@@ -118,4 +119,5 @@ type Service interface {
 
 	// Organization
 	ListOrganizations(ctx context.Context) (*api.OrganizationList, api.Status)
+	GetOrganization(ctx context.Context, orgID uuid.UUID) (*api.Organization, api.Status)
 }
