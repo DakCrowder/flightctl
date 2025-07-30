@@ -7,7 +7,9 @@ import (
 	"github.com/flightctl/flightctl/internal/auth/common"
 )
 
-type NilAuth struct{}
+type NilAuth struct {
+	orgValidator common.OrganizationValidator
+}
 
 func (a NilAuth) ValidateToken(ctx context.Context, token string) error {
 	return nil

@@ -1,16 +1,24 @@
 package auth
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/flightctl/flightctl/internal/auth/common"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
+
+type mockOrgStore struct{}
+
+func (m *mockOrgStore) GetByID(ctx context.Context, orgID uuid.UUID) (interface{}, error) {
+	return &struct{}{}, nil
+}
 
 var authZMiddleware = CreateAuthZMiddleware(logrus.New())(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)

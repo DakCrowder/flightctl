@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
+	"github.com/flightctl/flightctl/internal/auth/common"
 	"github.com/flightctl/flightctl/internal/flterrors"
 	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/store/model"
@@ -548,6 +549,31 @@ func (s *DummyOrganization) List(ctx context.Context) ([]*model.Organization, er
 		return []*model.Organization{}, nil
 	}
 	return *s.organizations, nil
+}
+
+func (s *DummyOrganization) ListAndCreateMissing(ctx context.Context, orgs []common.ExternalOrganization) ([]*model.Organization, error) {
+	if s.err != nil {
+		return nil, s.err
+	}
+	if s.organizations == nil {
+		s.organizations = &[]*model.Organization{}
+	}
+	return *s.organizations, nil
+}
+
+func (s *DummyOrganization) GetByID(ctx context.Context, orgID uuid.UUID) (*model.Organization, error) {
+	if s.err != nil {
+		return nil, s.err
+	}
+	if s.organizations == nil {
+		return nil, flterrors.ErrResourceNotFound
+	}
+	for _, org := range *s.organizations {
+		if org.ID == orgID {
+			return org, nil
+		}
+	}
+	return nil, flterrors.ErrResourceNotFound
 }
 
 // --------------------------------------> CallbackManager
