@@ -108,20 +108,21 @@ func (s *OrganizationStore) ListAndCreateMissing(ctx context.Context, orgs []com
 
 	db := s.getDB(ctx)
 
-	// Step 1: Find all existing organizations using a single 'IN' query.
-	externalIDs := make([]string, len(orgs))
-	for i, org := range orgs {
-		externalIDs[i] = org.ID
+	// Step 1: Create maps for tracking and lookup in a single pass through orgs
+	idsToFind := make(map[string]bool, len(orgs))
+	extOrgMap := make(map[string]common.ExternalOrganization, len(orgs))
+	externalIDs := make([]string, 0, len(orgs))
+
+	for _, org := range orgs {
+		idsToFind[org.ID] = true
+		extOrgMap[org.ID] = org
+		externalIDs = append(externalIDs, org.ID)
 	}
+
+	// Step 2: Find all existing organizations using a single 'IN' query.
 	var foundOrgs []*model.Organization
 	if err := db.Where("external_id IN ?", externalIDs).Find(&foundOrgs).Error; err != nil {
 		return nil, err
-	}
-
-	// Step 2: Use a map to efficiently identify which external IDs are missing.
-	idsToFind := make(map[string]bool)
-	for _, id := range externalIDs {
-		idsToFind[id] = true
 	}
 
 	for _, org := range foundOrgs {
@@ -130,17 +131,20 @@ func (s *OrganizationStore) ListAndCreateMissing(ctx context.Context, orgs []com
 	}
 
 	// Step 3: Prepare and bulk-create the missing organizations.
-	// TODO populate display name appropriately
 	var createdOrgs []*model.Organization
 	if len(idsToFind) > 0 {
 		var orgsToCreate []*model.Organization
 		for id := range idsToFind {
+			extOrg := extOrgMap[id]
+			displayName := extOrg.Name
+			if displayName == "" {
+				displayName = id // Fallback to ID if Name is empty
+			}
+
 			orgsToCreate = append(orgsToCreate, &model.Organization{
-				ID:         uuid.New(),
-				ExternalID: id,
-				// A reasonable default is to set the DisplayName to the ExternalID.
-				// You can adjust this based on your business logic.
-				DisplayName: id,
+				ID:          uuid.New(),
+				ExternalID:  id,
+				DisplayName: displayName,
 			})
 		}
 

@@ -27,6 +27,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/google/uuid"
 	oapimiddleware "github.com/oapi-codegen/nethttp-middleware"
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -47,6 +48,14 @@ func (c *customTransportHandler) AuthValidate(w http.ResponseWriter, r *http.Req
 const (
 	gracefulShutdownTimeout = 5 * time.Second
 )
+
+type orgStoreAdapter struct {
+	store store.Organization
+}
+
+func (a *orgStoreAdapter) GetByID(ctx context.Context, orgID uuid.UUID) (interface{}, error) {
+	return a.store.GetByID(ctx, orgID)
+}
 
 type Server struct {
 	log                logrus.FieldLogger

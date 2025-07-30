@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
+	"github.com/flightctl/flightctl/internal/auth/common"
 	"github.com/flightctl/flightctl/internal/flterrors"
 	"github.com/flightctl/flightctl/internal/store/model"
 	"github.com/flightctl/flightctl/pkg/log"
@@ -51,10 +52,20 @@ func setupMockStoreWithError(mockStore *TestStore, err error) {
 	mockStore.Organization().(*DummyOrganization).err = err
 }
 
+func createContextWithIdentity(organizations []common.ExternalOrganization) context.Context {
+	identity := &common.Identity{
+		Username:      "test-user",
+		UID:           "test-uid",
+		Groups:        []string{"test-group"},
+		Organizations: organizations,
+	}
+	return context.WithValue(context.Background(), common.IdentityCtxKey, identity)
+}
+
 func TestListOrganizations_EmptyResult(t *testing.T) {
 	handler, mockStore := createServiceHandlerWithOrgMockStore(t)
 	setupMockStoreWithOrganizations(mockStore, []*model.Organization{})
-	ctx := context.Background()
+	ctx := createContextWithIdentity([]common.ExternalOrganization{})
 
 	result, status := handler.ListOrganizations(ctx)
 
@@ -71,7 +82,11 @@ func TestListOrganizations_SingleOrganization(t *testing.T) {
 	orgID := uuid.New()
 	defaultOrg := createTestOrganizationModel(orgID, "default-external-id", "Default")
 	setupMockStoreWithOrganizations(mockStore, []*model.Organization{defaultOrg})
-	ctx := context.Background()
+
+	testOrgs := []common.ExternalOrganization{
+		{ID: "default-external-id", Name: "Default"},
+	}
+	ctx := createContextWithIdentity(testOrgs)
 
 	expectedOrg := createExpectedAPIOrganization(orgID, "Default", "default-external-id")
 
@@ -97,7 +112,12 @@ func TestListOrganizations_MultipleOrganizations(t *testing.T) {
 
 	orgs := []*model.Organization{org1, org2}
 	setupMockStoreWithOrganizations(mockStore, orgs)
-	ctx := context.Background()
+
+	testOrgs := []common.ExternalOrganization{
+		{ID: "external-id-1", Name: "Organization One"},
+		{ID: "external-id-2", Name: "Organization Two"},
+	}
+	ctx := createContextWithIdentity(testOrgs)
 
 	expectedOrg1 := createExpectedAPIOrganization(orgID1, "Organization One", "external-id-1")
 	expectedOrg2 := createExpectedAPIOrganization(orgID2, "Organization Two", "external-id-2")
@@ -119,7 +139,11 @@ func TestListOrganizations_StoreError(t *testing.T) {
 	handler, mockStore := createServiceHandlerWithOrgMockStore(t)
 	testError := errors.New("database connection failed")
 	setupMockStoreWithError(mockStore, testError)
-	ctx := context.Background()
+
+	testOrgs := []common.ExternalOrganization{
+		{ID: "test-external-id", Name: "Test Organization"},
+	}
+	ctx := createContextWithIdentity(testOrgs)
 
 	result, status := handler.ListOrganizations(ctx)
 
@@ -131,7 +155,11 @@ func TestListOrganizations_StoreError(t *testing.T) {
 func TestListOrganizations_ResourceNotFoundError(t *testing.T) {
 	handler, mockStore := createServiceHandlerWithOrgMockStore(t)
 	setupMockStoreWithError(mockStore, flterrors.ErrResourceNotFound)
-	ctx := context.Background()
+
+	testOrgs := []common.ExternalOrganization{
+		{ID: "test-external-id", Name: "Test Organization"},
+	}
+	ctx := createContextWithIdentity(testOrgs)
 
 	result, status := handler.ListOrganizations(ctx)
 

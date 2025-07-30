@@ -4,13 +4,15 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/flightctl/flightctl/internal/auth/common"
 	"github.com/flightctl/flightctl/pkg/k8sclient"
 	k8sAuthorizationV1 "k8s.io/api/authorization/v1"
 )
 
 type K8sAuthZ struct {
-	K8sClient k8sclient.K8SClient
-	Namespace string
+	K8sClient    k8sclient.K8SClient
+	Namespace    string
+	OrgValidator common.OrganizationValidator
 }
 
 func createSSAR(resource string, verb string, ns string) ([]byte, error) {
@@ -42,5 +44,10 @@ func (k8sAuth K8sAuthZ) CheckPermission(ctx context.Context, k8sToken string, re
 	if err := json.Unmarshal(res, ssar); err != nil {
 		return false, err
 	}
+
+	if err := k8sAuth.OrgValidator.ValidateOrganization(ctx, resource, op); err != nil {
+		return false, err
+	}
+
 	return ssar.Status.Allowed, nil
 }

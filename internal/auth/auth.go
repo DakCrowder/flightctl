@@ -62,7 +62,7 @@ func GetConfiguredAuthType() AuthType {
 
 var configuredAuthType AuthType
 
-func initK8sAuth(cfg *config.Config, log logrus.FieldLogger) error {
+func initK8sAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.OrganizationGetter) error {
 	apiUrl := strings.TrimSuffix(cfg.Auth.K8s.ApiUrl, "/")
 	externalOpenShiftApiUrl := strings.TrimSuffix(cfg.Auth.K8s.ExternalOpenShiftApiUrl, "/")
 	log.Infof("k8s auth enabled: %s", apiUrl)
@@ -76,7 +76,9 @@ func initK8sAuth(cfg *config.Config, log logrus.FieldLogger) error {
 	if err != nil {
 		return fmt.Errorf("failed to create k8s client: %w", err)
 	}
-	authZ = K8sToK8sAuth{K8sAuthZ: authz.K8sAuthZ{K8sClient: k8sClient, Namespace: cfg.Auth.K8s.RBACNs}}
+	authZ = K8sToK8sAuth{
+		K8sAuthZ: authz.K8sAuthZ{K8sClient: k8sClient, Namespace: cfg.Auth.K8s.RBACNs, OrgValidator: common.NewOrganizationExistsValidator(orgGetter)},
+	}
 	authN, err = authn.NewK8sAuthN(k8sClient, externalOpenShiftApiUrl)
 	if err != nil {
 		return fmt.Errorf("failed to create k8s AuthN: %w", err)
@@ -100,7 +102,7 @@ func initOIDCAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.O
 	oidcUrl := strings.TrimSuffix(cfg.Auth.OIDC.OIDCAuthority, "/")
 	externalOidcUrl := strings.TrimSuffix(cfg.Auth.OIDC.ExternalOIDCAuthority, "/")
 	log.Infof("OIDC auth enabled: %s", oidcUrl)
-	authZ = authz.OIDCAuthZ{OrgGetter: orgGetter}
+	authZ = authz.NewOIDCAuthZ(orgGetter)
 	var err error
 	authN, err = authn.NewJWTAuth(oidcUrl, externalOidcUrl, getTlsConfig(cfg))
 	if err != nil {
@@ -109,13 +111,18 @@ func initOIDCAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.O
 	return nil
 }
 
-func initAAPAuth(cfg *config.Config, log logrus.FieldLogger) error {
+func initAAPAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.OrganizationGetter) error {
 	gatewayUrl := strings.TrimSuffix(cfg.Auth.AAP.ApiUrl, "/")
 	gatewayExternalUrl := strings.TrimSuffix(cfg.Auth.AAP.ExternalApiUrl, "/")
 	log.Infof("AAP Gateway auth enabled: %s", gatewayUrl)
-	authZ = NilAuth{}
+	authZ = NilAuth{orgValidator: common.NewOrganizationExistsValidator(orgGetter)}
 	authN = authn.NewAapGatewayAuth(gatewayUrl, gatewayExternalUrl, getTlsConfig(cfg))
 	return nil
+}
+
+func initNilAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.OrganizationGetter) {
+	authZ = NilAuth{orgValidator: common.NewOrganizationExistsValidator(orgGetter)}
+	authN = authZ.(AuthNMiddleware)
 }
 
 func InitAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.OrganizationGetter) error {
@@ -123,19 +130,18 @@ func InitAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.Organ
 	if exists && value != "" {
 		log.Warnln("Auth disabled")
 		configuredAuthType = AuthTypeNil
-		authZ = NilAuth{}
-		authN = authZ.(AuthNMiddleware)
+		initNilAuth(cfg, log, orgGetter)
 	} else if cfg.Auth != nil {
 		var err error
 		if cfg.Auth.K8s != nil {
 			configuredAuthType = AuthTypeK8s
-			err = initK8sAuth(cfg, log)
+			err = initK8sAuth(cfg, log, orgGetter)
 		} else if cfg.Auth.OIDC != nil {
 			configuredAuthType = AuthTypeOIDC
 			err = initOIDCAuth(cfg, log, orgGetter)
 		} else if cfg.Auth.AAP != nil {
 			configuredAuthType = AuthTypeAAP
-			err = initAAPAuth(cfg, log)
+			err = initAAPAuth(cfg, log, orgGetter)
 		}
 
 		if err != nil {
