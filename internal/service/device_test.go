@@ -3,12 +3,10 @@ package service
 import (
 	"context"
 	"net/http"
-	"os"
 	"testing"
 	"time"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
-	"github.com/flightctl/flightctl/internal/auth"
 	"github.com/flightctl/flightctl/internal/consts"
 	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/util"
@@ -30,8 +28,6 @@ func verifyDevicePatchFailed(require *require.Assertions, status api.Status) {
 }
 
 func testDevicePatch(require *require.Assertions, patch api.PatchRequest) (*api.Device, api.Device, api.Status) {
-	_ = os.Setenv(auth.DisableAuthEnvKey, "true")
-	_ = auth.InitAuth(nil, log.InitLogs())
 	status := api.NewDeviceStatus()
 	device := api.Device{
 		ApiVersion: "v1",
@@ -59,8 +55,6 @@ func testDevicePatch(require *require.Assertions, patch api.PatchRequest) (*api.
 }
 
 func testDeviceStatusPatch(require *require.Assertions, orig api.Device, patch api.PatchRequest) (*api.Device, api.Status) {
-	_ = os.Setenv(auth.DisableAuthEnvKey, "true")
-	_ = auth.InitAuth(nil, log.InitLogs())
 	serviceHandler := &ServiceHandler{
 		EventHandler:    NewEventHandler(&TestStore{}, log.InitLogs()),
 		store:           &TestStore{},
