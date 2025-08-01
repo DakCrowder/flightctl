@@ -40,13 +40,18 @@ func (o OIDC) getOIDCClient(callback string) (*osincli.Client, error) {
 		return nil, err
 	}
 
+	scope := "openid"
+	if supportsOrganizationScope(oauthServerResponse.ScopesSupported) {
+		scope += " organization:*"
+	}
+
 	config := &osincli.ClientConfig{
 		ClientId:           o.ClientId,
 		AuthorizeUrl:       oauthServerResponse.AuthEndpoint,
 		TokenUrl:           oauthServerResponse.TokenEndpoint,
 		ErrorsInStatusCode: true,
 		RedirectUrl:        callback,
-		Scope:              "openid organization:*",
+		Scope:              scope,
 	}
 
 	client, err := osincli.NewClient(config)
@@ -69,12 +74,17 @@ func (o OIDC) authHeadless(username, password string) (AuthInfo, error) {
 		return AuthInfo{}, err
 	}
 
+	scope := "openid"
+	if supportsOrganizationScope(oauthResponse.ScopesSupported) {
+		scope += " organization:*"
+	}
+
 	param := url.Values{}
 	param.Add("client_id", o.ClientId)
 	param.Add("username", username)
 	param.Add("password", password)
 	param.Add("grant_type", "password")
-	param.Add("scope", "openid organization:*")
+	param.Add("scope", scope)
 	payload := bytes.NewBufferString(param.Encode())
 
 	req, err := http.NewRequest(http.MethodPost, oauthResponse.TokenEndpoint, payload)
