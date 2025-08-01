@@ -10,8 +10,9 @@ import (
 )
 
 type OauthServerResponse struct {
-	TokenEndpoint string `json:"token_endpoint"`
-	AuthEndpoint  string `json:"authorization_endpoint"`
+	TokenEndpoint   string   `json:"token_endpoint"`
+	AuthEndpoint    string   `json:"authorization_endpoint"`
+	ScopesSupported []string `json:"scopes_supported"`
 }
 
 func getAuthClientTlsConfig(authCAFile string, insecureSkipVerify bool) (*tls.Config, error) {
@@ -59,4 +60,13 @@ type AuthProvider interface {
 
 func StrIsEmpty(str string) bool {
 	return len(strings.TrimSpace(str)) == 0
+}
+
+func supportsOrganizationScope(scopes []string) bool {
+	for _, scope := range scopes {
+		if scope == "organization" {
+			return true
+		}
+	}
+	return false
 }
