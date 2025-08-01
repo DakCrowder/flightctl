@@ -78,6 +78,8 @@ global:
   imagePullPolicy: IfNotPresent
   rbac:
     create: true
+  organizations:
+    enabled: false
 
 
 ## @section Component specific parameters
