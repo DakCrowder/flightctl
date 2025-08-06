@@ -197,7 +197,7 @@ func main() {
 	}
 
 	// Initialize auth system
-	if err := auth.InitAuth(cfg, logger, nil); err != nil {
+	if err := auth.InitAuth(cfg, logger, nil, nil); err != nil {
 		logger.Fatalf("Failed to initialize auth: %v", err)
 	}
 

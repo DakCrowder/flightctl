@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/flightctl/flightctl/internal/auth/common"
+	"github.com/flightctl/flightctl/internal/org"
 	"github.com/flightctl/flightctl/internal/util"
 )
 
@@ -14,12 +15,12 @@ const (
 )
 
 type OIDCAuthZ struct {
-	orgGetter common.OrganizationGetter
+	orgResolver *org.Resolver
 }
 
-func NewOIDCAuthZ(orgGetter common.OrganizationGetter) *OIDCAuthZ {
+func NewOIDCAuthZ(orgResolver *org.Resolver) *OIDCAuthZ {
 	return &OIDCAuthZ{
-		orgGetter: orgGetter,
+		orgResolver: orgResolver,
 	}
 }
 
@@ -44,18 +45,13 @@ func (o OIDCAuthZ) CheckOrgPermission(ctx context.Context) (bool, error) {
 		return false, fmt.Errorf("no org id in context")
 	}
 
-	org, status := o.orgGetter.GetOrganization(ctx, orgID)
-	if status.Code < 200 || status.Code >= 300 {
-		return false, fmt.Errorf("failed to get org %s: %s", orgID, status.Message)
-	}
-
-	externalId := org.Spec.ExternalId
-	if externalId == nil {
-		return false, fmt.Errorf("org %s has no external id", orgID)
+	externalID, err := o.orgResolver.GetExternalID(ctx, orgID)
+	if err != nil {
+		return false, err
 	}
 
 	for _, org := range identity.Organizations {
-		if org.ID == *externalId {
+		if org.ID == externalID {
 			return true, nil
 		}
 	}

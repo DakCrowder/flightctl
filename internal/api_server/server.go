@@ -20,6 +20,7 @@ import (
 	"github.com/flightctl/flightctl/internal/instrumentation"
 	"github.com/flightctl/flightctl/internal/kvstore"
 	"github.com/flightctl/flightctl/internal/org"
+	"github.com/flightctl/flightctl/internal/org/providers"
 	"github.com/flightctl/flightctl/internal/service"
 	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/tasks_client"
@@ -81,7 +82,13 @@ func New(
 	metrics *instrumentation.ApiMetrics,
 	consoleEndpointReg console.InternalSessionRegistration,
 ) *Server {
-	resolver := org.NewResolver(st.Organization(), 5*time.Minute)
+	// TODO rearrange where config is passed around
+	resolver := org.NewResolver(org.ResolverConfig{
+		Store:            st.Organization(),
+		ExternalProvider: providers.NewJWTProvider(),
+		CacheTTL:         5 * time.Minute,
+	})
+
 	return &Server{
 		log:                log,
 		cfg:                cfg,
@@ -181,7 +188,7 @@ func (s *Server) Run(ctx context.Context) error {
 	serviceHandler := service.WrapWithTracing(service.NewServiceHandler(
 		s.store, callbackManager, kvStore, s.ca, s.log, s.cfg.Service.BaseAgentEndpointUrl, s.cfg.Service.BaseUIUrl))
 
-	err = auth.InitAuth(s.cfg, s.log, serviceHandler)
+	err = auth.InitAuth(s.cfg, s.log, s.orgResolver, serviceHandler)
 	if err != nil {
 		return fmt.Errorf("failed initializing auth: %w", err)
 	}
