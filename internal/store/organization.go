@@ -3,7 +3,6 @@ package store
 import (
 	"context"
 
-	"github.com/flightctl/flightctl/internal/auth/common"
 	"github.com/flightctl/flightctl/internal/flterrors"
 	"github.com/flightctl/flightctl/internal/store/model"
 	"github.com/google/uuid"
@@ -14,8 +13,9 @@ type Organization interface {
 	InitialMigration(ctx context.Context) error
 
 	Create(ctx context.Context, org *model.Organization) (*model.Organization, error)
+	CreateMany(ctx context.Context, orgs []*model.Organization) ([]*model.Organization, error)
 	List(ctx context.Context) ([]*model.Organization, error)
-	ListAndCreateMissing(ctx context.Context, orgs []common.ExternalOrganization) ([]*model.Organization, error)
+	ListByExternalIDs(ctx context.Context, externalIDs []string) ([]*model.Organization, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*model.Organization, error)
 }
 
@@ -100,63 +100,23 @@ func (s *OrganizationStore) List(ctx context.Context) ([]*model.Organization, er
 	return orgs, nil
 }
 
-// ListAndCreateMissing lists existing orgs and creates any that are missing from the provided list
-func (s *OrganizationStore) ListAndCreateMissing(ctx context.Context, orgs []common.ExternalOrganization) ([]*model.Organization, error) {
-	if len(orgs) == 0 {
-		return []*model.Organization{}, nil
-	}
-
+func (s *OrganizationStore) ListByExternalIDs(ctx context.Context, externalIDs []string) ([]*model.Organization, error) {
 	db := s.getDB(ctx)
 
-	// Step 1: Create maps for tracking and lookup in a single pass through orgs
-	idsToFind := make(map[string]bool, len(orgs))
-	extOrgMap := make(map[string]common.ExternalOrganization, len(orgs))
-	externalIDs := make([]string, 0, len(orgs))
-
-	for _, org := range orgs {
-		idsToFind[org.ID] = true
-		extOrgMap[org.ID] = org
-		externalIDs = append(externalIDs, org.ID)
-	}
-
-	// Step 2: Find all existing organizations using a single 'IN' query.
-	var foundOrgs []*model.Organization
-	if err := db.Where("external_id IN ?", externalIDs).Find(&foundOrgs).Error; err != nil {
+	var orgs []*model.Organization
+	if err := db.Where("external_id IN (?)", externalIDs).Find(&orgs).Error; err != nil {
 		return nil, err
 	}
 
-	for _, org := range foundOrgs {
-		// This ID was found, so remove it from the map of IDs we need to create.
-		delete(idsToFind, org.ExternalID)
+	return orgs, nil
+}
+
+func (s *OrganizationStore) CreateMany(ctx context.Context, orgs []*model.Organization) ([]*model.Organization, error) {
+	db := s.getDB(ctx)
+
+	if err := db.Create(orgs).Error; err != nil {
+		return nil, err
 	}
 
-	// Step 3: Prepare and bulk-create the missing organizations.
-	var createdOrgs []*model.Organization
-	if len(idsToFind) > 0 {
-		var orgsToCreate []*model.Organization
-		for id := range idsToFind {
-			extOrg := extOrgMap[id]
-			displayName := extOrg.Name
-			if displayName == "" {
-				displayName = id // Fallback to ID if Name is empty
-			}
-
-			orgsToCreate = append(orgsToCreate, &model.Organization{
-				ID:          uuid.New(),
-				ExternalID:  id,
-				DisplayName: displayName,
-			})
-		}
-
-		// GORM's Create with a slice performs a bulk insert.
-		// It also populates the slice with primary keys and timestamps from the DB.
-		if err := db.Create(&orgsToCreate).Error; err != nil {
-			return nil, err
-		}
-		createdOrgs = orgsToCreate
-	}
-
-	// Step 4: Combine the found and newly created records and return.
-	allOrgs := append(foundOrgs, createdOrgs...)
-	return allOrgs, nil
+	return orgs, nil
 }
