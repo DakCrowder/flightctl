@@ -14,6 +14,7 @@ import (
 	"github.com/flightctl/flightctl/internal/auth/authz"
 	"github.com/flightctl/flightctl/internal/auth/common"
 	"github.com/flightctl/flightctl/internal/config"
+	"github.com/flightctl/flightctl/internal/org"
 	"github.com/flightctl/flightctl/pkg/k8sclient"
 	"github.com/sirupsen/logrus"
 )
@@ -98,11 +99,11 @@ func getTlsConfig(cfg *config.Config) *tls.Config {
 	return tlsConfig
 }
 
-func initOIDCAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.OrganizationGetter) error {
+func initOIDCAuth(cfg *config.Config, log logrus.FieldLogger, orgResolver *org.Resolver) error {
 	oidcUrl := strings.TrimSuffix(cfg.Auth.OIDC.OIDCAuthority, "/")
 	externalOidcUrl := strings.TrimSuffix(cfg.Auth.OIDC.ExternalOIDCAuthority, "/")
 	log.Infof("OIDC auth enabled: %s", oidcUrl)
-	authZ = authz.NewOIDCAuthZ(orgGetter)
+	authZ = authz.NewOIDCAuthZ(orgResolver)
 	var err error
 	authN, err = authn.NewJWTAuth(oidcUrl, externalOidcUrl, getTlsConfig(cfg))
 	if err != nil {
@@ -125,7 +126,8 @@ func initNilAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.Or
 	authN = authZ.(AuthNMiddleware)
 }
 
-func InitAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.OrganizationGetter) error {
+// TODO remove orgGetter
+func InitAuth(cfg *config.Config, log logrus.FieldLogger, orgResolver *org.Resolver, orgGetter common.OrganizationGetter) error {
 	value, exists := os.LookupEnv(DisableAuthEnvKey)
 	if exists && value != "" {
 		log.Warnln("Auth disabled")
@@ -138,7 +140,7 @@ func InitAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.Organ
 			err = initK8sAuth(cfg, log, orgGetter)
 		} else if cfg.Auth.OIDC != nil {
 			configuredAuthType = AuthTypeOIDC
-			err = initOIDCAuth(cfg, log, orgGetter)
+			err = initOIDCAuth(cfg, log, orgResolver)
 		} else if cfg.Auth.AAP != nil {
 			configuredAuthType = AuthTypeAAP
 			err = initAAPAuth(cfg, log, orgGetter)
