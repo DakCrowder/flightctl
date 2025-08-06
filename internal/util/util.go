@@ -330,3 +330,7 @@ func GetOrgIdFromContext(ctx context.Context) (uuid.UUID, bool) {
 	orgID, ok := ctx.Value(consts.OrganizationIDCtxKey).(uuid.UUID)
 	return orgID, ok
 }
+
+func IsInternalRequest(ctx context.Context) bool {
+	return ctx.Value(consts.InternalRequestCtxKey) != nil
+}
