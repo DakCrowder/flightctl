@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/auth/common"
@@ -61,7 +62,45 @@ func (h *ServiceHandler) listUserScopedOrganizations(ctx context.Context) ([]*mo
 		return nil, err
 	}
 
-	return h.store.Organization().ListAndCreateMissing(ctx, identity.Organizations)
+	externalOrgIDs := make([]string, len(identity.Organizations))
+	for i, org := range identity.Organizations {
+		externalOrgIDs[i] = org.ID
+	}
+
+	organizations, err := h.store.Organization().ListByExternalIDs(ctx, externalOrgIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO this is all quite inefficient, once other types are reconciled revist
+	newExternalOrgIDs := make([]string, 0)
+	for _, org := range organizations {
+		// if the external orgid in externalOrgIDs is not present in organizations, add it to newExternalOrgIDs
+		if !slices.Contains(externalOrgIDs, org.ExternalID) {
+			newExternalOrgIDs = append(newExternalOrgIDs, org.ExternalID)
+		}
+	}
+
+	if len(newExternalOrgIDs) > 0 {
+		newOrgs := make([]*model.Organization, len(newExternalOrgIDs))
+		for i, orgID := range newExternalOrgIDs {
+			// TODO populate name
+			id := uuid.New()
+			newOrgs[i] = &model.Organization{
+				ID:          id,
+				ExternalID:  orgID,
+				DisplayName: id.String(),
+			}
+		}
+
+		newOrgs, err = h.store.Organization().CreateMany(ctx, newOrgs)
+		if err != nil {
+			return nil, err
+		}
+		organizations = append(organizations, newOrgs...)
+	}
+
+	return organizations, nil
 }
 
 func (h *ServiceHandler) GetOrganization(ctx context.Context, orgID uuid.UUID) (*api.Organization, api.Status) {
