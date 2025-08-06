@@ -6,19 +6,23 @@ import (
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
 	"github.com/flightctl/flightctl/internal/auth/common"
+	"github.com/flightctl/flightctl/internal/store/model"
+	"github.com/flightctl/flightctl/internal/util"
 	"github.com/google/uuid"
 )
 
 var organizationApiVersion = fmt.Sprintf("%s/%s", api.APIGroup, api.OrganizationAPIVersion)
 
 func (h *ServiceHandler) ListOrganizations(ctx context.Context) (*api.OrganizationList, api.Status) {
-	// TODO Change identity to be a different format
-	identity, err := common.GetIdentity(ctx)
-	if err != nil {
-		return nil, StoreErrorToApiStatus(err, false, api.OrganizationKind, nil)
+
+	var orgs []*model.Organization
+	var err error
+	if util.IsInternalRequest(ctx) {
+		orgs, err = h.listSystemOrganizations(ctx)
+	} else {
+		orgs, err = h.listUserScopedOrganizations(ctx)
 	}
 
-	orgs, err := h.store.Organization().ListAndCreateMissing(ctx, identity.Organizations)
 	status := StoreErrorToApiStatus(err, false, api.OrganizationKind, nil)
 	if err != nil {
 		return nil, status
@@ -44,6 +48,20 @@ func (h *ServiceHandler) ListOrganizations(ctx context.Context) (*api.Organizati
 		Kind:       api.OrganizationListKind,
 		Metadata:   api.ListMeta{},
 	}, status
+}
+
+func (h *ServiceHandler) listSystemOrganizations(ctx context.Context) ([]*model.Organization, error) {
+	return h.store.Organization().List(ctx)
+}
+
+func (h *ServiceHandler) listUserScopedOrganizations(ctx context.Context) ([]*model.Organization, error) {
+	// TODO Change identity to be a different format
+	identity, err := common.GetIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return h.store.Organization().ListAndCreateMissing(ctx, identity.Organizations)
 }
 
 func (h *ServiceHandler) GetOrganization(ctx context.Context, orgID uuid.UUID) (*api.Organization, api.Status) {
