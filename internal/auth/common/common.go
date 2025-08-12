@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	api "github.com/flightctl/flightctl/api/v1alpha1"
+	"github.com/flightctl/flightctl/internal/org"
 	"github.com/flightctl/flightctl/internal/util"
 	"github.com/google/uuid"
-	"github.com/jellydator/ttlcache/v3"
 )
 
 type ctxKeyAuthHeader string
@@ -53,19 +52,12 @@ type OrganizationValidator interface {
 }
 
 type OrganizationExistsValidator struct {
-	cache     *ttlcache.Cache[uuid.UUID, bool]
-	orgGetter OrganizationGetter
+	orgResolver *org.Resolver
 }
 
-func NewOrganizationExistsValidator(orgGetter OrganizationGetter) *OrganizationExistsValidator {
-	cache := ttlcache.New[uuid.UUID, bool](
-		ttlcache.WithTTL[uuid.UUID, bool](5 * time.Minute),
-	)
-	go cache.Start()
-
+func NewOrganizationExistsValidator(orgResolver *org.Resolver) *OrganizationExistsValidator {
 	return &OrganizationExistsValidator{
-		cache:     cache,
-		orgGetter: orgGetter,
+		orgResolver: orgResolver,
 	}
 }
 
@@ -81,19 +73,14 @@ func (v *OrganizationExistsValidator) ValidateOrganization(ctx context.Context, 
 		return fmt.Errorf("no org id in context")
 	}
 
-	if item := v.cache.Get(orgID); item != nil {
-		return nil
+	exists, err := v.orgResolver.ValidateAccess(ctx, orgID)
+	if err != nil {
+		return fmt.Errorf("failed to validate organization: %w", err)
+	}
+	if !exists {
+		return fmt.Errorf("organization not found: %s", orgID)
 	}
 
-	_, status := v.orgGetter.GetOrganization(ctx, orgID)
-	if status.Code < 200 || status.Code >= 300 {
-		if status.Code == 404 {
-			return fmt.Errorf("organization not found: %s", orgID)
-		}
-		return fmt.Errorf("failed to validate organization: %s", status.Message)
-	}
-
-	v.cache.Set(orgID, true, ttlcache.DefaultTTL)
 	return nil
 }
 

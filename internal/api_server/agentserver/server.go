@@ -16,6 +16,7 @@ import (
 	"github.com/flightctl/flightctl/internal/crypto"
 	"github.com/flightctl/flightctl/internal/kvstore"
 	"github.com/flightctl/flightctl/internal/org"
+	"github.com/flightctl/flightctl/internal/org/providers"
 	"github.com/flightctl/flightctl/internal/service"
 	"github.com/flightctl/flightctl/internal/store"
 	"github.com/flightctl/flightctl/internal/tasks_client"
@@ -56,7 +57,11 @@ func New(
 	queuesProvider queues.Provider,
 	tlsConfig *tls.Config,
 ) *AgentServer {
-	resolver := org.NewResolver(st.Organization(), cacheExpirationTime)
+	resolver := org.NewResolver(org.ResolverConfig{
+		Store:            st.Organization(),
+		ExternalProvider: providers.NewJWTProvider(),
+		CacheTTL:         cacheExpirationTime,
+	})
 	return &AgentServer{
 		log:            log,
 		cfg:            cfg,

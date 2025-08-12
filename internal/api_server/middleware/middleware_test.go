@@ -15,6 +15,7 @@ import (
 	"github.com/flightctl/flightctl/internal/crypto/signer"
 	"github.com/flightctl/flightctl/internal/flterrors"
 	"github.com/flightctl/flightctl/internal/org"
+	"github.com/flightctl/flightctl/internal/org/providers"
 	"github.com/flightctl/flightctl/internal/store/model"
 	"github.com/flightctl/flightctl/internal/util"
 	"github.com/google/uuid"
@@ -185,7 +186,11 @@ func TestAddOrgIDToCtx(t *testing.T) {
 				storeMock.wantID = validID
 			}
 
-			resolver := org.NewResolver(storeMock, 5*time.Minute)
+			resolver := org.NewResolver(org.ResolverConfig{
+				Store:            storeMock,
+				ExternalProvider: providers.NewJWTProvider(),
+				CacheTTL:         5 * time.Minute,
+			})
 			mw := AddOrgIDToCtx(resolver, tc.extractor)
 
 			var (

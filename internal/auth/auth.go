@@ -63,7 +63,7 @@ func GetConfiguredAuthType() AuthType {
 
 var configuredAuthType AuthType
 
-func initK8sAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.OrganizationGetter) error {
+func initK8sAuth(cfg *config.Config, log logrus.FieldLogger, orgResolver *org.Resolver) error {
 	apiUrl := strings.TrimSuffix(cfg.Auth.K8s.ApiUrl, "/")
 	externalOpenShiftApiUrl := strings.TrimSuffix(cfg.Auth.K8s.ExternalOpenShiftApiUrl, "/")
 	log.Infof("k8s auth enabled: %s", apiUrl)
@@ -78,7 +78,7 @@ func initK8sAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.Or
 		return fmt.Errorf("failed to create k8s client: %w", err)
 	}
 	authZ = K8sToK8sAuth{
-		K8sAuthZ: authz.K8sAuthZ{K8sClient: k8sClient, Namespace: cfg.Auth.K8s.RBACNs, OrgValidator: common.NewOrganizationExistsValidator(orgGetter)},
+		K8sAuthZ: authz.K8sAuthZ{K8sClient: k8sClient, Namespace: cfg.Auth.K8s.RBACNs, OrgValidator: common.NewOrganizationExistsValidator(orgResolver)},
 	}
 	authN, err = authn.NewK8sAuthN(k8sClient, externalOpenShiftApiUrl)
 	if err != nil {
@@ -112,38 +112,37 @@ func initOIDCAuth(cfg *config.Config, log logrus.FieldLogger, orgResolver *org.R
 	return nil
 }
 
-func initAAPAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.OrganizationGetter) error {
+func initAAPAuth(cfg *config.Config, log logrus.FieldLogger, orgResolver *org.Resolver) error {
 	gatewayUrl := strings.TrimSuffix(cfg.Auth.AAP.ApiUrl, "/")
 	gatewayExternalUrl := strings.TrimSuffix(cfg.Auth.AAP.ExternalApiUrl, "/")
 	log.Infof("AAP Gateway auth enabled: %s", gatewayUrl)
-	authZ = NilAuth{orgValidator: common.NewOrganizationExistsValidator(orgGetter)}
+	authZ = NilAuth{orgValidator: common.NewOrganizationExistsValidator(orgResolver)}
 	authN = authn.NewAapGatewayAuth(gatewayUrl, gatewayExternalUrl, getTlsConfig(cfg))
 	return nil
 }
 
-func initNilAuth(cfg *config.Config, log logrus.FieldLogger, orgGetter common.OrganizationGetter) {
-	authZ = NilAuth{orgValidator: common.NewOrganizationExistsValidator(orgGetter)}
+func initNilAuth(cfg *config.Config, log logrus.FieldLogger, orgResolver *org.Resolver) {
+	authZ = NilAuth{orgValidator: common.NewOrganizationExistsValidator(orgResolver)}
 	authN = authZ.(AuthNMiddleware)
 }
 
-// TODO remove orgGetter
-func InitAuth(cfg *config.Config, log logrus.FieldLogger, orgResolver *org.Resolver, orgGetter common.OrganizationGetter) error {
+func InitAuth(cfg *config.Config, log logrus.FieldLogger, orgResolver *org.Resolver) error {
 	value, exists := os.LookupEnv(DisableAuthEnvKey)
 	if exists && value != "" {
 		log.Warnln("Auth disabled")
 		configuredAuthType = AuthTypeNil
-		initNilAuth(cfg, log, orgGetter)
+		initNilAuth(cfg, log, orgResolver)
 	} else if cfg.Auth != nil {
 		var err error
 		if cfg.Auth.K8s != nil {
 			configuredAuthType = AuthTypeK8s
-			err = initK8sAuth(cfg, log, orgGetter)
+			err = initK8sAuth(cfg, log, orgResolver)
 		} else if cfg.Auth.OIDC != nil {
 			configuredAuthType = AuthTypeOIDC
 			err = initOIDCAuth(cfg, log, orgResolver)
 		} else if cfg.Auth.AAP != nil {
 			configuredAuthType = AuthTypeAAP
-			err = initAAPAuth(cfg, log, orgGetter)
+			err = initAAPAuth(cfg, log, orgResolver)
 		}
 
 		if err != nil {

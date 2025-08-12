@@ -4,20 +4,11 @@ import (
 	"context"
 	"time"
 
+	"github.com/flightctl/flightctl/internal/org/providers"
 	"github.com/flightctl/flightctl/internal/store/model"
 	"github.com/google/uuid"
 	"github.com/jellydator/ttlcache/v3"
 )
-
-// ExternalOrgProvider fetches external organization IDs that a user has access to.
-// Different implementations can fetch from JWTs, external APIs, etc.
-type ExternalOrgProvider interface {
-	// GetUserOrgs returns external org IDs the user has access to
-	GetUserOrgs(ctx context.Context) ([]string, error)
-
-	// HasAccess checks if user has access to a specific external org
-	HasAccess(ctx context.Context, externalOrgID string) (bool, error)
-}
 
 // OrgLookup retrieves an organization by ID.
 type OrgLookup interface {
@@ -27,7 +18,7 @@ type OrgLookup interface {
 // Resolver caches organization ID validation.
 type Resolver struct {
 	store               OrgLookup
-	externalOrgProvider ExternalOrgProvider
+	externalOrgProvider providers.ExternalOrgProvider
 	internalCache       *ttlcache.Cache[uuid.UUID, *model.Organization]
 	externalCache       *ttlcache.Cache[string, *model.Organization]
 	ttl                 time.Duration
@@ -35,7 +26,7 @@ type Resolver struct {
 
 type ResolverConfig struct {
 	Store            OrgLookup
-	ExternalProvider ExternalOrgProvider
+	ExternalProvider providers.ExternalOrgProvider
 	CacheTTL         time.Duration
 }
 
