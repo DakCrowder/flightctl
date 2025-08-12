@@ -15,7 +15,6 @@ import (
 var organizationApiVersion = fmt.Sprintf("%s/%s", api.APIGroup, api.OrganizationAPIVersion)
 
 func (h *ServiceHandler) ListOrganizations(ctx context.Context) (*api.OrganizationList, api.Status) {
-
 	var orgs []*model.Organization
 	var err error
 	if util.IsInternalRequest(ctx) {
