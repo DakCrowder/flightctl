@@ -28,7 +28,7 @@ const (
 type AuthNMiddleware interface {
 	GetAuthToken(r *http.Request) (string, error)
 	ValidateToken(ctx context.Context, token string) error
-	GetIdentity(ctx context.Context, token string) (*common.Identity, error)
+	GetIdentity(ctx context.Context, token string) (common.Identity, error)
 	GetAuthConfig() common.AuthConfig
 }
 

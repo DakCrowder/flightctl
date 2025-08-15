@@ -56,7 +56,7 @@ func AddEventMetadataToCtx(next http.Handler) http.Handler {
 		if auth.GetConfiguredAuthType() != auth.AuthTypeNil {
 			identity, err := common.GetIdentity(ctx)
 			if err == nil && identity != nil {
-				userName = identity.Username
+				userName = identity.GetUsername()
 			}
 		}
 		ctx = context.WithValue(ctx, consts.EventActorCtxKey, fmt.Sprintf("user:%s", userName))

@@ -31,18 +31,59 @@ type AuthOrganizationsConfig struct {
 	Enabled bool
 }
 
-type Identity struct {
-	Username string
-	UID      string
-	Groups   []string
+type Identity interface {
+	GetUsername() string
+	SetUsername(username string)
+	GetUID() string
+	SetUID(uID string)
+	GetGroups() []string
+	SetGroups(groups []string)
 }
 
-func GetIdentity(ctx context.Context) (*Identity, error) {
+type UserIdentity struct {
+	username string
+	uID      string
+	groups   []string
+}
+
+func NewUserIdentity(username string, uID string, groups []string) *UserIdentity {
+	return &UserIdentity{
+		username: username,
+		uID:      uID,
+		groups:   groups,
+	}
+}
+
+func (i *UserIdentity) GetUsername() string {
+	return i.username
+}
+
+func (i *UserIdentity) SetUsername(username string) {
+	i.username = username
+}
+
+func (i *UserIdentity) GetUID() string {
+	return i.uID
+}
+
+func (i *UserIdentity) SetUID(uID string) {
+	i.uID = uID
+}
+
+func (i *UserIdentity) GetGroups() []string {
+	return i.groups
+}
+
+func (i *UserIdentity) SetGroups(groups []string) {
+	i.groups = groups
+}
+
+func GetIdentity(ctx context.Context) (Identity, error) {
 	identityVal := ctx.Value(IdentityCtxKey)
 	if identityVal == nil {
 		return nil, fmt.Errorf("failed to get identity from context")
 	}
-	identity, ok := identityVal.(*Identity)
+	identity, ok := identityVal.(*UserIdentity)
 	if !ok {
 		return nil, fmt.Errorf("incorrect type of identity in context")
 	}

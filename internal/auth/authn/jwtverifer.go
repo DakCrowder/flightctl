@@ -27,6 +27,19 @@ type OIDCServerResponse struct {
 	JwksUri       string `json:"jwks_uri"`
 }
 
+type JWTUserIdentity struct {
+	common.UserIdentity
+	organizations map[string]bool
+}
+
+func (i *JWTUserIdentity) IsMemberOf(orgID string) bool {
+	return i.organizations[orgID]
+}
+
+func (i *JWTUserIdentity) SetOrganizations(orgs map[string]bool) {
+	i.organizations = orgs
+}
+
 func NewJWTAuth(oidcAuthority string, externalOIDCAuthority string, clientTlsConfig *tls.Config, orgConfig *common.AuthOrganizationsConfig) (JWTAuth, error) {
 	jwtAuth := JWTAuth{
 		oidcAuthority:         oidcAuthority,
@@ -58,17 +71,61 @@ func NewJWTAuth(oidcAuthority string, externalOIDCAuthority string, clientTlsCon
 }
 
 func (j JWTAuth) ValidateToken(ctx context.Context, token string) error {
-	jwkSet, err := jwk.Fetch(ctx, j.jwksUri, jwk.WithHTTPClient(j.client))
-	if err != nil {
-		return err
-	}
-	_, err = jwt.Parse([]byte(token), jwt.WithKeySet(jwkSet), jwt.WithValidate(true))
+	_, err := j.parseAndValidateToken(ctx, token)
 	return err
 }
 
-func (j JWTAuth) GetIdentity(ctx context.Context, token string) (*common.Identity, error) {
-	// TODO return filled identity information
-	return &common.Identity{}, nil
+func (j JWTAuth) parseAndValidateToken(ctx context.Context, token string) (jwt.Token, error) {
+	jwkSet, err := jwk.Fetch(ctx, j.jwksUri, jwk.WithHTTPClient(j.client))
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch JWK set: %w", err)
+	}
+
+	parsedToken, err := jwt.Parse([]byte(token), jwt.WithKeySet(jwkSet), jwt.WithValidate(true))
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse JWT token: %w", err)
+	}
+	return parsedToken, nil
+}
+
+func (j JWTAuth) GetIdentity(ctx context.Context, token string) (common.Identity, error) {
+	parsedToken, err := j.parseAndValidateToken(ctx, token)
+	if err != nil {
+		return nil, err
+	}
+
+	identity := &JWTUserIdentity{}
+
+	if sub, exists := parsedToken.Get("sub"); exists {
+		if uid, ok := sub.(string); ok {
+			identity.SetUID(uid)
+		}
+	}
+
+	if preferredUsername, exists := parsedToken.Get("preferred_username"); exists {
+		if username, ok := preferredUsername.(string); ok {
+			identity.SetUsername(username)
+		}
+	}
+
+	orgs := make(map[string]bool)
+	if orgClaim, exists := parsedToken.Get("organization"); exists {
+		if orgMap, ok := orgClaim.(map[string]interface{}); ok {
+			for orgName, orgData := range orgMap {
+				orgs[orgName] = true
+				if orgDetails, ok := orgData.(map[string]interface{}); ok {
+					if id, exists := orgDetails["id"]; exists {
+						if idStr, ok := id.(string); ok {
+							orgs[idStr] = true
+						}
+					}
+				}
+			}
+		}
+	}
+	identity.SetOrganizations(orgs)
+
+	return identity, nil
 }
 
 func (j JWTAuth) GetAuthConfig() common.AuthConfig {

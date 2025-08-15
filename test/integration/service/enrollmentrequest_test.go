@@ -235,7 +235,7 @@ var _ = Describe("EnrollmentRequest Integration Tests", func() {
 				var setupResult *api.EnrollmentRequest
 				if approveFirst {
 					By("approving the EnrollmentRequest first")
-					identity := authcommon.Identity{Username: "testuser"}
+					identity := authcommon.NewUserIdentity("testuser", "", []string{})
 					ctxApproval := context.WithValue(ctx, authcommon.IdentityCtxKey, &identity)
 
 					approval := api.EnrollmentRequestApproval{
@@ -379,7 +379,7 @@ var _ = Describe("EnrollmentRequest Integration Tests", func() {
 			erName := lo.FromPtr(er.Metadata.Name)
 
 			// Set up identity context
-			identity := authcommon.Identity{Username: "testuser"}
+			identity := authcommon.NewUserIdentity("testuser", "", []string{})
 			ctx := context.WithValue(suite.Ctx, authcommon.IdentityCtxKey, &identity)
 
 			By("creating initial EnrollmentRequest")
