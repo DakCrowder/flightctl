@@ -15,7 +15,7 @@ import (
 	"github.com/flightctl/flightctl/internal/config"
 	"github.com/flightctl/flightctl/internal/crypto"
 	"github.com/flightctl/flightctl/internal/kvstore"
-	"github.com/flightctl/flightctl/internal/org"
+	"github.com/flightctl/flightctl/internal/org/resolvers"
 	"github.com/flightctl/flightctl/internal/service"
 	"github.com/flightctl/flightctl/internal/store"
 	transport "github.com/flightctl/flightctl/internal/transport/agent"
@@ -43,7 +43,7 @@ type AgentServer struct {
 	queuesProvider queues.Provider
 	tlsConfig      *tls.Config
 	grpcServer     *AgentGrpcServer
-	orgResolver    *org.Resolver
+	orgResolver    resolvers.Resolver
 }
 
 // New returns a new instance of a flightctl server.
@@ -56,7 +56,7 @@ func New(
 	queuesProvider queues.Provider,
 	tlsConfig *tls.Config,
 ) *AgentServer {
-	resolver := org.NewResolver(st.Organization(), cacheExpirationTime)
+	resolver := resolvers.BuildResolver(cfg, st.Organization(), log)
 	return &AgentServer{
 		log:            log,
 		cfg:            cfg,
@@ -91,7 +91,7 @@ func (s *AgentServer) Run(ctx context.Context) error {
 	workerClient := worker_client.NewWorkerClient(publisher, s.log)
 
 	serviceHandler := service.WrapWithTracing(
-		service.NewServiceHandler(s.store, workerClient, kvStore, s.ca, s.log, s.cfg.Service.AgentEndpointAddress, s.cfg.Service.BaseUIUrl, s.cfg.Service.TPMCAPaths))
+		service.NewServiceHandler(s.store, workerClient, kvStore, s.ca, s.log, s.cfg.Service.AgentEndpointAddress, s.cfg.Service.BaseUIUrl, s.cfg.Service.TPMCAPaths, s.orgResolver))
 
 	httpAPIHandler, err := s.prepareHTTPHandler(serviceHandler)
 	if err != nil {

@@ -27,3 +27,8 @@ func MustParse(s string) uuid.UUID {
 	}
 	return id
 }
+
+type ExternalOrganization struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}

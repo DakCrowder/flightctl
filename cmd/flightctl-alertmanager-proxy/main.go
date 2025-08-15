@@ -26,7 +26,10 @@ import (
 	"github.com/flightctl/flightctl/internal/auth"
 	"github.com/flightctl/flightctl/internal/auth/common"
 	"github.com/flightctl/flightctl/internal/config"
+	"github.com/flightctl/flightctl/internal/consts"
 	"github.com/flightctl/flightctl/internal/crypto"
+	"github.com/flightctl/flightctl/internal/org/resolvers"
+	"github.com/flightctl/flightctl/internal/store"
 	fclog "github.com/flightctl/flightctl/pkg/log"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
@@ -106,7 +109,7 @@ func (p *AlertmanagerProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create context with token for authorization check (using proper context key)
-	ctx := context.WithValue(r.Context(), common.TokenCtxKey, token)
+	ctx := context.WithValue(r.Context(), consts.TokenCtxKey, token)
 
 	// Check if user has permission to access alerts
 	allowed, err := auth.GetAuthZ().CheckPermission(ctx, alertsResource, getAction)
@@ -196,8 +199,19 @@ func main() {
 		logger.Fatalf("failed creating TLS config: %v", err)
 	}
 
+	logger.Println("Initializing data store")
+	db, err := store.InitDB(cfg, logger)
+	if err != nil {
+		logger.Fatalf("initializing data store: %v", err)
+	}
+
+	store := store.NewStore(db, logger.WithField("pkg", "store"))
+	defer store.Close()
+
+	orgResolver := resolvers.BuildResolver(cfg, store.Organization(), logger)
+
 	// Initialize auth system
-	if err := auth.InitAuth(cfg, logger); err != nil {
+	if err := auth.InitAuth(cfg, logger, orgResolver); err != nil {
 		logger.Fatalf("Failed to initialize auth: %v", err)
 	}
 

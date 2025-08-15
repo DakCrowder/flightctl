@@ -13,7 +13,9 @@ type Organization interface {
 	InitialMigration(ctx context.Context) error
 
 	Create(ctx context.Context, org *model.Organization) (*model.Organization, error)
+	CreateMany(ctx context.Context, orgs []*model.Organization) ([]*model.Organization, error)
 	List(ctx context.Context) ([]*model.Organization, error)
+	ListByExternalIDs(ctx context.Context, externalIDs []string) ([]*model.Organization, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*model.Organization, error)
 }
 
@@ -72,6 +74,16 @@ func (s *OrganizationStore) Create(ctx context.Context, org *model.Organization)
 	return org, nil
 }
 
+func (s *OrganizationStore) CreateMany(ctx context.Context, orgs []*model.Organization) ([]*model.Organization, error) {
+	db := s.getDB(ctx)
+
+	if err := db.Create(orgs).Error; err != nil {
+		return nil, err
+	}
+
+	return orgs, nil
+}
+
 func (s *OrganizationStore) GetByID(ctx context.Context, id uuid.UUID) (*model.Organization, error) {
 	db := s.getDB(ctx)
 
@@ -92,6 +104,17 @@ func (s *OrganizationStore) List(ctx context.Context) ([]*model.Organization, er
 
 	var orgs []*model.Organization
 	if err := db.Find(&orgs).Error; err != nil {
+		return nil, err
+	}
+
+	return orgs, nil
+}
+
+func (s *OrganizationStore) ListByExternalIDs(ctx context.Context, externalIDs []string) ([]*model.Organization, error) {
+	db := s.getDB(ctx)
+
+	var orgs []*model.Organization
+	if err := db.Where("external_id IN (?)", externalIDs).Find(&orgs).Error; err != nil {
 		return nil, err
 	}
 
