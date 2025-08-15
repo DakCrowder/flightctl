@@ -27,6 +27,8 @@ import (
 	"github.com/flightctl/flightctl/internal/auth/common"
 	"github.com/flightctl/flightctl/internal/config"
 	"github.com/flightctl/flightctl/internal/crypto"
+	"github.com/flightctl/flightctl/internal/org"
+	"github.com/flightctl/flightctl/internal/store"
 	fclog "github.com/flightctl/flightctl/pkg/log"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
@@ -196,8 +198,19 @@ func main() {
 		logger.Fatalf("failed creating TLS config: %v", err)
 	}
 
+	logger.Println("Initializing data store")
+	db, err := store.InitDB(cfg, logger)
+	if err != nil {
+		logger.Fatalf("initializing data store: %v", err)
+	}
+
+	store := store.NewStore(db, logger.WithField("pkg", "store"))
+	defer store.Close()
+
+	orgResolver := org.NewResolver(store.Organization(), 5*time.Minute)
+
 	// Initialize auth system
-	if err := auth.InitAuth(cfg, logger); err != nil {
+	if err := auth.InitAuth(cfg, logger, orgResolver); err != nil {
 		logger.Fatalf("Failed to initialize auth: %v", err)
 	}
 

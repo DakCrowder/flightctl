@@ -83,7 +83,7 @@ func GetIdentity(ctx context.Context) (Identity, error) {
 	if identityVal == nil {
 		return nil, fmt.Errorf("failed to get identity from context")
 	}
-	identity, ok := identityVal.(*UserIdentity)
+	identity, ok := identityVal.(Identity)
 	if !ok {
 		return nil, fmt.Errorf("incorrect type of identity in context")
 	}

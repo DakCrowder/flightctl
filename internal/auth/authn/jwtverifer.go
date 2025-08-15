@@ -113,6 +113,15 @@ func (j JWTAuth) GetIdentity(ctx context.Context, token string) (common.Identity
 		}
 	}
 
+	// TODO nail down org format in struct?
+	// "organization": {
+	// 	"pinkcorp": {
+	// 	  "id": "a6e97659-16a5-4b18-9d90-7fe88a744e2a"
+	// 	},
+	// 	"orangecorp": {
+	// 	  "id": "7ca05aab-652c-46a4-aef5-1093e573865c"
+	// 	}
+	//   },
 	orgs := make(map[string]bool)
 	if orgClaim, exists := parsedToken.Get("organization"); exists {
 		if orgMap, ok := orgClaim.(map[string]interface{}); ok {

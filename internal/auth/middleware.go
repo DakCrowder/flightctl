@@ -110,7 +110,7 @@ func CreateAuthZMiddleware(log logrus.FieldLogger) func(http.Handler) http.Handl
 				return
 			}
 
-			if !isAllowed(r.Context(), resource, action, w) {
+			if !isAllowed(r.Context(), log, resource, action, w) {
 				// http.Error was called in isAllowed
 				return
 			}
@@ -122,10 +122,11 @@ func CreateAuthZMiddleware(log logrus.FieldLogger) func(http.Handler) http.Handl
 	}
 }
 
-func isAllowed(ctx context.Context, resource string, action action, w http.ResponseWriter) bool {
+func isAllowed(ctx context.Context, log logrus.FieldLogger, resource string, action action, w http.ResponseWriter) bool {
 	// Perform permission check
 	allowed, err := GetAuthZ().CheckPermission(ctx, resource, string(action))
 	if err != nil {
+		log.WithError(err).Error("failed to check permission")
 		http.Error(w, errAuthorizationServerUnavailable, http.StatusServiceUnavailable)
 		return false
 	}
