@@ -27,6 +27,11 @@ type OIDCServerResponse struct {
 	JwksUri       string `json:"jwks_uri"`
 }
 
+type JWTIdentity interface {
+	common.Identity
+	IsMemberOf(orgID string) bool
+}
+
 type JWTUserIdentity struct {
 	common.UserIdentity
 	organizations map[string]bool
