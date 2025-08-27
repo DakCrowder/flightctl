@@ -28,6 +28,8 @@ import (
 	"github.com/flightctl/flightctl/internal/config"
 	"github.com/flightctl/flightctl/internal/consts"
 	"github.com/flightctl/flightctl/internal/crypto"
+	"github.com/flightctl/flightctl/internal/org/resolvers"
+	"github.com/flightctl/flightctl/internal/store"
 	fclog "github.com/flightctl/flightctl/pkg/log"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
@@ -108,6 +110,15 @@ func (p *AlertmanagerProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Create context with token for authorization check (using proper context key)
 	ctx := context.WithValue(r.Context(), consts.TokenCtxKey, token)
+
+	identity, err := auth.GetAuthN().GetIdentity(r.Context(), token)
+	if err != nil {
+		p.log.WithError(err).Error("failed to get identity")
+	} else {
+		ctx = context.WithValue(ctx, consts.IdentityCtxKey, identity)
+	}
+
+	// TODO set org id in context from params
 
 	// Check if user has permission to access alerts
 	allowed, err := auth.GetAuthZ().CheckPermission(ctx, alertsResource, getAction)
@@ -197,8 +208,22 @@ func main() {
 		logger.Fatalf("failed creating TLS config: %v", err)
 	}
 
+	// Create context to later handle graceful shutdown
+	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
+	defer cancel()
+
+	logger.Println("Initializing data store")
+	db, err := store.InitDB(cfg, logger)
+	if err != nil {
+		logger.Fatalf("initializing data store: %v", err)
+	}
+
+	store := store.NewStore(db, logger.WithField("pkg", "store"))
+	defer store.Close()
+	orgResolver := resolvers.BuildResolver(ctx, cfg, store.Organization(), logger)
+
 	// Initialize auth system
-	if err := auth.InitAuth(cfg, logger, nil); err != nil {
+	if err := auth.InitAuth(cfg, logger, orgResolver); err != nil {
 		logger.Fatalf("Failed to initialize auth: %v", err)
 	}
 
@@ -262,10 +287,6 @@ func main() {
 	if err != nil {
 		logger.Fatalf("creating TLS listener: %v", err)
 	}
-
-	// Handle graceful shutdown
-	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
-	defer cancel()
 
 	go func() {
 		<-ctx.Done()

@@ -52,6 +52,16 @@ spec:
             - name: FLIGHTCTL_DISABLE_AUTH
               value: "true"
             {{- end }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: flightctl-db-app-secret
+                  key: userPassword
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: flightctl-db-app-secret
+                  key: user
           volumeMounts:
             - mountPath: /app/certs
               name: flightctl-alertmanager-proxy-certs

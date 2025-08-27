@@ -7,6 +7,11 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   config.yaml: |-
+    database:
+      hostname: flightctl-db.{{ default .Release.Namespace .Values.global.internalNamespace }}.svc.cluster.local
+      type: pgsql
+      port: 5432
+      name: {{ (default "flightctl" $.Values.db.name) }}
     service:
       certStore: "/app/certs"
       {{ if and .Values.api.rateLimit (not (empty .Values.api.rateLimit)) }}
