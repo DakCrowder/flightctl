@@ -38,19 +38,23 @@ type AAPGatewayClient struct {
 	maxPageSize *int
 }
 
-func NewAAPGatewayClient(gatewayUrl string, clientTlsConfig *tls.Config) *AAPGatewayClient {
+type AAPGatewayClientOptions struct {
+	GatewayUrl      string
+	ClientTlsConfig *tls.Config
+	MaxPageSize     *int
+}
+
+func NewAAPGatewayClient(options AAPGatewayClientOptions) *AAPGatewayClient {
 	client := &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig: clientTlsConfig,
+			TLSClientConfig: options.ClientTlsConfig,
 		},
 	}
 
-	maxPageSize := 1
-
 	return &AAPGatewayClient{
 		client:      client,
-		gatewayUrl:  gatewayUrl,
-		maxPageSize: &maxPageSize,
+		gatewayUrl:  options.GatewayUrl,
+		maxPageSize: options.MaxPageSize,
 	}
 }
 
@@ -60,6 +64,9 @@ func (a *AAPGatewayClient) buildURL(path string) string {
 
 // TODO parameterized results type
 func (a *AAPGatewayClient) getWithPagination(ctx context.Context, path string, token string) ([]AAPOrganization, error) {
+	// TODO remove debugging logs
+	fmt.Printf("getting with pagination: %s\n", path)
+
 	url := a.buildURL(path)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -103,7 +110,12 @@ func (a *AAPGatewayClient) getWithPagination(ctx context.Context, path string, t
 
 // GET /api/gateway/v1/users/{user_id}/organizations
 func (a *AAPGatewayClient) GetUserOrganizations(ctx context.Context, userID string) ([]AAPOrganization, error) {
-	url := fmt.Sprintf("/api/gateway/v1/users/%s/organizations?page_size=1", userID)
+	var path string
+	if a.maxPageSize != nil {
+		path = fmt.Sprintf("/api/gateway/v1/users/%s/organizations?page_size=%d", userID, *a.maxPageSize)
+	} else {
+		path = fmt.Sprintf("/api/gateway/v1/users/%s/organizations", userID)
+	}
 
-	return a.getWithPagination(ctx, url, ctx.Value(consts.TokenCtxKey).(string))
+	return a.getWithPagination(ctx, path, ctx.Value(consts.TokenCtxKey).(string))
 }

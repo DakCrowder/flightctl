@@ -15,8 +15,11 @@ func main() {
 	token := "9rVtDCufPf4Q1GEMVUqq2coeCgptXw"
 	ctx := context.WithValue(context.Background(), consts.TokenCtxKey, token)
 
-	aapClient := aap_client.NewAAPGatewayClient(gatewayUrl, &tls.Config{
-		InsecureSkipVerify: true,
+	aapClient := aap_client.NewAAPGatewayClient(aap_client.AAPGatewayClientOptions{
+		GatewayUrl: gatewayUrl,
+		ClientTlsConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
 	})
 	organizations, err := aapClient.GetUserOrganizations(ctx, "3")
 	if err != nil {
