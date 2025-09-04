@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -45,14 +46,20 @@ type AAPGatewayClient struct {
 
 type AAPGatewayClientOptions struct {
 	GatewayUrl      string
-	ClientTlsConfig *tls.Config
+	TLSClientConfig *tls.Config
 	MaxPageSize     *int
 }
 
-func NewAAPGatewayClient(options AAPGatewayClientOptions) *AAPGatewayClient {
+func NewAAPGatewayClient(options AAPGatewayClientOptions) (*AAPGatewayClient, error) {
+	if options.GatewayUrl == "" {
+		return nil, errors.New("aap_client: GatewayUrl is required")
+	}
+	if options.TLSClientConfig == nil {
+		return nil, errors.New("aap_client: TLSClientConfig is required")
+	}
 	client := &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig: options.ClientTlsConfig,
+			TLSClientConfig: options.TLSClientConfig,
 		},
 	}
 
@@ -60,7 +67,7 @@ func NewAAPGatewayClient(options AAPGatewayClientOptions) *AAPGatewayClient {
 		client:      client,
 		gatewayUrl:  options.GatewayUrl,
 		maxPageSize: options.MaxPageSize,
-	}
+	}, nil
 }
 
 func (a *AAPGatewayClient) buildURL(path string) string {
@@ -121,20 +128,17 @@ func (a *AAPGatewayClient) appendQueryParams(path string) string {
 // GET api/gateway/v1/organizations
 func (a *AAPGatewayClient) GetOrganizations(ctx context.Context) ([]AAPOrganization, error) {
 	path := a.appendQueryParams("/api/gateway/v1/organizations")
-
 	return getWithPagination[AAPOrganization](ctx, a, path, ctx.Value(consts.TokenCtxKey).(string))
 }
 
 // GET /api/gateway/v1/users/{user_id}/organizations
 func (a *AAPGatewayClient) GetUserOrganizations(ctx context.Context, userID string) ([]AAPOrganization, error) {
 	path := a.appendQueryParams(fmt.Sprintf("/api/gateway/v1/users/%s/organizations", userID))
-
 	return getWithPagination[AAPOrganization](ctx, a, path, ctx.Value(consts.TokenCtxKey).(string))
 }
 
 // GET /api/gateway/v1/users/{user_id}/teams
 func (a *AAPGatewayClient) GetUserTeams(ctx context.Context, userID string) ([]AAPTeam, error) {
 	path := a.appendQueryParams(fmt.Sprintf("/api/gateway/v1/users/%s/teams", userID))
-
 	return getWithPagination[AAPTeam](ctx, a, path, ctx.Value(consts.TokenCtxKey).(string))
 }

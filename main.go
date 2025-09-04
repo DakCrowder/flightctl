@@ -15,12 +15,17 @@ func main() {
 	token := "9rVtDCufPf4Q1GEMVUqq2coeCgptXw"
 	ctx := context.WithValue(context.Background(), consts.TokenCtxKey, token)
 
-	aapClient := aap_client.NewAAPGatewayClient(aap_client.AAPGatewayClientOptions{
+	aapClient, err := aap_client.NewAAPGatewayClient(aap_client.AAPGatewayClientOptions{
 		GatewayUrl: gatewayUrl,
-		ClientTlsConfig: &tls.Config{
+		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
 		},
 	})
+	if err != nil {
+		fmt.Printf("err: %s", err)
+		return
+	}
+
 	organizations, err := aapClient.GetUserOrganizations(ctx, "3")
 	if err != nil {
 		fmt.Printf("err: %s", err)
