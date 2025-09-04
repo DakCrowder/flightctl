@@ -13,16 +13,11 @@ import (
 )
 
 // AAP Gateway API response types
-type AAPPaginatedResponse struct {
-	Count    int           `json:"count"`
-	Next     *string       `json:"next"`
-	Previous *string       `json:"previous"`
-	Results  []interface{} `json:"results"`
-}
-
-type PaginatedResponse[T any] interface {
-	GetResults() []T
-	GetNext() *string
+type AAPPaginatedResponse[T any] struct {
+	Count    int     `json:"count"`
+	Next     *string `json:"next"`
+	Previous *string `json:"previous"`
+	Results  []T     `json:"results"`
 }
 
 type AAPTeamSummaryFields struct {
@@ -34,40 +29,14 @@ type AAPTeam struct {
 	SummaryFields AAPTeamSummaryFields `json:"summary_fields"`
 }
 
-func (r AAPTeamsResponse) GetResults() []AAPTeam {
-	return r.Results
-}
-
-func (r AAPTeamsResponse) GetNext() *string {
-	return r.Next
-}
-
 type AAPOrganization struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
 
-type AAPOrganizationsResponse struct {
-	Count    int               `json:"count"`
-	Next     *string           `json:"next"`
-	Previous *string           `json:"previous"`
-	Results  []AAPOrganization `json:"results"`
-}
+type AAPOrganizationsResponse = AAPPaginatedResponse[AAPOrganization]
 
-type AAPTeamsResponse struct {
-	Count    int       `json:"count"`
-	Next     *string   `json:"next"`
-	Previous *string   `json:"previous"`
-	Results  []AAPTeam `json:"results"`
-}
-
-func (r AAPOrganizationsResponse) GetResults() []AAPOrganization {
-	return r.Results
-}
-
-func (r AAPOrganizationsResponse) GetNext() *string {
-	return r.Next
-}
+type AAPTeamsResponse = AAPPaginatedResponse[AAPTeam]
 
 type AAPGatewayClient struct {
 	gatewayUrl  string
@@ -99,7 +68,7 @@ func (a *AAPGatewayClient) buildURL(path string) string {
 	return fmt.Sprintf("%s%s", a.gatewayUrl, path)
 }
 
-func getWithPagination[T any, R PaginatedResponse[T]](ctx context.Context, a *AAPGatewayClient, path string, token string, responseFactory func() R) ([]T, error) {
+func getWithPagination[T any](ctx context.Context, a *AAPGatewayClient, path string, token string) ([]T, error) {
 	// TODO remove debugging logs
 	fmt.Printf("getting with pagination: %s\n", path)
 
@@ -125,15 +94,15 @@ func getWithPagination[T any, R PaginatedResponse[T]](ctx context.Context, a *AA
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
-	result := responseFactory()
+	var result AAPPaginatedResponse[T]
 	if err := json.Unmarshal(body, &result); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response body: %w", err)
 	}
 
-	items := result.GetResults()
+	items := result.Results
 
-	if result.GetNext() != nil {
-		nextResult, err := getWithPagination(ctx, a, *result.GetNext(), token, responseFactory)
+	if result.Next != nil {
+		nextResult, err := getWithPagination[T](ctx, a, *result.Next, token)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get next page: %w", err)
 		}
@@ -152,9 +121,7 @@ func (a *AAPGatewayClient) GetUserOrganizations(ctx context.Context, userID stri
 		path = fmt.Sprintf("/api/gateway/v1/users/%s/organizations", userID)
 	}
 
-	return getWithPagination(ctx, a, path, ctx.Value(consts.TokenCtxKey).(string), func() AAPOrganizationsResponse {
-		return AAPOrganizationsResponse{}
-	})
+	return getWithPagination[AAPOrganization](ctx, a, path, ctx.Value(consts.TokenCtxKey).(string))
 }
 
 // GET /api/gateway/v1/users/{user_id}/teams
@@ -166,7 +133,5 @@ func (a *AAPGatewayClient) GetUserTeams(ctx context.Context, userID string) ([]A
 		path = fmt.Sprintf("/api/gateway/v1/users/%s/teams", userID)
 	}
 
-	return getWithPagination(ctx, a, path, ctx.Value(consts.TokenCtxKey).(string), func() AAPTeamsResponse {
-		return AAPTeamsResponse{}
-	})
+	return getWithPagination[AAPTeam](ctx, a, path, ctx.Value(consts.TokenCtxKey).(string))
 }
