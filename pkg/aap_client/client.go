@@ -20,6 +20,28 @@ type AAPPaginatedResponse struct {
 	Results  []interface{} `json:"results"`
 }
 
+type PaginatedResponse[T any] interface {
+	GetResults() []T
+	GetNext() *string
+}
+
+type AAPTeamSummaryFields struct {
+	Organization AAPOrganization `json:"organization"`
+}
+
+type AAPTeam struct {
+	ID            int                  `json:"id"`
+	SummaryFields AAPTeamSummaryFields `json:"summary_fields"`
+}
+
+func (r AAPTeamsResponse) GetResults() []AAPTeam {
+	return r.Results
+}
+
+func (r AAPTeamsResponse) GetNext() *string {
+	return r.Next
+}
+
 type AAPOrganization struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
@@ -30,6 +52,21 @@ type AAPOrganizationsResponse struct {
 	Next     *string           `json:"next"`
 	Previous *string           `json:"previous"`
 	Results  []AAPOrganization `json:"results"`
+}
+
+type AAPTeamsResponse struct {
+	Count    int       `json:"count"`
+	Next     *string   `json:"next"`
+	Previous *string   `json:"previous"`
+	Results  []AAPTeam `json:"results"`
+}
+
+func (r AAPOrganizationsResponse) GetResults() []AAPOrganization {
+	return r.Results
+}
+
+func (r AAPOrganizationsResponse) GetNext() *string {
+	return r.Next
 }
 
 type AAPGatewayClient struct {
@@ -62,8 +99,7 @@ func (a *AAPGatewayClient) buildURL(path string) string {
 	return fmt.Sprintf("%s%s", a.gatewayUrl, path)
 }
 
-// TODO parameterized results type
-func (a *AAPGatewayClient) getWithPagination(ctx context.Context, path string, token string) ([]AAPOrganization, error) {
+func getWithPagination[T any, R PaginatedResponse[T]](ctx context.Context, a *AAPGatewayClient, path string, token string, responseFactory func() R) ([]T, error) {
 	// TODO remove debugging logs
 	fmt.Printf("getting with pagination: %s\n", path)
 
@@ -89,16 +125,15 @@ func (a *AAPGatewayClient) getWithPagination(ctx context.Context, path string, t
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
-	result := AAPOrganizationsResponse{}
-	items := []AAPOrganization{}
+	result := responseFactory()
 	if err := json.Unmarshal(body, &result); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response body: %w", err)
 	}
 
-	items = append(items, result.Results...)
+	items := result.GetResults()
 
-	if result.Next != nil {
-		nextResult, err := a.getWithPagination(ctx, *result.Next, token)
+	if result.GetNext() != nil {
+		nextResult, err := getWithPagination(ctx, a, *result.GetNext(), token, responseFactory)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get next page: %w", err)
 		}
@@ -117,5 +152,21 @@ func (a *AAPGatewayClient) GetUserOrganizations(ctx context.Context, userID stri
 		path = fmt.Sprintf("/api/gateway/v1/users/%s/organizations", userID)
 	}
 
-	return a.getWithPagination(ctx, path, ctx.Value(consts.TokenCtxKey).(string))
+	return getWithPagination(ctx, a, path, ctx.Value(consts.TokenCtxKey).(string), func() AAPOrganizationsResponse {
+		return AAPOrganizationsResponse{}
+	})
+}
+
+// GET /api/gateway/v1/users/{user_id}/teams
+func (a *AAPGatewayClient) GetUserTeams(ctx context.Context, userID string) ([]AAPTeam, error) {
+	var path string
+	if a.maxPageSize != nil {
+		path = fmt.Sprintf("/api/gateway/v1/users/%s/teams?page_size=%d", userID, *a.maxPageSize)
+	} else {
+		path = fmt.Sprintf("/api/gateway/v1/users/%s/teams", userID)
+	}
+
+	return getWithPagination(ctx, a, path, ctx.Value(consts.TokenCtxKey).(string), func() AAPTeamsResponse {
+		return AAPTeamsResponse{}
+	})
 }
