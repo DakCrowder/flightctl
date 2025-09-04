@@ -31,6 +31,30 @@ type AapGatewayAuth struct {
 	cache              *ttlcache.Cache[string, *AAPUser]
 }
 
+type AAPRoleIdentity interface {
+	common.Identity
+	IsSuperuser() bool
+	IsPlatformAuditor() bool
+}
+
+// AAPGatewayIdentity extends common.Identity with AAP-specific fields
+type AAPGatewayIdentity struct {
+	common.BaseIdentity
+	isSuperuser       bool
+	isPlatformAuditor bool
+}
+
+// Ensure AAPGatewayIdentity implements AAPRoleIdentity
+var _ AAPRoleIdentity = (*AAPGatewayIdentity)(nil)
+
+func (i *AAPGatewayIdentity) IsSuperuser() bool {
+	return i.isSuperuser
+}
+
+func (i *AAPGatewayIdentity) IsPlatformAuditor() bool {
+	return i.isPlatformAuditor
+}
+
 func NewAapGatewayAuth(gatewayUrl string, externalGatewayUrl string, clientTlsConfig *tls.Config) AapGatewayAuth {
 	authN := AapGatewayAuth{
 		gatewayUrl:         gatewayUrl,
