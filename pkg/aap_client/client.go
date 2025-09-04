@@ -33,8 +33,9 @@ type AAPOrganizationsResponse struct {
 }
 
 type AAPGatewayClient struct {
-	gatewayUrl string
-	client     *http.Client
+	gatewayUrl  string
+	client      *http.Client
+	maxPageSize *int
 }
 
 func NewAAPGatewayClient(gatewayUrl string, clientTlsConfig *tls.Config) *AAPGatewayClient {
@@ -44,45 +45,65 @@ func NewAAPGatewayClient(gatewayUrl string, clientTlsConfig *tls.Config) *AAPGat
 		},
 	}
 
+	maxPageSize := 1
+
 	return &AAPGatewayClient{
-		client:     client,
-		gatewayUrl: gatewayUrl,
+		client:      client,
+		gatewayUrl:  gatewayUrl,
+		maxPageSize: &maxPageSize,
 	}
 }
 
-// GET /api/gateway/v1/users/{user_id}/organizations
-func (a *AAPGatewayClient) GetUserOrganizations(ctx context.Context, userID string) ([]AAPOrganization, error) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/api/gateway/v1/users/%s/organizations", a.gatewayUrl, userID), nil)
+func (a *AAPGatewayClient) buildURL(path string) string {
+	return fmt.Sprintf("%s%s", a.gatewayUrl, path)
+}
+
+// TODO parameterized results type
+func (a *AAPGatewayClient) getWithPagination(ctx context.Context, path string, token string) ([]AAPOrganization, error) {
+	url := a.buildURL(path)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return []AAPOrganization{}, fmt.Errorf("failed to create request: %w", err)
+		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
-	token := ctx.Value(consts.TokenCtxKey)
-	if token == nil {
-		return []AAPOrganization{}, fmt.Errorf("failed to get token from context")
-	}
 	req.Header.Add(common.AuthHeader, fmt.Sprintf("Bearer %s", token))
-
 	resp, err := a.client.Do(req)
 	if err != nil {
-		return []AAPOrganization{}, fmt.Errorf("failed to send request: %w", err)
+		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return []AAPOrganization{}, fmt.Errorf("unexpected status code: %v", resp.StatusCode)
+		return nil, fmt.Errorf("unexpected status code: %v", resp.StatusCode)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return []AAPOrganization{}, fmt.Errorf("failed to read response body: %w", err)
+		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
-	organizations := AAPOrganizationsResponse{}
-	if err := json.Unmarshal(body, &organizations); err != nil {
-		return []AAPOrganization{}, fmt.Errorf("failed to unmarshal response body: %w", err)
+	result := AAPOrganizationsResponse{}
+	items := []AAPOrganization{}
+	if err := json.Unmarshal(body, &result); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal response body: %w", err)
 	}
 
-	// For now ignore pagination and just return results
-	return organizations.Results, nil
+	items = append(items, result.Results...)
+
+	if result.Next != nil {
+		nextResult, err := a.getWithPagination(ctx, *result.Next, token)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get next page: %w", err)
+		}
+		items = append(items, nextResult...)
+	}
+
+	return items, nil
+}
+
+// GET /api/gateway/v1/users/{user_id}/organizations
+func (a *AAPGatewayClient) GetUserOrganizations(ctx context.Context, userID string) ([]AAPOrganization, error) {
+	url := fmt.Sprintf("/api/gateway/v1/users/%s/organizations?page_size=1", userID)
+
+	return a.getWithPagination(ctx, url, ctx.Value(consts.TokenCtxKey).(string))
 }
