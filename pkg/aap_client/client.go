@@ -35,7 +35,6 @@ type AAPOrganization struct {
 }
 
 type AAPOrganizationsResponse = AAPPaginatedResponse[AAPOrganization]
-
 type AAPTeamsResponse = AAPPaginatedResponse[AAPTeam]
 
 type AAPGatewayClient struct {
@@ -112,26 +111,30 @@ func getWithPagination[T any](ctx context.Context, a *AAPGatewayClient, path str
 	return items, nil
 }
 
+func (a *AAPGatewayClient) appendQueryParams(path string) string {
+	if a.maxPageSize != nil {
+		return fmt.Sprintf("%s?page_size=%d", path, *a.maxPageSize)
+	}
+	return path
+}
+
+// GET api/gateway/v1/organizations
+func (a *AAPGatewayClient) GetOrganizations(ctx context.Context) ([]AAPOrganization, error) {
+	path := a.appendQueryParams("/api/gateway/v1/organizations")
+
+	return getWithPagination[AAPOrganization](ctx, a, path, ctx.Value(consts.TokenCtxKey).(string))
+}
+
 // GET /api/gateway/v1/users/{user_id}/organizations
 func (a *AAPGatewayClient) GetUserOrganizations(ctx context.Context, userID string) ([]AAPOrganization, error) {
-	var path string
-	if a.maxPageSize != nil {
-		path = fmt.Sprintf("/api/gateway/v1/users/%s/organizations?page_size=%d", userID, *a.maxPageSize)
-	} else {
-		path = fmt.Sprintf("/api/gateway/v1/users/%s/organizations", userID)
-	}
+	path := a.appendQueryParams(fmt.Sprintf("/api/gateway/v1/users/%s/organizations", userID))
 
 	return getWithPagination[AAPOrganization](ctx, a, path, ctx.Value(consts.TokenCtxKey).(string))
 }
 
 // GET /api/gateway/v1/users/{user_id}/teams
 func (a *AAPGatewayClient) GetUserTeams(ctx context.Context, userID string) ([]AAPTeam, error) {
-	var path string
-	if a.maxPageSize != nil {
-		path = fmt.Sprintf("/api/gateway/v1/users/%s/teams?page_size=%d", userID, *a.maxPageSize)
-	} else {
-		path = fmt.Sprintf("/api/gateway/v1/users/%s/teams", userID)
-	}
+	path := a.appendQueryParams(fmt.Sprintf("/api/gateway/v1/users/%s/teams", userID))
 
 	return getWithPagination[AAPTeam](ctx, a, path, ctx.Value(consts.TokenCtxKey).(string))
 }

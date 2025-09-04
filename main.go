@@ -34,4 +34,13 @@ func main() {
 		return
 	}
 	fmt.Println(teams)
+
+	fmt.Println("--------------------------------")
+
+	organizations, err = aapClient.GetOrganizations(ctx)
+	if err != nil {
+		fmt.Printf("err: %s", err)
+		return
+	}
+	fmt.Println(organizations)
 }
