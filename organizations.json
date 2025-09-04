@@ -1,0 +1,89 @@
+{
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "url": "/api/gateway/v1/organizations/1/",
+            "related": {
+                "activity_stream": "/api/gateway/v1/activitystream/?content_type=3&object_id=1",
+                "created_by": "/api/gateway/v1/users/1/",
+                "modified_by": "/api/gateway/v1/users/1/",
+                "teams": "/api/gateway/v1/organizations/1/teams/",
+                "users": "/api/gateway/v1/organizations/1/users/",
+                "admins": "/api/gateway/v1/organizations/1/admins/"
+            },
+            "summary_fields": {
+                "modified_by": {
+                    "id": 1,
+                    "username": "_system",
+                    "first_name": "",
+                    "last_name": ""
+                },
+                "created_by": {
+                    "id": 1,
+                    "username": "_system",
+                    "first_name": "",
+                    "last_name": ""
+                },
+                "resource": {
+                    "ansible_id": "3f82842e-ddbf-49b4-a305-8b1c50c55ecf",
+                    "resource_type": "shared.organization"
+                },
+                "related_field_counts": {
+                    "teams": 1,
+                    "users": 1
+                }
+            },
+            "created": "2025-04-17T09:09:52.136086Z",
+            "created_by": 1,
+            "modified": "2025-04-17T09:09:52.136069Z",
+            "modified_by": 1,
+            "name": "Default",
+            "description": "The default organization for Ansible Automation Platform",
+            "managed": true
+        },
+        {
+            "id": 2,
+            "url": "/api/gateway/v1/organizations/2/",
+            "related": {
+                "activity_stream": "/api/gateway/v1/activitystream/?content_type=3&object_id=2",
+                "created_by": "/api/gateway/v1/users/2/",
+                "modified_by": "/api/gateway/v1/users/2/",
+                "teams": "/api/gateway/v1/organizations/2/teams/",
+                "users": "/api/gateway/v1/organizations/2/users/",
+                "admins": "/api/gateway/v1/organizations/2/admins/"
+            },
+            "summary_fields": {
+                "modified_by": {
+                    "id": 2,
+                    "username": "admin",
+                    "first_name": "",
+                    "last_name": ""
+                },
+                "created_by": {
+                    "id": 2,
+                    "username": "admin",
+                    "first_name": "",
+                    "last_name": ""
+                },
+                "resource": {
+                    "ansible_id": "db3d0e79-72fb-4b4d-bc51-0ffa97099fdd",
+                    "resource_type": "shared.organization"
+                },
+                "related_field_counts": {
+                    "teams": 1,
+                    "users": 5
+                }
+            },
+            "created": "2025-06-04T13:16:24.868645Z",
+            "created_by": 2,
+            "modified": "2025-06-04T13:16:24.868617Z",
+            "modified_by": 2,
+            "name": "Test Organization",
+            "description": "",
+            "managed": false
+        }
+    ]
+}

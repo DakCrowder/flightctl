@@ -14,7 +14,10 @@ import (
 )
 
 type AAPUser struct {
-	Username string `json:"username,omitempty"`
+	ID                int    `json:"id,omitempty"`
+	Username          string `json:"username,omitempty"`
+	IsSuperuser       bool   `json:"is_superuser,omitempty"`
+	IsPlatformAuditor bool   `json:"is_platform_auditor,omitempty"`
 }
 
 type AAPUserInfo struct {
