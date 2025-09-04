@@ -12,7 +12,9 @@ import (
 func main() {
 	gatewayUrl := "https://192.168.122.98"
 
-	token := "9rVtDCufPf4Q1GEMVUqq2coeCgptXw"
+	// Dev tokens from a local auth provider
+	// token := "9rVtDCufPf4Q1GEMVUqq2coeCgptXw"
+	token := "S3E5Afs36v39tecnsmhFJBUAPjU44n"
 	ctx := context.WithValue(context.Background(), consts.TokenCtxKey, token)
 
 	aapClient, err := aap_client.NewAAPGatewayClient(aap_client.AAPGatewayClientOptions{
@@ -48,4 +50,11 @@ func main() {
 		return
 	}
 	fmt.Println(organizations)
+
+	organization, err := aapClient.GetOrganization(ctx, "5")
+	if err != nil {
+		fmt.Printf("err: %s", err)
+		return
+	}
+	fmt.Println(organization)
 }
