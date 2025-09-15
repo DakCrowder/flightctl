@@ -93,13 +93,17 @@ func get[T any](a *AAPGatewayClient, path string, token string) (*T, error) {
 	return &result, nil
 }
 
-func getWithPagination[T any](a *AAPGatewayClient, path string, token string) ([]T, error) {
+func getWithPagination[T any](a *AAPGatewayClient, path string, token string) ([]*T, error) {
 	result, err := get[AAPPaginatedResponse[T]](a, path, token)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get with pagination: %w", err)
 	}
 
-	items := result.Results
+	// Convert []T to []*T
+	items := make([]*T, len(result.Results))
+	for i := range result.Results {
+		items[i] = &result.Results[i]
+	}
 
 	if result.Next != nil {
 		nextResult, err := getWithPagination[T](a, *result.Next, token)
