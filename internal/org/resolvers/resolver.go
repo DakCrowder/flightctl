@@ -2,6 +2,8 @@ package resolvers
 
 import (
 	"context"
+	"crypto/tls"
+	"fmt"
 
 	"github.com/flightctl/flightctl/internal/auth/common"
 	"github.com/flightctl/flightctl/internal/config"
@@ -31,12 +33,12 @@ type BuildResolverOptions struct {
 	Cache  cache.OrganizationCache
 }
 
-func BuildResolver(opts BuildResolverOptions) Resolver {
+func BuildResolver(opts BuildResolverOptions) (Resolver, error) {
 	if opts.Config != nil && opts.Config.Auth != nil && opts.Config.Organizations != nil && opts.Config.Organizations.Enabled {
 		if opts.Config.Auth.OIDC != nil {
-			return NewExternalResolver(opts.Store, opts.Cache, &providers.ClaimsProvider{}, opts.Log)
+			return buildOIDCResolver(opts), nil
 		} else if opts.Config.Auth.AAP != nil {
-			opts.Log.Warn("AAP organizations are not supported yet, falling back to default resolver")
+			return buildAAPResolver(opts)
 		} else if opts.Config.Auth.K8s != nil {
 			opts.Log.Warn("K8s organizations are not supported yet, falling back to default resolver")
 		} else {
@@ -44,5 +46,19 @@ func BuildResolver(opts BuildResolverOptions) Resolver {
 		}
 	}
 
-	return NewDefaultResolver(opts.Store, opts.Cache)
+	return NewDefaultResolver(opts.Store, opts.Cache), nil
+}
+
+func buildOIDCResolver(opts BuildResolverOptions) Resolver {
+	return NewExternalResolver(opts.Store, opts.Cache, &providers.ClaimsProvider{}, opts.Log)
+}
+
+func buildAAPResolver(opts BuildResolverOptions) (Resolver, error) {
+	provider, err := providers.NewAAPOrganizationProvider(opts.Config.Auth.AAP.ApiUrl, &tls.Config{
+		InsecureSkipVerify: opts.Config.Auth.InsecureSkipTlsVerify,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create AAP organization provider: %w", err)
+	}
+	return NewExternalResolver(opts.Store, opts.Cache, provider, opts.Log), nil
 }

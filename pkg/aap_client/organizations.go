@@ -17,8 +17,7 @@ type AAPOrganizationsResponse = AAPPaginatedResponse[AAPOrganization]
 // GET /api/gateway/v1/organizations/{organization_id}
 func (a *AAPGatewayClient) GetOrganization(ctx context.Context, organizationID string) (*AAPOrganization, error) {
 	path := a.appendQueryParams(fmt.Sprintf("/api/gateway/v1/organizations/%s", organizationID))
-	// TODO shold we return pointers or values consistently?
-	// TODO handle error if token is not in context
+	// TODO pass token
 	result, err := get[AAPOrganization](a, path, ctx.Value(consts.TokenCtxKey).(string))
 	if err != nil {
 		return nil, err

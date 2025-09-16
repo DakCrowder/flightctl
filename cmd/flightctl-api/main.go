@@ -177,7 +177,10 @@ func main() {
 		Log:    log,
 		Cache:  orgCache,
 	}
-	orgResolver := resolvers.BuildResolver(buildResolverOpts)
+	orgResolver, err := resolvers.BuildResolver(buildResolverOpts)
+	if err != nil {
+		log.Fatalf("failed to build organization resolver: %v", err)
+	}
 
 	agentServer, err := agentserver.New(ctx, log, cfg, store, ca, agentListener, provider, agentTlsConfig, orgResolver)
 	if err != nil {

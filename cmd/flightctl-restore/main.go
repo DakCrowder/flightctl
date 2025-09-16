@@ -74,7 +74,10 @@ func main() {
 		Log:    log,
 		Cache:  orgCache,
 	}
-	orgResolver := resolvers.BuildResolver(buildResolverOpts)
+	orgResolver, err := resolvers.BuildResolver(buildResolverOpts)
+	if err != nil {
+		log.Fatalf("failed to build organization resolver: %v", err)
+	}
 	serviceHandler := service.NewServiceHandler(storeInst, nil, kvStore, nil, log, "", "", []string{}, orgResolver)
 
 	log.Println("Running post-restoration device preparation")

@@ -90,7 +90,10 @@ func main() {
 		Log:    log,
 		Cache:  orgCache,
 	}
-	orgResolver := resolvers.BuildResolver(buildResolverOpts)
+	orgResolver, err := resolvers.BuildResolver(buildResolverOpts)
+	if err != nil {
+		log.Fatalf("failed to build organization resolver: %v", err)
+	}
 	serviceHandler := service.WrapWithTracing(service.NewServiceHandler(store, workerClient, kvStore, nil, log, "", "", []string{}, orgResolver))
 
 	server := alert_exporter.New(cfg, log)

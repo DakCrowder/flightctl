@@ -80,7 +80,10 @@ func (s *Server) Run(ctx context.Context) error {
 		Log:    s.log,
 		Cache:  orgCache,
 	}
-	orgResolver := resolvers.BuildResolver(buildResolverOpts)
+	orgResolver, err := resolvers.BuildResolver(buildResolverOpts)
+	if err != nil {
+		return err
+	}
 	serviceHandler := service.WrapWithTracing(
 		service.NewServiceHandler(s.store, workerClient, kvStore, nil, s.log, "", "", []string{}, orgResolver))
 

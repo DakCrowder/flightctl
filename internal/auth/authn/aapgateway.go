@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/flightctl/flightctl/internal/auth/common"
@@ -14,6 +15,7 @@ import (
 )
 
 type AAPUser struct {
+	ID       int    `json:"id,omitempty"`
 	Username string `json:"username,omitempty"`
 }
 
@@ -51,6 +53,7 @@ func (a AapGatewayAuth) loadUserInfo(token string) (*AAPUser, error) {
 		},
 	}
 
+	// TODO use aap client
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/api/gateway/v1/me/", a.gatewayUrl), nil)
 	if err != nil {
 		return nil, err
@@ -108,5 +111,5 @@ func (a AapGatewayAuth) GetIdentity(ctx context.Context, token string) (common.I
 		return nil, fmt.Errorf("failed to get identity: %w", err)
 	}
 
-	return common.NewBaseIdentity(userInfo.Username, "", []string{}), nil
+	return common.NewBaseIdentity(userInfo.Username, strconv.Itoa(userInfo.ID), []string{}), nil
 }
