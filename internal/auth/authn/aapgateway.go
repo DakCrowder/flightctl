@@ -15,12 +15,38 @@ import (
 )
 
 type AAPUser struct {
-	ID       int    `json:"id,omitempty"`
-	Username string `json:"username,omitempty"`
+	ID                int    `json:"id,omitempty"`
+	Username          string `json:"username,omitempty"`
+	IsSuperuser       bool   `json:"is_superuser,omitempty"`
+	IsPlatformAuditor bool   `json:"is_platform_auditor,omitempty"`
 }
 
 type AAPUserInfo struct {
 	Results []AAPUser `json:"results,omitempty"`
+}
+
+type AAPGatewayUserIdentity interface {
+	common.Identity
+	IsSuperuser() bool
+	IsPlatformAuditor() bool
+}
+
+// AAPGatewayIdentity extends common.Identity with AAP-specific fields
+type AAPIdentity struct {
+	common.BaseIdentity
+	superUser       bool
+	platformAuditor bool
+}
+
+// Ensure JWTIdentity implements TokenIdentity
+var _ AAPGatewayUserIdentity = (*AAPIdentity)(nil)
+
+func (a *AAPIdentity) IsSuperuser() bool {
+	return a.superUser
+}
+
+func (a *AAPIdentity) IsPlatformAuditor() bool {
+	return a.platformAuditor
 }
 
 type AapGatewayAuth struct {
@@ -111,5 +137,11 @@ func (a AapGatewayAuth) GetIdentity(ctx context.Context, token string) (common.I
 		return nil, fmt.Errorf("failed to get identity: %w", err)
 	}
 
-	return common.NewBaseIdentity(userInfo.Username, strconv.Itoa(userInfo.ID), []string{}), nil
+	identity := &AAPIdentity{
+		BaseIdentity:    *common.NewBaseIdentity(userInfo.Username, strconv.Itoa(userInfo.ID), []string{}),
+		superUser:       userInfo.IsSuperuser,
+		platformAuditor: userInfo.IsPlatformAuditor,
+	}
+
+	return identity, nil
 }
