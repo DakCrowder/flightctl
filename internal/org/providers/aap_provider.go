@@ -74,16 +74,25 @@ func (p *AAPOrganizationProvider) IsMemberOf(ctx context.Context, identity commo
 	}
 
 	organization, err := p.client.GetOrganization(ctx, externalOrgID)
-	if err != nil {
-		if errors.Is(err, aap_client.ErrNotFound) || errors.Is(err, aap_client.ErrForbidden) {
-			return false, nil
-		}
+	if err != nil && !errors.Is(err, aap_client.ErrNotFound) && !errors.Is(err, aap_client.ErrForbidden) {
 		return false, err
 	}
 
-	if organization == nil {
-		return false, nil
+	if organization != nil {
+		return true, nil
 	}
 
-	return true, nil
+	// If we can't get the organization directly, we have to double check team-based membership
+	teams, err := p.client.GetUserTeams(ctx, userID)
+	if err != nil {
+		return false, err
+	}
+
+	for _, team := range teams {
+		if strconv.Itoa(team.SummaryFields.Organization.ID) == externalOrgID {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
