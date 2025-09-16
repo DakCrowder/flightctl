@@ -19,7 +19,7 @@ func (m *mockMembershipChecker) IsMemberOf(ctx context.Context, identity common.
 	return m.membership, m.err
 }
 
-func TestJWTAuthZ_CheckPermission(t *testing.T) {
+func TestOrgMembershipAuthZ_CheckPermission(t *testing.T) {
 	backgroundCtx := context.Background()
 
 	identity := common.NewBaseIdentity("test-username", "test-uid", []string{})
@@ -101,7 +101,7 @@ func TestJWTAuthZ_CheckPermission(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			jwtAuthZ := NewJWTAuthZ(&tt.membershipChecker)
+			jwtAuthZ := NewOrgMembershipAuthZ(&tt.membershipChecker)
 			got, err := jwtAuthZ.CheckPermission(tt.ctx, tt.resource, tt.op)
 			assert.Equal(t, tt.want, got)
 			assert.Equal(t, tt.wantErr, err != nil)
