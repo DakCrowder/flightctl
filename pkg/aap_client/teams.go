@@ -1,10 +1,7 @@
 package aap_client
 
 import (
-	"context"
 	"fmt"
-
-	"github.com/flightctl/flightctl/internal/consts"
 )
 
 type AAPTeamSummaryFields struct {
@@ -19,7 +16,7 @@ type AAPTeam struct {
 type AAPTeamsResponse = AAPPaginatedResponse[AAPTeam]
 
 // GET /api/gateway/v1/users/{user_id}/teams
-func (a *AAPGatewayClient) GetUserTeams(ctx context.Context, userID string) ([]*AAPTeam, error) {
+func (a *AAPGatewayClient) GetUserTeams(token string, userID string) ([]*AAPTeam, error) {
 	path := a.appendQueryParams(fmt.Sprintf("/api/gateway/v1/users/%s/teams", userID))
-	return getWithPagination[AAPTeam](a, path, ctx.Value(consts.TokenCtxKey).(string))
+	return getWithPagination[AAPTeam](a, path, token)
 }

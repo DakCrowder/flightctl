@@ -9,6 +9,7 @@ import (
 
 	"github.com/flightctl/flightctl/internal/auth/authn"
 	"github.com/flightctl/flightctl/internal/auth/common"
+	"github.com/flightctl/flightctl/internal/consts"
 	"github.com/flightctl/flightctl/internal/org"
 	"github.com/flightctl/flightctl/pkg/aap_client"
 )
@@ -51,7 +52,12 @@ func (p *AAPOrganizationProvider) GetUserOrganizations(ctx context.Context, iden
 }
 
 func (p *AAPOrganizationProvider) getAllOrganizations(ctx context.Context) ([]org.ExternalOrganization, error) {
-	organizations, err := p.client.GetOrganizations(ctx)
+	token, ok := ctx.Value(consts.TokenCtxKey).(string)
+	if !ok {
+		return nil, fmt.Errorf("token is required")
+	}
+
+	organizations, err := p.client.GetOrganizations(token)
 	if err != nil {
 		return nil, err
 	}
@@ -67,12 +73,17 @@ func (p *AAPOrganizationProvider) getAllOrganizations(ctx context.Context) ([]or
 }
 
 func (p *AAPOrganizationProvider) getUserScopedOrganizations(ctx context.Context, userID string) ([]org.ExternalOrganization, error) {
-	aapOrganizations, err := p.client.GetUserOrganizations(ctx, userID)
+	token, ok := ctx.Value(consts.TokenCtxKey).(string)
+	if !ok {
+		return nil, fmt.Errorf("token is required")
+	}
+
+	aapOrganizations, err := p.client.GetUserOrganizations(token, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	aapTeams, err := p.client.GetUserTeams(ctx, userID)
+	aapTeams, err := p.client.GetUserTeams(token, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +127,12 @@ func (p *AAPOrganizationProvider) IsMemberOf(ctx context.Context, identity commo
 }
 
 func (p *AAPOrganizationProvider) organizationExists(ctx context.Context, externalOrgID string) (bool, error) {
-	_, err := p.client.GetOrganization(ctx, externalOrgID)
+	token, ok := ctx.Value(consts.TokenCtxKey).(string)
+	if !ok {
+		return false, fmt.Errorf("token is required")
+	}
+
+	_, err := p.client.GetOrganization(token, externalOrgID)
 	if err != nil {
 		return false, err
 	}
@@ -125,13 +141,18 @@ func (p *AAPOrganizationProvider) organizationExists(ctx context.Context, extern
 }
 
 func (p *AAPOrganizationProvider) userHasMembership(ctx context.Context, userID string, externalOrgID string) (bool, error) {
-	_, err := p.client.GetOrganization(ctx, externalOrgID)
+	token, ok := ctx.Value(consts.TokenCtxKey).(string)
+	if !ok {
+		return false, fmt.Errorf("token is required")
+	}
+
+	_, err := p.client.GetOrganization(token, externalOrgID)
 	if err != nil && !errors.Is(err, aap_client.ErrNotFound) && !errors.Is(err, aap_client.ErrForbidden) {
 		return false, err
 	}
 
 	// If we can't get the organization directly, we have to double check team-based membership
-	teams, err := p.client.GetUserTeams(ctx, userID)
+	teams, err := p.client.GetUserTeams(token, userID)
 	if err != nil {
 		return false, err
 	}

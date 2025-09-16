@@ -16,7 +16,7 @@ type AAPPaginatedResponse[T any] struct {
 	Count    int     `json:"count"`
 	Next     *string `json:"next"`
 	Previous *string `json:"previous"`
-	Results  []T     `json:"results"`
+	Results  []*T    `json:"results"`
 }
 
 type AAPGatewayClient struct {
@@ -105,11 +105,7 @@ func getWithPagination[T any](a *AAPGatewayClient, path string, token string) ([
 		return nil, fmt.Errorf("failed to get with pagination: %w", err)
 	}
 
-	// Convert []T to []*T
-	items := make([]*T, len(result.Results))
-	for i := range result.Results {
-		items[i] = &result.Results[i]
-	}
+	items := result.Results
 
 	if result.Next != nil {
 		nextResult, err := getWithPagination[T](a, *result.Next, token)
