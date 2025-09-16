@@ -3,27 +3,15 @@ package authn
 import (
 	"context"
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/flightctl/flightctl/internal/auth/common"
+	"github.com/flightctl/flightctl/pkg/aap_client"
 	"github.com/jellydator/ttlcache/v3"
 )
-
-type AAPUser struct {
-	ID                int    `json:"id,omitempty"`
-	Username          string `json:"username,omitempty"`
-	IsSuperuser       bool   `json:"is_superuser,omitempty"`
-	IsPlatformAuditor bool   `json:"is_platform_auditor,omitempty"`
-}
-
-type AAPUserInfo struct {
-	Results []AAPUser `json:"results,omitempty"`
-}
 
 type AAPGatewayUserIdentity interface {
 	common.Identity
@@ -50,73 +38,52 @@ func (a *AAPIdentity) IsPlatformAuditor() bool {
 }
 
 type AapGatewayAuth struct {
-	gatewayUrl         string
 	externalGatewayUrl string
-	clientTlsConfig    *tls.Config
-	cache              *ttlcache.Cache[string, *AAPUser]
+	aapClient          *aap_client.AAPGatewayClient
+	cache              *ttlcache.Cache[string, *AAPIdentity]
 }
 
-func NewAapGatewayAuth(gatewayUrl string, externalGatewayUrl string, clientTlsConfig *tls.Config) AapGatewayAuth {
+func NewAapGatewayAuth(gatewayUrl string, externalGatewayUrl string, clientTlsConfig *tls.Config) (*AapGatewayAuth, error) {
+	aapClient, err := aap_client.NewAAPGatewayClient(aap_client.AAPGatewayClientOptions{
+		GatewayUrl:      gatewayUrl,
+		TLSClientConfig: clientTlsConfig,
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	authN := AapGatewayAuth{
-		gatewayUrl:         gatewayUrl,
+		aapClient:          aapClient,
 		externalGatewayUrl: externalGatewayUrl,
-		clientTlsConfig:    clientTlsConfig,
-		cache:              ttlcache.New[string, *AAPUser](ttlcache.WithTTL[string, *AAPUser](5 * time.Second)),
+		cache:              ttlcache.New[string, *AAPIdentity](ttlcache.WithTTL[string, *AAPIdentity](5 * time.Second)),
 	}
 	go authN.cache.Start()
-	return authN
+	return &authN, nil
 }
 
-func (a AapGatewayAuth) loadUserInfo(token string) (*AAPUser, error) {
+func (a AapGatewayAuth) loadUserInfo(ctx context.Context, token string) (*AAPIdentity, error) {
 	item := a.cache.Get(token)
 	if item != nil {
 		return item.Value(), nil
 	}
 
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: a.clientTlsConfig,
-		},
-	}
-
-	// TODO use aap client
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/api/gateway/v1/me/", a.gatewayUrl), nil)
+	aapUserInfo, err := a.aapClient.GetMe(token)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Add(common.AuthHeader, fmt.Sprintf("Bearer %s", token))
-
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("unexpected error: %w", err)
+	userInfo := &AAPIdentity{
+		BaseIdentity:    *common.NewBaseIdentity(aapUserInfo.Username, strconv.Itoa(aapUserInfo.ID), []string{}),
+		superUser:       aapUserInfo.IsSuperuser,
+		platformAuditor: aapUserInfo.IsPlatformAuditor,
 	}
 
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %v", res.StatusCode)
-	}
-
-	defer res.Body.Close()
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
-	}
-
-	userInfo := &AAPUserInfo{}
-	if err := json.Unmarshal(body, userInfo); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
-	}
-
-	if len(userInfo.Results) == 0 {
-		return nil, fmt.Errorf("no user info in response")
-	}
-
-	a.cache.Set(token, &userInfo.Results[0], ttlcache.DefaultTTL)
-	return &userInfo.Results[0], nil
+	a.cache.Set(token, userInfo, ttlcache.DefaultTTL)
+	return userInfo, nil
 }
 
 func (a AapGatewayAuth) ValidateToken(ctx context.Context, token string) error {
-	_, err := a.loadUserInfo(token)
+	_, err := a.loadUserInfo(ctx, token)
 	return err
 }
 
@@ -132,16 +99,10 @@ func (AapGatewayAuth) GetAuthToken(r *http.Request) (string, error) {
 }
 
 func (a AapGatewayAuth) GetIdentity(ctx context.Context, token string) (common.Identity, error) {
-	userInfo, err := a.loadUserInfo(token)
+	userInfo, err := a.loadUserInfo(ctx, token)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get identity: %w", err)
 	}
 
-	identity := &AAPIdentity{
-		BaseIdentity:    *common.NewBaseIdentity(userInfo.Username, strconv.Itoa(userInfo.ID), []string{}),
-		superUser:       userInfo.IsSuperuser,
-		platformAuditor: userInfo.IsPlatformAuditor,
-	}
-
-	return identity, nil
+	return userInfo, nil
 }

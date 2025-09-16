@@ -115,7 +115,10 @@ func initAAPAuth(cfg *config.Config, log logrus.FieldLogger, orgResolver resolve
 	gatewayExternalUrl := strings.TrimSuffix(cfg.Auth.AAP.ExternalApiUrl, "/")
 	log.Infof("AAP Gateway auth enabled: %s", gatewayUrl)
 	authZProvider := authz.NewOrgMembershipAuthZ(orgResolver)
-	authNProvider := authn.NewAapGatewayAuth(gatewayUrl, gatewayExternalUrl, getTlsConfig(cfg))
+	authNProvider, err := authn.NewAapGatewayAuth(gatewayUrl, gatewayExternalUrl, getTlsConfig(cfg))
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create AAP Gateway AuthN: %w", err)
+	}
 	return authNProvider, authZProvider, nil
 }
 
