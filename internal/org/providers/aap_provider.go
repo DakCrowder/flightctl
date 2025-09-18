@@ -11,14 +11,20 @@ import (
 	"github.com/flightctl/flightctl/internal/auth/common"
 	"github.com/flightctl/flightctl/internal/consts"
 	"github.com/flightctl/flightctl/internal/org"
+	"github.com/flightctl/flightctl/internal/org/cache"
 	"github.com/flightctl/flightctl/pkg/aap_client"
 )
 
 type AAPOrganizationProvider struct {
 	client *aap_client.AAPGatewayClient
+	cache  cache.MembershipCache
 }
 
-func NewAAPOrganizationProvider(apiUrl string, tlsConfig *tls.Config) (*AAPOrganizationProvider, error) {
+func cacheKey(userID string, orgID string) string {
+	return fmt.Sprintf("%s:%s", userID, orgID)
+}
+
+func NewAAPOrganizationProvider(apiUrl string, tlsConfig *tls.Config, cache cache.MembershipCache) (*AAPOrganizationProvider, error) {
 	aapClient, err := aap_client.NewAAPGatewayClient(aap_client.AAPGatewayClientOptions{
 		GatewayUrl:      apiUrl,
 		TLSClientConfig: tlsConfig,
@@ -27,8 +33,13 @@ func NewAAPOrganizationProvider(apiUrl string, tlsConfig *tls.Config) (*AAPOrgan
 		return nil, err
 	}
 
+	if cache == nil {
+		return nil, fmt.Errorf("AAP organization provider requires a membership cache")
+	}
+
 	return &AAPOrganizationProvider{
 		client: aapClient,
+		cache:  cache,
 	}, nil
 }
 
@@ -38,17 +49,24 @@ func (p *AAPOrganizationProvider) GetUserOrganizations(ctx context.Context, iden
 		return nil, fmt.Errorf("cannot get organizations claims from a non-token identity (got %T)", aapIdentity)
 	}
 
-	if aapIdentity.IsSuperuser() || aapIdentity.IsPlatformAuditor() {
-		return p.getAllOrganizations(ctx)
-	}
-
 	userID := aapIdentity.GetUID()
-
 	if userID == "" {
 		return nil, fmt.Errorf("user ID is required")
 	}
 
-	return p.getUserScopedOrganizations(ctx, userID)
+	var orgs []org.ExternalOrganization
+	var err error
+	if aapIdentity.IsSuperuser() || aapIdentity.IsPlatformAuditor() {
+		orgs, err = p.getAllOrganizations(ctx)
+	} else {
+		orgs, err = p.getUserScopedOrganizations(ctx, userID)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	p.updateCacheFromOrgs(userID, orgs)
+	return orgs, nil
 }
 
 func (p *AAPOrganizationProvider) getAllOrganizations(ctx context.Context) ([]org.ExternalOrganization, error) {
@@ -114,16 +132,29 @@ func (p *AAPOrganizationProvider) IsMemberOf(ctx context.Context, identity commo
 		return false, fmt.Errorf("cannot get organizations claims from a non-token identity (got %T)", aapIdentity)
 	}
 
-	if aapIdentity.IsSuperuser() || aapIdentity.IsPlatformAuditor() {
-		return p.organizationExists(ctx, externalOrgID)
-	}
-
 	userID := aapIdentity.GetUID()
 	if userID == "" {
 		return false, fmt.Errorf("user ID is required")
 	}
 
-	return p.userHasMembership(ctx, userID, externalOrgID)
+	if p.cache.Get(cacheKey(userID, externalOrgID)) {
+		return true, nil
+	}
+
+	var isMember bool
+	var err error
+	if aapIdentity.IsSuperuser() || aapIdentity.IsPlatformAuditor() {
+		isMember, err = p.organizationExists(ctx, externalOrgID)
+	} else {
+		isMember, err = p.userHasMembership(ctx, userID, externalOrgID)
+	}
+
+	if err != nil {
+		return false, err
+	}
+
+	p.updateCache(userID, externalOrgID, isMember)
+	return isMember, nil
 }
 
 func (p *AAPOrganizationProvider) organizationExists(ctx context.Context, externalOrgID string) (bool, error) {
@@ -164,4 +195,15 @@ func (p *AAPOrganizationProvider) userHasMembership(ctx context.Context, userID 
 	}
 
 	return false, nil
+}
+
+func (p *AAPOrganizationProvider) updateCache(userID string, externalOrgID string, isMember bool) {
+	key := cacheKey(userID, externalOrgID)
+	p.cache.Set(key, isMember)
+}
+
+func (p *AAPOrganizationProvider) updateCacheFromOrgs(userID string, orgs []org.ExternalOrganization) {
+	for _, org := range orgs {
+		p.updateCache(userID, org.ID, true)
+	}
 }

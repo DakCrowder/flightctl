@@ -27,10 +27,11 @@ type Resolver interface {
 }
 
 type BuildResolverOptions struct {
-	Config *config.Config
-	Store  OrgStore
-	Log    logrus.FieldLogger
-	Cache  cache.OrganizationCache
+	Config          *config.Config
+	Store           OrgStore
+	Log             logrus.FieldLogger
+	Cache           cache.OrganizationCache
+	MembershipCache cache.MembershipCache
 }
 
 func BuildResolver(opts BuildResolverOptions) (Resolver, error) {
@@ -56,7 +57,7 @@ func buildOIDCResolver(opts BuildResolverOptions) Resolver {
 func buildAAPResolver(opts BuildResolverOptions) (Resolver, error) {
 	provider, err := providers.NewAAPOrganizationProvider(opts.Config.Auth.AAP.ApiUrl, &tls.Config{
 		InsecureSkipVerify: opts.Config.Auth.InsecureSkipTlsVerify,
-	})
+	}, opts.MembershipCache)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create AAP organization provider: %w", err)
 	}

@@ -61,7 +61,7 @@ func NewAapGatewayAuth(gatewayUrl string, externalGatewayUrl string, clientTlsCo
 	return &authN, nil
 }
 
-func (a AapGatewayAuth) loadUserInfo(ctx context.Context, token string) (*AAPIdentity, error) {
+func (a AapGatewayAuth) loadUserInfo(token string) (*AAPIdentity, error) {
 	item := a.cache.Get(token)
 	if item != nil {
 		return item.Value(), nil
@@ -83,7 +83,7 @@ func (a AapGatewayAuth) loadUserInfo(ctx context.Context, token string) (*AAPIde
 }
 
 func (a AapGatewayAuth) ValidateToken(ctx context.Context, token string) error {
-	_, err := a.loadUserInfo(ctx, token)
+	_, err := a.loadUserInfo(token)
 	return err
 }
 
@@ -99,7 +99,7 @@ func (AapGatewayAuth) GetAuthToken(r *http.Request) (string, error) {
 }
 
 func (a AapGatewayAuth) GetIdentity(ctx context.Context, token string) (common.Identity, error) {
-	userInfo, err := a.loadUserInfo(ctx, token)
+	userInfo, err := a.loadUserInfo(token)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get identity: %w", err)
 	}

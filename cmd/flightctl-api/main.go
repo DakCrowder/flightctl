@@ -177,6 +177,15 @@ func main() {
 		Log:    log,
 		Cache:  orgCache,
 	}
+
+	// TODO look into other options for passing caches / management
+	if cfg.Auth.AAP != nil {
+		membershipCache := cache.NewMembershipTTL(cache.DefaultTTL)
+		go membershipCache.Start()
+		defer membershipCache.Stop()
+		buildResolverOpts.MembershipCache = membershipCache
+	}
+
 	orgResolver, err := resolvers.BuildResolver(buildResolverOpts)
 	if err != nil {
 		log.Fatalf("failed to build organization resolver: %v", err)
