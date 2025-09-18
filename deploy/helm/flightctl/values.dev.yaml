@@ -1,8 +1,10 @@
 global:
   auth:
-    type: "none"
-    oidc:
-      oidcAuthority: http://keycloak.flightctl-external.svc.cluster.local:8081/realms/flightctl
+    type: "aap"
+    insecureSkipTlsVerify: true
+    aap:
+      apiUrl: https://192.168.122.98
+      externalApiUrl: https://192.168.122.98
   tracing:
     enabled: true
     endpoint: jaeger-collector.flightctl-e2e.svc.cluster.local:4318
@@ -22,6 +24,8 @@ global:
     telemetryGatewayProm: 9464
     gitserver: 3222
     registry: 5000
+  organizations:
+    enabled: true
 
 db:
   # hostname: <set to external DB host to override cluster default>

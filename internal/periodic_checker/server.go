@@ -82,12 +82,21 @@ func (s *Server) Run(ctx context.Context) error {
 	orgCache := cache.NewOrganizationTTL(cache.DefaultTTL)
 	go orgCache.Start()
 	defer orgCache.Stop()
+
 	buildResolverOpts := resolvers.BuildResolverOptions{
 		Config: s.cfg,
 		Store:  s.store.Organization(),
 		Log:    s.log,
 		Cache:  orgCache,
 	}
+
+	if s.cfg.Auth.AAP != nil {
+		membershipCache := cache.NewMembershipTTL(cache.DefaultTTL)
+		go membershipCache.Start()
+		defer membershipCache.Stop()
+		buildResolverOpts.MembershipCache = membershipCache
+	}
+
 	orgResolver, err := resolvers.BuildResolver(buildResolverOpts)
 	if err != nil {
 		return err
