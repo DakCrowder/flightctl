@@ -90,7 +90,7 @@ func (s *Server) Run(ctx context.Context) error {
 		Cache:  orgCache,
 	}
 
-	if s.cfg.Auth.AAP != nil {
+	if s.cfg.Auth != nil && s.cfg.Auth.AAP != nil {
 		membershipCache := cache.NewMembershipTTL(cache.DefaultTTL)
 		go membershipCache.Start()
 		defer membershipCache.Stop()

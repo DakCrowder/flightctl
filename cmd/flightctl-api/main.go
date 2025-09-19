@@ -178,7 +178,7 @@ func main() {
 		Cache:  orgCache,
 	}
 
-	if cfg.Auth.AAP != nil {
+	if cfg.Auth != nil && cfg.Auth.AAP != nil {
 		membershipCache := cache.NewMembershipTTL(cache.DefaultTTL)
 		go membershipCache.Start()
 		defer membershipCache.Stop()
