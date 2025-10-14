@@ -198,6 +198,14 @@ PEM
 NSING
 multiline
 localhost
+copr
+repo
+rpm
+podman
+Quickstart
+https
+selinux
+timestamped
  - docs/user/api-resources.md
 approvedBy
 creationTimestamp
