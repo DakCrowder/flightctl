@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+set -x
+
+# Ensure script is run with sudo available
+if ! sudo -n true 2>/dev/null; then
+    echo "This script requires sudo privileges. Please run with a user that has sudo access."
+    exit 1
+fi
+
+echo "Warning: This operation could generate a very large file in the current directory."
+read -p "Do you have enough storage space? (y/n): " -n 1 -r
+echo ""
+
+# Check the user's response
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+  echo "Operation canceled by the user."
+  exit 1
+fi
+
+echo "Collecting system information..."
+
+timestamp=$(date +"%Y%m%d-%H%M%S")
+temp_dir=$(mktemp -d)
+
+echo "### Collecting system and installed packages information..."
+uname -a > "$temp_dir/host-info.log"
+sudo dnf list installed flightctl-services > "$temp_dir/services-version.log"
+
+echo "### Collecting systemd information..."
+
+sudo systemctl list-dependencies flightctl.target > "$temp_dir/target-list-dependencies.log"
+sudo systemctl status 'flightctl*' > "$temp_dir/systemd-status.log"
+sudo systemctl list-units 'flightctl*' > "$temp_dir/systemd-list-units.log"
+
+echo "### Collecting journal logs..."
+
+for service in $(sudo systemctl list-units --no-legend 'flightctl*' |
+awk '{print $1}'); do
+    echo "### Collecting logs for $service..."
+    sudo journalctl -u "$service" --since "24 hours ago" --no-pager > "$temp_dir/${service}.log"
+done
+
+echo "### Collecting podman information..."
+sudo podman ps -a > "$temp_dir/podman-ps.log"
+sudo podman images -a > "$temp_dir/podman-images.log"
+sudo podman volume ls > "$temp_dir/podman-volumes.log"
+sudo podman network ls > "$temp_dir/podman-networks.log"
+sudo podman secret ls > "$temp_dir/podman-secrets.log"
+sudo podman info > "$temp_dir/podman-info.log"
+
+echo "### Collecting must-gather script itself..."
+cp "$0" "$temp_dir/flightctl-services-must-gather.txt"
+
+tar -czf "must-gather-$timestamp.tgz" -C "$temp_dir" .
+
+rm -rf "$temp_dir"
+
+echo "must-gather-$timestamp.tgz created successfully."
