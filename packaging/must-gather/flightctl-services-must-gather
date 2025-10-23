@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -x
+set -euo pipefail
 
 # Ensure script is run with sudo available
 if ! sudo -n true 2>/dev/null; then
@@ -18,42 +18,79 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
   exit 1
 fi
 
-echo "Collecting system information..."
+echo "Beginning Must Gather Collection..."
 
 timestamp=$(date +"%Y%m%d-%H%M%S")
 temp_dir=$(mktemp -d)
+trap 'rm -rf "$temp_dir"' EXIT
 
-echo "### Collecting system and installed packages information..."
-uname -a > "$temp_dir/host-info.log"
-sudo dnf list installed flightctl-services > "$temp_dir/services-version.log"
+echo "### Collecting system information..."
+uname -a > "$temp_dir/uname-info.log" || true
+cat /etc/os-release > "$temp_dir/os-release.log" || true
+getenforce > "$temp_dir/selinux-status.log" || echo "SELinux not available" > "$temp_dir/selinux-status.log"
+sudo firewall-cmd --list-all > "$temp_dir/firewalld.log" 2>/dev/null || true
+ip a > "$temp_dir/ip-a.log" || true
+ip route > "$temp_dir/ip-route.log" || true
+sudo dnf list installed flightctl-services > "$temp_dir/services-version.log" || echo "Package not found or dnf not available" > "$temp_dir/services-version.log"
 
 echo "### Collecting systemd information..."
 
-sudo systemctl list-dependencies flightctl.target > "$temp_dir/target-list-dependencies.log"
-sudo systemctl status 'flightctl*' > "$temp_dir/systemd-status.log"
-sudo systemctl list-units 'flightctl*' > "$temp_dir/systemd-list-units.log"
+sudo systemctl list-dependencies flightctl.target > "$temp_dir/target-list-dependencies.log" || echo "flightctl.target not found" > "$temp_dir/target-list-dependencies.log"
+sudo systemctl status 'flightctl*' > "$temp_dir/systemd-status.log" || echo "No flightctl services found" > "$temp_dir/systemd-status.log"
+sudo systemctl list-units 'flightctl*' > "$temp_dir/systemd-list-units.log" || echo "No flightctl units found" > "$temp_dir/systemd-list-units.log"
 
 echo "### Collecting journal logs..."
 
-for service in $(sudo systemctl list-units --no-legend 'flightctl*' |
-awk '{print $1}'); do
-    echo "### Collecting logs for $service..."
-    sudo journalctl -u "$service" --since "24 hours ago" --no-pager > "$temp_dir/${service}.log"
+for service in $(sudo systemctl list-units --no-legend 'flightctl*' 2>/dev/null |
+awk '{print $1}' || true); do
+    if [ -n "$service" ]; then
+        echo "### Collecting logs for $service..."
+        sudo journalctl -u "$service" --since "24 hours ago" --no-pager > "$temp_dir/${service}.log" || echo "Failed to collect logs for $service" > "$temp_dir/${service}.log"
+    fi
 done
 
 echo "### Collecting podman information..."
-sudo podman ps -a > "$temp_dir/podman-ps.log"
-sudo podman images -a > "$temp_dir/podman-images.log"
-sudo podman volume ls > "$temp_dir/podman-volumes.log"
-sudo podman network ls > "$temp_dir/podman-networks.log"
-sudo podman secret ls > "$temp_dir/podman-secrets.log"
-sudo podman info > "$temp_dir/podman-info.log"
+sudo podman ps -a > "$temp_dir/podman-ps.log" || echo "podman ps failed" > "$temp_dir/podman-ps.log"
+sudo podman images -a > "$temp_dir/podman-images.log" || echo "podman images failed" > "$temp_dir/podman-images.log"
+sudo podman volume ls > "$temp_dir/podman-volumes.log" || echo "podman volume ls failed" > "$temp_dir/podman-volumes.log"
+sudo podman network ls > "$temp_dir/podman-networks.log" || echo "podman network ls failed" > "$temp_dir/podman-networks.log"
+sudo podman secret ls > "$temp_dir/podman-secrets.log" || echo "podman secret ls failed" > "$temp_dir/podman-secrets.log"
+sudo podman info > "$temp_dir/podman-info.log" || echo "podman info failed" > "$temp_dir/podman-info.log"
+if sudo podman network exists flightctl 2>/dev/null; then
+    sudo podman network inspect flightctl > "$temp_dir/podman-network-flightctl.log" || echo "Failed to inspect flightctl network" > "$temp_dir/podman-network-flightctl.log"
+else
+    echo "Network does not exist" > "$temp_dir/podman-network-flightctl.log"
+fi
+
+redact_yaml() {
+  local input_file="$1"
+  local output_file="$2"
+
+  # Regex pattern for sensitive key names
+  local pattern='(token|password|secret|key|client_id|clientID|clientSecret|client_secret|oauth|certificate)'
+
+  # Copy the original file while redacting sensitive values
+  # Works line-by-line; safe for most YAML layouts
+  sed -E \
+    -e "s/^([[:space:]]*[^#]*(${pattern})[[:space:]]*:[[:space:]]*).*/\1[REDACTED]/I" \
+    -e "s/(^.*(${pattern}).*:).*$/\1 [REDACTED]/I" \
+    "$input_file" > "$output_file"
+}
+
+if [ -f /etc/flightctl/system-config.yaml ]; then
+  echo "### Collecting sanitized Flight Control service configuration..."
+  redact_yaml "/etc/flightctl/system-config.yaml" "$temp_dir/system-config-redacted.yaml"
+else
+  echo "No /etc/flightctl/system-config.yaml found" > "$temp_dir/system-config.log"
+fi
 
 echo "### Collecting must-gather script itself..."
 cp "$0" "$temp_dir/flightctl-services-must-gather.txt"
 
-tar -czf "must-gather-$timestamp.tgz" -C "$temp_dir" .
+echo "### Creating must-gather archive..."
+filename="flightctl-services-must-gather-$timestamp.tgz"
 
+tar -czf "$filename" -C "$temp_dir"
 rm -rf "$temp_dir"
 
-echo "must-gather-$timestamp.tgz created successfully."
+echo "$filename created successfully."
