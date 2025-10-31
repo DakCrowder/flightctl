@@ -10,10 +10,11 @@ Image=quay.io/flightctl/flightctl-api:latest
 Pull=newer
 
 Volume=/etc/flightctl/service-config.yaml:/app/service-config.yaml:ro,z
-Volume=/usr/share/flightctl/flightctl-api:/app/templates:ro,z
+Volume=/usr/share/flightctl/flightctl-api/env.template:/app/templates/env.template:ro,z
+Volume=/usr/share/flightctl/flightctl-api/config.yaml.template:/app/templates/config.yaml.template:ro,z
 Volume=/etc/flightctl/flightctl-api:/app/rendered:rw,z
 
-Exec=/app/flightctl-api-setup
+Exec=/app/flightctl-service-setup
 
 [Service]
 Type=oneshot
