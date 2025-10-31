@@ -41,7 +41,7 @@ RUN --mount=type=cache,target=/var/cache/dnf \
 # Use BuildKit cache mounts for Go caching
 RUN --mount=type=cache,target=/opt/app-root/src/.cache/go-build \
     --mount=type=cache,target=/opt/app-root/src/go/pkg/mod \
-    make build-multiarch-clis
+    make build-multiarch-clis build-service-setup
 
 FROM registry.access.redhat.com/ubi9/ubi
 # Use BuildKit cache mounts for dnf package caching
@@ -59,7 +59,7 @@ ENV USER_UID=1001 \
 
 COPY --from=builder /app/packaging/containers/cli-artifacts/nginx.conf ${NGINX_CONF_PATH}
 COPY --from=builder /app/packaging/containers/cli-artifacts/entrypoint.sh ${ENTRYPOINT_PATH}
-
+COPY --from=builder /app/bin/flightctl-service-setup /app/flightctl-service-setup
 USER root
 
 RUN mkdir -p ${HOME}/src/gh-archives \
