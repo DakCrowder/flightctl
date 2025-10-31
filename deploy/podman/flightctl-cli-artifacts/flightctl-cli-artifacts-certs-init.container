@@ -8,10 +8,10 @@ Wants=flightctl-api.service
 Image=registry.access.redhat.com/ubi9/ubi-minimal
 ContainerName=flightctl-cli-artifacts-certs-init
 Volume=/usr/share/flightctl/init_utils.sh:/utils/init_utils.sh:ro,z
-Volume=/usr/share/flightctl/flightctl-cli-artifacts/certs-init.sh:/config-source/certs-init.sh:ro,z
+Volume=/usr/share/flightctl/flightctl-cli-artifacts/init.sh:/config-source/init.sh:ro,z
 Volume=/etc/flightctl/pki:/certs-source:ro,z
 Volume=flightctl-cli-artifacts-certs:/certs-destination:rw,z
-Exec=/bin/sh /config-source/certs-init.sh
+Exec=/bin/sh /config-source/init.sh
 
 [Service]
 Type=oneshot
