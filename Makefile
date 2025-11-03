@@ -299,6 +299,7 @@ push-containers: login
 	podman push flightctl-cli-artifacts:latest
 	podman push flightctl-userinfo-proxy:latest
 	podman push flightctl-telemetry-gateway:latest
+	podman push flightctl-ui-setup:latest
 
 # A convenience target to run the full CI process.
 ci-build: build-containers push-containers
@@ -318,6 +319,7 @@ clean-containers:
 	- podman rmi flightctl-cli-artifacts:latest || true
 	- podman rmi flightctl-userinfo-proxy:latest || true
 	- podman rmi flightctl-telemetry-gateway:latest || true
+	- podman rmi flightctl-ui-setup:latest || true
 
 build-containers: flightctl-api-container flightctl-db-setup-container flightctl-worker-container flightctl-periodic-container flightctl-alert-exporter-container flightctl-alertmanager-proxy-container flightctl-multiarch-cli-container flightctl-userinfo-proxy-container flightctl-telemetry-gateway-container flightctl-ui-setup-container
 
