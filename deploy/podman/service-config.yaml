@@ -1,8 +1,15 @@
 global:
   baseDomain:
+  baseDomainTls:
+    # -- File path to the base domain wildcard certificate
+    cert:
+    # -- File path to the key for the base domain wildcard certificate
+    key:
   auth:
     type: none # aap, oidc, or none
     insecureSkipTlsVerify: false
+    # -- File path to the CA certificate for the configured authentication provider
+    caCert:
     aap:
       apiUrl:
       externalApiUrl:
