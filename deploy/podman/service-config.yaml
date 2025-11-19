@@ -1,5 +1,8 @@
 global:
   baseDomain:
+  baseDomainTls:
+    cert: ""
+    key: ""
   auth:
     type: oidc # aap, oidc, or none
     insecureSkipTlsVerify: true
