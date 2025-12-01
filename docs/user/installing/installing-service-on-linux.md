@@ -146,18 +146,29 @@ sudo podman secret inspect flightctl-postgresql-user-password --showsecret | jq 
 
 ## Certificate Management
 
-Certs are generated and stored in the `/etc/flightctl/pki` directory. These include:
+Certificates are automatically generated and stored in the `/etc/flightctl/pki` directory when services are first started. The certificate structure includes:
 
 ```bash
-/etc/flightctl/pki/ca.crt
-/etc/flightctl/pki/ca.key
-/etc/flightctl/pki/client-enrollment.crt
-/etc/flightctl/pki/client-enrollment.key
-/etc/flightctl/pki/server.crt
-/etc/flightctl/pki/server.key
+/etc/flightctl/pki/
+├── ca.crt                                # Root CA certificate
+├── ca.key                                # Root CA private key
+├── ca-bundle.crt                         # CA bundle (ca.crt + client-signer.crt)
+└── flightctl-api/
+    ├── server.crt                        # API server TLS certificate
+    ├── server.key                        # API server private key
+    ├── client-signer.crt                 # Client certificate signing CA
+    └── client-signer.key                 # Client signer private key
 ```
 
-The `server.crt` and `server.key` are self-signed and automatically generated unless otherwise specified.  To use custom certificates, replace (or populate before first starting the services) `server.crt` and `server.key` files.
+### Automatic Certificate Generation
+
+On first startup, certificates are automatically generated with the following behavior:
+
+- A self-signed root CA is created if not already present
+- An intermediate client-signer CA is generated for managing client certificates
+- The API server certificate is created with the configured `baseDomain` as a Subject Alternative Name (SAN)
+
+### Authentication Provider CA
 
 A custom CA certificate for use with configured authentication providers can be placed in the following location:
 
