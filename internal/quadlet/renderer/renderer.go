@@ -8,6 +8,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/flightctl/flightctl/internal/quadlet"
 	"github.com/sirupsen/logrus"
 )
 
@@ -71,11 +72,11 @@ type RendererConfig struct {
 
 func NewRendererConfig() *RendererConfig {
 	return &RendererConfig{
-		ReadOnlyConfigOutputDir:  "/usr/share/flightctl",
-		WriteableConfigOutputDir: "/etc/flightctl",
-		QuadletFilesOutputDir:    "/usr/share/containers/systemd",
-		SystemdUnitOutputDir:     "/usr/lib/systemd/system",
-		BinOutputDir:             "/usr/bin",
+		ReadOnlyConfigOutputDir:  quadlet.DefaultReadOnlyConfigDir,
+		WriteableConfigOutputDir: quadlet.DefaultWriteableConfigDir,
+		QuadletFilesOutputDir:    quadlet.DefaultQuadletDir,
+		SystemdUnitOutputDir:     quadlet.DefaultSystemdUnitDir,
+		BinOutputDir:             quadlet.DefaultBinDir,
 	}
 }
 

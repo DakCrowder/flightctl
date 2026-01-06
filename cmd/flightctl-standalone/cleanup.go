@@ -16,35 +16,11 @@ import (
 )
 
 const (
-	// Default location for installed quadlet files
-	defaultQuadletDir = "/usr/share/containers/systemd"
-	// Systemd target name
-	flightctlTarget = "flightctl.target"
-	// Network name
-	networkName = "flightctl"
 	// Timeout for waiting for containers to be removed by systemd
 	containerStopTimeout = 60 * time.Second
 	// Polling interval for checking container status
 	containerPollInterval = 2 * time.Second
 )
-
-// Known volume names from .volume files
-var knownVolumes = []string{
-	"flightctl-db",
-	"flightctl-kv",
-	"flightctl-alertmanager",
-	"flightctl-ui-certs",
-	"flightctl-cli-artifacts-certs",
-}
-
-// Known secret names from Secret= directives in .container files
-var knownSecrets = []string{
-	"flightctl-postgresql-password",
-	"flightctl-postgresql-master-password",
-	"flightctl-postgresql-user-password",
-	"flightctl-postgresql-migrator-password",
-	"flightctl-kv-password",
-}
 
 type CleanupOptions struct {
 	AcceptPrompt bool
@@ -132,7 +108,7 @@ func confirmCleanup() bool {
 func stopServices(logger *logrus.Logger) error {
 	logger.Info("Stopping Flight Control services...")
 
-	cmd := exec.Command("systemctl", "stop", flightctlTarget)
+	cmd := exec.Command("systemctl", "stop", quadlet.FlightctlTarget)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		// It's okay if the target doesn't exist or is already stopped
 		logger.Debugf("systemctl stop output: %s", string(output))
@@ -146,7 +122,7 @@ func stopServices(logger *logrus.Logger) error {
 func disableTarget(logger *logrus.Logger) error {
 	logger.Info("Disabling Flight Control target...")
 
-	cmd := exec.Command("systemctl", "disable", flightctlTarget)
+	cmd := exec.Command("systemctl", "disable", quadlet.FlightctlTarget)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		// It's okay if the target doesn't exist
 		logger.Debugf("systemctl disable output: %s", string(output))
@@ -205,7 +181,7 @@ func removeImages(logger *logrus.Logger) error {
 	logger.Info("Removing Flight Control images...")
 
 	// Find all .container files in the quadlet directory
-	pattern := filepath.Join(defaultQuadletDir, "flightctl*.container")
+	pattern := filepath.Join(quadlet.DefaultQuadletDir, "flightctl*.container")
 	containerFiles, err := filepath.Glob(pattern)
 	if err != nil {
 		return fmt.Errorf("failed to glob container files: %w", err)
@@ -257,7 +233,7 @@ func removeImages(logger *logrus.Logger) error {
 func removeVolumes(logger *logrus.Logger) error {
 	logger.Info("Removing Flight Control volumes...")
 
-	for _, volume := range knownVolumes {
+	for _, volume := range quadlet.KnownVolumes {
 		// Check if volume exists
 		inspectCmd := exec.Command("sudo", "podman", "volume", "inspect", volume)
 		if err := inspectCmd.Run(); err != nil {
@@ -280,16 +256,16 @@ func removeNetwork(logger *logrus.Logger) error {
 	logger.Info("Removing Flight Control network...")
 
 	// Check if network exists
-	inspectCmd := exec.Command("sudo", "podman", "network", "inspect", networkName)
+	inspectCmd := exec.Command("sudo", "podman", "network", "inspect", quadlet.FlightctlNetwork)
 	if err := inspectCmd.Run(); err != nil {
-		logger.Debugf("Network %s does not exist, skipping", networkName)
+		logger.Debugf("Network %s does not exist, skipping", quadlet.FlightctlNetwork)
 		return nil
 	}
 
-	logger.Infof("Removing network: %s", networkName)
-	rmCmd := exec.Command("sudo", "podman", "network", "rm", networkName)
+	logger.Infof("Removing network: %s", quadlet.FlightctlNetwork)
+	rmCmd := exec.Command("sudo", "podman", "network", "rm", quadlet.FlightctlNetwork)
 	if output, err := rmCmd.CombinedOutput(); err != nil {
-		logger.Warnf("Failed to remove network %s: %s", networkName, string(output))
+		logger.Warnf("Failed to remove network %s: %s", quadlet.FlightctlNetwork, string(output))
 	}
 
 	return nil
@@ -298,7 +274,7 @@ func removeNetwork(logger *logrus.Logger) error {
 func removeSecrets(logger *logrus.Logger) error {
 	logger.Info("Removing Flight Control secrets...")
 
-	for _, secret := range knownSecrets {
+	for _, secret := range quadlet.KnownSecrets {
 		// Check if secret exists
 		inspectCmd := exec.Command("sudo", "podman", "secret", "inspect", secret)
 		if err := inspectCmd.Run(); err != nil {
