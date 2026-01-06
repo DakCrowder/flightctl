@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -10,8 +11,10 @@ import (
 	"time"
 
 	"github.com/flightctl/flightctl/internal/quadlet"
+	"github.com/flightctl/flightctl/pkg/executer"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/pkg/log"
-	"github.com/sirupsen/logrus"
+	"github.com/flightctl/flightctl/pkg/podman"
 	"github.com/spf13/cobra"
 )
 
@@ -47,7 +50,11 @@ This operation is destructive - use with caution.`,
 }
 
 func (o *CleanupOptions) Run() error {
-	logger := log.InitLogs()
+	logger := log.NewPrefixLogger("cleanup")
+
+	if os.Geteuid() != 0 {
+		return fmt.Errorf("cleanup requires root privileges, please run with sudo")
+	}
 
 	if !o.AcceptPrompt {
 		if !confirmCleanup() {
@@ -57,6 +64,12 @@ func (o *CleanupOptions) Run() error {
 	}
 
 	fmt.Println("Starting Flight Control cleanup...")
+
+	// Create podman client (running as root, no sudo needed)
+	rw := fileio.NewReadWriter()
+	podmanClient := podman.NewClient(logger, &executer.CommonExecuter{}, rw)
+
+	ctx := context.Background()
 
 	if err := stopServices(logger); err != nil {
 		logger.Warnf("Failed to stop services: %v", err)
@@ -70,11 +83,11 @@ func (o *CleanupOptions) Run() error {
 		logger.Warnf("Failed waiting for containers to stop: %v", err)
 	}
 
-	if err := removeImages(logger); err != nil {
+	if err := removeImages(ctx, logger, podmanClient); err != nil {
 		logger.Warnf("Failed to remove images: %v", err)
 	}
 
-	if err := removeVolumes(logger); err != nil {
+	if err := removeVolumes(ctx, logger, podmanClient); err != nil {
 		logger.Warnf("Failed to remove volumes: %v", err)
 	}
 
@@ -82,7 +95,7 @@ func (o *CleanupOptions) Run() error {
 		logger.Warnf("Failed to remove secrets: %v", err)
 	}
 
-	if err := removeNetwork(logger); err != nil {
+	if err := removeNetwork(ctx, logger, podmanClient); err != nil {
 		logger.Warnf("Failed to remove network: %v", err)
 	}
 
@@ -105,7 +118,7 @@ func confirmCleanup() bool {
 	return response == "y" || response == "yes"
 }
 
-func stopServices(logger *logrus.Logger) error {
+func stopServices(logger *log.PrefixLogger) error {
 	logger.Info("Stopping Flight Control services...")
 
 	cmd := exec.Command("systemctl", "stop", quadlet.FlightctlTarget)
@@ -119,7 +132,7 @@ func stopServices(logger *logrus.Logger) error {
 	return nil
 }
 
-func disableTarget(logger *logrus.Logger) error {
+func disableTarget(logger *log.PrefixLogger) error {
 	logger.Info("Disabling Flight Control target...")
 
 	cmd := exec.Command("systemctl", "disable", quadlet.FlightctlTarget)
@@ -133,7 +146,7 @@ func disableTarget(logger *logrus.Logger) error {
 	return nil
 }
 
-func waitForContainersToStop(logger *logrus.Logger) error {
+func waitForContainersToStop(logger *log.PrefixLogger) error {
 	logger.Info("Waiting for Flight Control containers to be removed...")
 
 	deadline := time.Now().Add(containerStopTimeout)
@@ -160,7 +173,7 @@ func waitForContainersToStop(logger *logrus.Logger) error {
 
 func getFlightctlContainers() ([]string, error) {
 	// Use -a to include stopped containers that haven't been fully removed yet
-	cmd := exec.Command("sudo", "podman", "ps", "-a", "--format", "{{.Names}}", "--filter", "name=flightctl-")
+	cmd := exec.Command("podman", "ps", "-a", "--format", "{{.Names}}", "--filter", "name=flightctl-")
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, err
@@ -177,7 +190,7 @@ func getFlightctlContainers() ([]string, error) {
 	return containers, nil
 }
 
-func removeImages(logger *logrus.Logger) error {
+func removeImages(ctx context.Context, logger *log.PrefixLogger, client *podman.Client) error {
 	logger.Info("Removing Flight Control images...")
 
 	// Find all .container files in the quadlet directory
@@ -218,65 +231,65 @@ func removeImages(logger *logrus.Logger) error {
 		imageSet[image] = struct{}{}
 	}
 
-	// Remove each unique image
+	// Remove each unique image using the podman client
 	for image := range imageSet {
 		logger.Infof("Removing image: %s", image)
-		cmd := exec.Command("sudo", "podman", "rmi", image)
-		if output, err := cmd.CombinedOutput(); err != nil {
-			logger.Warnf("Failed to remove image %s (may be in use): %s", image, string(output))
+		if err := client.RemoveImage(ctx, image); err != nil {
+			logger.Warnf("Failed to remove image %s (may be in use): %v", image, err)
 		}
 	}
 
 	return nil
 }
 
-func removeVolumes(logger *logrus.Logger) error {
+func removeVolumes(ctx context.Context, logger *log.PrefixLogger, client *podman.Client) error {
 	logger.Info("Removing Flight Control volumes...")
 
 	for _, volume := range quadlet.KnownVolumes {
-		// Check if volume exists
-		inspectCmd := exec.Command("sudo", "podman", "volume", "inspect", volume)
-		if err := inspectCmd.Run(); err != nil {
-			// Volume doesn't exist, skip
+		// Check if volume exists using the podman client
+		if !client.VolumeExists(ctx, volume) {
 			logger.Debugf("Volume %s does not exist, skipping", volume)
 			continue
 		}
 
 		logger.Infof("Removing volume: %s", volume)
-		rmCmd := exec.Command("sudo", "podman", "volume", "rm", volume)
-		if output, err := rmCmd.CombinedOutput(); err != nil {
-			logger.Warnf("Failed to remove volume %s: %s", volume, string(output))
+		if err := client.RemoveVolumes(ctx, volume); err != nil {
+			logger.Warnf("Failed to remove volume %s: %v", volume, err)
 		}
 	}
 
 	return nil
 }
 
-func removeNetwork(logger *logrus.Logger) error {
+func removeNetwork(ctx context.Context, logger *log.PrefixLogger, client *podman.Client) error {
 	logger.Info("Removing Flight Control network...")
 
-	// Check if network exists
-	inspectCmd := exec.Command("sudo", "podman", "network", "inspect", quadlet.FlightctlNetwork)
-	if err := inspectCmd.Run(); err != nil {
+	// Check if network exists by trying to list it
+	networks, err := client.ListNetworks(ctx, nil, []string{fmt.Sprintf("name=%s", quadlet.FlightctlNetwork)})
+	if err != nil {
+		logger.Debugf("Failed to check network %s: %v", quadlet.FlightctlNetwork, err)
+		return nil
+	}
+
+	if len(networks) == 0 {
 		logger.Debugf("Network %s does not exist, skipping", quadlet.FlightctlNetwork)
 		return nil
 	}
 
 	logger.Infof("Removing network: %s", quadlet.FlightctlNetwork)
-	rmCmd := exec.Command("sudo", "podman", "network", "rm", quadlet.FlightctlNetwork)
-	if output, err := rmCmd.CombinedOutput(); err != nil {
-		logger.Warnf("Failed to remove network %s: %s", quadlet.FlightctlNetwork, string(output))
+	if err := client.RemoveNetworks(ctx, quadlet.FlightctlNetwork); err != nil {
+		logger.Warnf("Failed to remove network %s: %v", quadlet.FlightctlNetwork, err)
 	}
 
 	return nil
 }
 
-func removeSecrets(logger *logrus.Logger) error {
+func removeSecrets(logger *log.PrefixLogger) error {
 	logger.Info("Removing Flight Control secrets...")
 
 	for _, secret := range quadlet.KnownSecrets {
 		// Check if secret exists
-		inspectCmd := exec.Command("sudo", "podman", "secret", "inspect", secret)
+		inspectCmd := exec.Command("podman", "secret", "inspect", secret)
 		if err := inspectCmd.Run(); err != nil {
 			// Secret doesn't exist, skip
 			logger.Debugf("Secret %s does not exist, skipping", secret)
@@ -284,7 +297,7 @@ func removeSecrets(logger *logrus.Logger) error {
 		}
 
 		logger.Infof("Removing secret: %s", secret)
-		rmCmd := exec.Command("sudo", "podman", "secret", "rm", secret)
+		rmCmd := exec.Command("podman", "secret", "rm", secret)
 		if output, err := rmCmd.CombinedOutput(); err != nil {
 			logger.Warnf("Failed to remove secret %s: %s", secret, string(output))
 		}

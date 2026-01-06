@@ -6,6 +6,7 @@ import (
 
 	"github.com/flightctl/flightctl/api/v1beta1"
 	"github.com/flightctl/flightctl/internal/agent/device/errors"
+	pkgfileio "github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 )
@@ -69,7 +70,7 @@ func TestExists(t *testing.T) {
 
 func TestIsUpToDate(t *testing.T) {
 	require := require.New(t)
-	testUid, testGid, err := getUserIdentity()
+	testUid, testGid, err := pkgfileio.GetUserIdentity()
 	require.NoError(err)
 	tests := []struct {
 		name string
