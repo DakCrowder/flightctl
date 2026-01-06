@@ -167,3 +167,8 @@ func (u *Unit) Add(section string, key string, value string) *Unit {
 	})
 	return u
 }
+
+// GetImage returns the Image value from the [Container] section of a quadlet unit file.
+func (u *Unit) GetImage() (string, error) {
+	return u.Lookup(ContainerGroup, ImageKey)
+}
