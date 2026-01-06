@@ -9,7 +9,7 @@ import (
 	"github.com/flightctl/flightctl/internal/agent/client"
 	"github.com/flightctl/flightctl/internal/agent/config"
 	"github.com/flightctl/flightctl/internal/agent/device/certmanager/provider"
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/internal/agent/identity"
 	pkgcertmanager "github.com/flightctl/flightctl/pkg/certmanager"
 )

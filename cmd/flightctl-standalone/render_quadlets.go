@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/flightctl/flightctl/internal/quadlet/renderer"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/pkg/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -22,7 +23,8 @@ func NewRenderQuadletsCommand() *cobra.Command {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			logger := log.InitLogs()
-			return renderer.RenderQuadlets(config, logger)
+			rw := fileio.NewReadWriter()
+			return renderer.RenderQuadlets(rw, config, logger)
 		},
 	}
 

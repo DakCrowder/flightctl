@@ -13,7 +13,7 @@ import (
 	"github.com/flightctl/flightctl/internal/agent/device/applications/lifecycle"
 	"github.com/flightctl/flightctl/internal/agent/device/dependency"
 	"github.com/flightctl/flightctl/internal/agent/device/errors"
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/internal/api/common"
 	"github.com/flightctl/flightctl/internal/quadlet"
 	"github.com/flightctl/flightctl/internal/util/validation"

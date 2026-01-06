@@ -14,7 +14,7 @@ import (
 	"strings"
 
 	agent_config "github.com/flightctl/flightctl/internal/agent/config"
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	fccrypto "github.com/flightctl/flightctl/pkg/crypto"
 	"github.com/flightctl/flightctl/pkg/log"
 	"github.com/google/go-tpm/tpm2"

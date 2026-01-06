@@ -14,7 +14,7 @@ import (
 	"github.com/flightctl/flightctl/internal/agent/device/console"
 	"github.com/flightctl/flightctl/internal/agent/device/dependency"
 	"github.com/flightctl/flightctl/internal/agent/device/errors"
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	managedfileio "github.com/flightctl/flightctl/internal/agent/device/fileio"
 	"github.com/flightctl/flightctl/internal/agent/device/hook"
 	"github.com/flightctl/flightctl/internal/agent/device/lifecycle"
 	"github.com/flightctl/flightctl/internal/agent/device/os"
@@ -26,6 +26,7 @@ import (
 	"github.com/flightctl/flightctl/internal/agent/device/systemd"
 	"github.com/flightctl/flightctl/internal/agent/device/systeminfo"
 	"github.com/flightctl/flightctl/pkg/executer"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/pkg/log"
 	"github.com/flightctl/flightctl/pkg/poll"
 	testutil "github.com/flightctl/flightctl/test/util"
@@ -196,7 +197,7 @@ func TestSync(t *testing.T) {
 			log := log.NewPrefixLogger("test")
 			log.SetLevel(logrus.DebugLevel)
 			tmpDir := t.TempDir()
-			readWriter := fileio.NewReadWriter()
+			readWriter := managedfileio.NewManagedReadWriter()
 			readWriter.SetRootdir(tmpDir)
 
 			podmanClient := client.NewPodman(log, mockExec, readWriter, testutil.NewPollConfig())

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/flightctl/flightctl/internal/agent/device/errors"
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/internal/api/common"
 	"github.com/stretchr/testify/require"
 )

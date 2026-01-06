@@ -15,9 +15,10 @@ import (
 
 	"github.com/flightctl/flightctl/api/v1beta1"
 	"github.com/flightctl/flightctl/internal/agent/device/errors"
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	managedfileio "github.com/flightctl/flightctl/internal/agent/device/fileio"
 	"github.com/flightctl/flightctl/internal/api/common"
 	"github.com/flightctl/flightctl/internal/util/validation"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/samber/lo"
 )
 
@@ -216,7 +217,7 @@ func ParseComposeFromSpec(contents []v1beta1.ApplicationContent) (*common.Compos
 			continue
 		}
 
-		contentBytes, err := fileio.DecodeContent(lo.FromPtr(c.Content), c.ContentEncoding)
+		contentBytes, err := managedfileio.DecodeContent(lo.FromPtr(c.Content), c.ContentEncoding)
 		if err != nil {
 			return nil, fmt.Errorf("decoding content %q: %w", filename, err)
 		}

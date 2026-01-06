@@ -8,7 +8,7 @@ import (
 
 	"github.com/flightctl/flightctl/api/v1beta1"
 	"github.com/flightctl/flightctl/internal/agent/client"
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/pkg/log"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"

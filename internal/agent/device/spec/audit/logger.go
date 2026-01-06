@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/pkg/log"
 	"gopkg.in/natefinch/lumberjack.v2"
 )

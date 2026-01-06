@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/pkg/certmanager"
 	"sigs.k8s.io/yaml"
 )

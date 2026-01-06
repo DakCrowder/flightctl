@@ -19,7 +19,7 @@ import (
 	"time"
 
 	agent_config "github.com/flightctl/flightctl/internal/agent/config"
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/pkg/log"
 	"github.com/google/go-tpm-tools/simulator"
 	legacy "github.com/google/go-tpm/legacy/tpm2"

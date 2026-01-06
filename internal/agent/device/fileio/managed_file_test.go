@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/flightctl/flightctl/api/v1beta1"
-	"github.com/flightctl/flightctl/internal/agent/device/errors"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/require"
 )
@@ -38,14 +38,14 @@ func TestExists(t *testing.T) {
 				Path: "/",
 			},
 			pathExists:    false,
-			expectedError: errors.ErrPathIsDir,
+			expectedError: fileio.ErrPathIsDir,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tmpDir := t.TempDir()
-			writer := NewWriter()
+			writer := NewManagedWriter()
 			writer.SetRootdir(tmpDir)
 			if tt.pathExists {
 				err := writer.WriteFile(tt.f.Path, []byte("contents"), 0644)
@@ -69,7 +69,7 @@ func TestExists(t *testing.T) {
 
 func TestIsUpToDate(t *testing.T) {
 	require := require.New(t)
-	testUid, testGid, err := getUserIdentity()
+	testUid, testGid, err := fileio.GetUserIdentity()
 	require.NoError(err)
 	tests := []struct {
 		name string
@@ -81,19 +81,19 @@ func TestIsUpToDate(t *testing.T) {
 	}{
 		{
 			name:         "file is up to date",
-			current:      createTestFile("up_to_date", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(DefaultFilePermissions), testUid, testGid),
-			desired:      createTestFile("up_to_date", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(DefaultFilePermissions), testUid, testGid),
+			current:      createTestFile("up_to_date", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(fileio.DefaultFilePermissions), testUid, testGid),
+			desired:      createTestFile("up_to_date", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(fileio.DefaultFilePermissions), testUid, testGid),
 			wantUpToDate: true,
 		},
 		{
 			name:    "file content is not up to date",
-			current: createTestFile("not_up_to_date", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(DefaultFilePermissions), testUid, testGid),
-			desired: createTestFile("not_up_to_date", "data:,This%20system%20is%20managed%20by%20flightctl%20v2.%0A", int(DefaultFilePermissions), testUid, testGid),
+			current: createTestFile("not_up_to_date", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(fileio.DefaultFilePermissions), testUid, testGid),
+			desired: createTestFile("not_up_to_date", "data:,This%20system%20is%20managed%20by%20flightctl%20v2.%0A", int(fileio.DefaultFilePermissions), testUid, testGid),
 		},
 		{
 			name:    "file does not exist",
 			current: nil,
-			desired: createTestFile("does_not_exist", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(DefaultFilePermissions), testUid, testGid),
+			desired: createTestFile("does_not_exist", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(fileio.DefaultFilePermissions), testUid, testGid),
 		},
 		{
 			name:    "file with different permissions",
@@ -102,20 +102,20 @@ func TestIsUpToDate(t *testing.T) {
 		},
 		{
 			name:    "file with different user",
-			current: createTestFile("diff_user", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(DefaultFilePermissions), testUid, testGid),
-			desired: createTestFile("diff_user", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(DefaultFilePermissions), testUid+1, testGid),
+			current: createTestFile("diff_user", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(fileio.DefaultFilePermissions), testUid, testGid),
+			desired: createTestFile("diff_user", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(fileio.DefaultFilePermissions), testUid+1, testGid),
 		},
 		{
 			name:    "file with different group",
-			current: createTestFile("diff_group", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(DefaultFilePermissions), testUid, testGid),
-			desired: createTestFile("diff_group", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(DefaultFilePermissions), testUid, testGid+1),
+			current: createTestFile("diff_group", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(fileio.DefaultFilePermissions), testUid, testGid),
+			desired: createTestFile("diff_group", "data:,This%20system%20is%20managed%20by%20flightctl.%0A", int(fileio.DefaultFilePermissions), testUid, testGid+1),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tmpDir := t.TempDir()
 			t.Log(tmpDir)
-			writer := NewWriter()
+			writer := NewManagedWriter()
 			writer.SetRootdir(tmpDir)
 			if tt.current != nil {
 				// write the current file to disk if it exists

@@ -1,13 +1,12 @@
 package fileio
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
 	"os"
 	"path"
-
-	"github.com/flightctl/flightctl/internal/agent/device/errors"
 )
 
 const (
@@ -15,18 +14,18 @@ const (
 	entryTypeDir  = "dir"
 )
 
-// Reader is a struct for reading files from the device
+// reader is responsible for reading files from the filesystem.
 type reader struct {
-	// rootDir is the root directory for the device writer useful for testing
+	// rootDir is the root directory, useful for testing
 	rootDir string
 }
 
-// New creates a new writer
+// NewReader creates a new reader.
 func NewReader() *reader {
 	return &reader{}
 }
 
-// SetRootdir sets the root directory for the reader, useful for testing
+// SetRootdir sets the root directory for the reader, useful for testing.
 func (r *reader) SetRootdir(path string) {
 	r.rootDir = path
 }
@@ -37,13 +36,13 @@ func (r *reader) PathFor(filePath string) string {
 	return path.Join(r.rootDir, filePath)
 }
 
-// ReadFile reads the file at the provided path
+// ReadFile reads the file at the provided path.
 func (r *reader) ReadFile(filePath string) ([]byte, error) {
 	return os.ReadFile(r.PathFor(filePath))
 }
 
-// ReadDir reads the directory at the provided path and returns a slice of fs.DirEntry. If the directory
-// does not exist, it returns an empty slice and no error.
+// ReadDir reads the directory at the provided path and returns a slice of fs.DirEntry.
+// If the directory does not exist, it returns an empty slice and no error.
 func (r *reader) ReadDir(dirPath string) ([]fs.DirEntry, error) {
 	entries, err := os.ReadDir(r.PathFor(dirPath))
 	if err != nil {
@@ -55,49 +54,35 @@ func (r *reader) ReadDir(dirPath string) ([]fs.DirEntry, error) {
 	return entries, nil
 }
 
-// PathExistsOption represents options for PathExists function
-type PathExistsOption func(*pathExistsOptions)
-
-type pathExistsOptions struct {
-	skipContentCheck bool
-}
-
-// WithSkipContentCheck configures PathExists to skip content verification
-// and only check if the path can be opened
-func WithSkipContentCheck() PathExistsOption {
-	return func(opts *pathExistsOptions) {
-		opts.skipContentCheck = true
-	}
-}
-
 // PathExists checks if a path exists and is readable and returns a boolean
 // indicating existence, and an error only if there was a problem checking the
 // path.
-func (r *reader) PathExists(path string, opts ...PathExistsOption) (bool, error) {
+func (r *reader) PathExists(filePath string, opts ...PathExistsOption) (bool, error) {
 	options := &pathExistsOptions{}
 	for _, opt := range opts {
 		opt(options)
 	}
-	return checkPathExists(r.PathFor(path), options)
+	return checkPathExists(r.PathFor(filePath), options)
 }
 
-func checkPathExists(path string, options *pathExistsOptions) (bool, error) {
-	info, err := os.Stat(path)
+func checkPathExists(filePath string, options *pathExistsOptions) (bool, error) {
+	info, err := os.Stat(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return false, nil
 		}
 		return false, fmt.Errorf("error checking path: %w", err)
 	}
+
 	pathType := entryTypeFile
 	if info.IsDir() {
 		pathType = entryTypeDir
 	}
 
 	// Open the file/directory once
-	file, err := os.Open(path)
+	file, err := os.Open(filePath)
 	if err != nil {
-		return false, fmt.Errorf("%s exists but %w: %w", pathType, errors.ErrReadingPath, err)
+		return false, fmt.Errorf("%s exists but %w: %w", pathType, ErrReadingPath, err)
 	}
 	defer file.Close()
 
@@ -117,7 +102,7 @@ func validateContents(file *os.File, isDir bool) error {
 		// read a single entry from the directory to confirm readability
 		_, err := file.Readdirnames(1)
 		if err != nil && !errors.Is(err, io.EOF) {
-			return fmt.Errorf("%w: %w", errors.ErrReadingPath, err)
+			return fmt.Errorf("%w: %w", ErrReadingPath, err)
 		}
 		return nil
 	}
@@ -126,7 +111,7 @@ func validateContents(file *os.File, isDir bool) error {
 	buffer := make([]byte, 1)
 	_, err := file.Read(buffer)
 	if err != nil {
-		return fmt.Errorf("%w, %w", errors.ErrReadingPath, err)
+		return fmt.Errorf("%w, %w", ErrReadingPath, err)
 	}
 	return nil
 }

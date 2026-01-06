@@ -75,8 +75,6 @@ var (
 	ErrAuthenticationFailed = errors.New("authentication failed")
 
 	// io
-	ErrReadingPath = errors.New("failed reading path")
-	ErrPathIsDir   = errors.New("provided path is a directory")
 	ErrNotFound    = errors.New("not found")
 	ErrNotExist    = os.ErrNotExist
 	ErrInvalidPath = errors.New("invalid path")

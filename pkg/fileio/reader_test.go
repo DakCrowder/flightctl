@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/flightctl/flightctl/internal/agent/device/errors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -29,7 +28,7 @@ func TestCheckPathExistsAndReadable(t *testing.T) {
 
 	// exists but not readable
 	exists, err = readWriter.PathExists(filePath)
-	require.ErrorIs(err, errors.ErrReadingPath)
+	require.ErrorIs(err, ErrReadingPath)
 	require.False(exists)
 
 	subDir := "sub"
@@ -37,7 +36,7 @@ func TestCheckPathExistsAndReadable(t *testing.T) {
 	require.NoError(err)
 
 	exists, err = readWriter.PathExists(subDir)
-	require.ErrorIs(err, errors.ErrReadingPath)
+	require.ErrorIs(err, ErrReadingPath)
 	require.False(exists)
 
 	// empty dir

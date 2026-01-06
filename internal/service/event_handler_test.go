@@ -7,7 +7,6 @@ import (
 	"time"
 
 	api "github.com/flightctl/flightctl/api/v1beta1"
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
 	"github.com/flightctl/flightctl/internal/config/ca"
 	"github.com/flightctl/flightctl/internal/consts"
 	fcrypto "github.com/flightctl/flightctl/internal/crypto"
@@ -17,6 +16,7 @@ import (
 	"github.com/flightctl/flightctl/internal/store/model"
 	"github.com/flightctl/flightctl/internal/util"
 	fccrypto "github.com/flightctl/flightctl/pkg/crypto"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"github.com/sirupsen/logrus"

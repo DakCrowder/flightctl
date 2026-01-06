@@ -8,7 +8,8 @@ import (
 	"github.com/flightctl/flightctl/api/v1beta1"
 	"github.com/flightctl/flightctl/internal/agent/client"
 	"github.com/flightctl/flightctl/internal/agent/device/errors"
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	managedfileio "github.com/flightctl/flightctl/internal/agent/device/fileio"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/pkg/log"
 	"github.com/samber/lo"
 )
@@ -135,7 +136,7 @@ func (p *inlineProvider) writeInlineContent(appPath string, contents []v1beta1.A
 		return fmt.Errorf("creating directory: %w", err)
 	}
 	for _, content := range contents {
-		contentBytes, err := fileio.DecodeContent(lo.FromPtr(content.Content), content.ContentEncoding)
+		contentBytes, err := managedfileio.DecodeContent(lo.FromPtr(content.Content), content.ContentEncoding)
 		if err != nil {
 			return fmt.Errorf("decoding application content: %w", err)
 		}

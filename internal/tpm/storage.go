@@ -7,7 +7,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/pkg/log"
 	"github.com/google/go-tpm/tpm2"
 	"gopkg.in/yaml.v3"

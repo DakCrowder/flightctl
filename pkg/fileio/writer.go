@@ -1,14 +1,10 @@
 package fileio
 
 import (
-	"archive/tar"
 	"bufio"
-	"compress/gzip"
 	"crypto/rand"
-	"encoding/base64"
 	"fmt"
 	"io"
-	"io/fs"
 	"os"
 	"os/user"
 	"path"
@@ -17,84 +13,21 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/flightctl/flightctl/api/v1beta1"
 	"github.com/google/renameio"
-	"github.com/samber/lo"
 )
 
-// writer is responsible for writing files to the device
+// writer is responsible for writing files to the filesystem.
 type writer struct {
-	// rootDir is the root directory for the device writer useful for testing
+	// rootDir is the root directory, useful for testing
 	rootDir string
 }
 
-type symlinkBehavior int
-
-const (
-	symlinkSkip symlinkBehavior = iota
-	symlinkError
-	symlinkPreserve
-	symlinkFollow
-	symlinkFollowWithinRoot
-	symlinkPreserveWithinRoot
-)
-
-type copyDirOptions struct {
-	symlinkBehavior symlinkBehavior
-	rootDir         string
-}
-
-// CopyDirOption is a functional option for CopyDir
-type CopyDirOption func(*copyDirOptions)
-
-// WithSkipSymlink skips symlinks during directory copy
-func WithSkipSymlink() CopyDirOption {
-	return func(opts *copyDirOptions) {
-		opts.symlinkBehavior = symlinkSkip
-	}
-}
-
-// WithErrorOnSymlink returns an error if a symlink is encountered during directory copy
-func WithErrorOnSymlink() CopyDirOption {
-	return func(opts *copyDirOptions) {
-		opts.symlinkBehavior = symlinkError
-	}
-}
-
-// WithPreserveSymlink preserves symlinks as-is during directory copy
-func WithPreserveSymlink() CopyDirOption {
-	return func(opts *copyDirOptions) {
-		opts.symlinkBehavior = symlinkPreserve
-	}
-}
-
-// WithFollowSymlink follows symlinks during directory copy with validation
-func WithFollowSymlink() CopyDirOption {
-	return func(opts *copyDirOptions) {
-		opts.symlinkBehavior = symlinkFollow
-	}
-}
-
-// WithFollowSymlinkWithinRoot follows symlinks only if they resolve within the source root directory
-func WithFollowSymlinkWithinRoot() CopyDirOption {
-	return func(opts *copyDirOptions) {
-		opts.symlinkBehavior = symlinkFollowWithinRoot
-	}
-}
-
-// WithPreserveSymlinkWithinRoot preserves symlinks only if they resolve within the source root directory
-func WithPreserveSymlinkWithinRoot() CopyDirOption {
-	return func(opts *copyDirOptions) {
-		opts.symlinkBehavior = symlinkPreserveWithinRoot
-	}
-}
-
-// New creates a new writer
+// NewWriter creates a new writer.
 func NewWriter() *writer {
 	return &writer{}
 }
 
-// SetRootdir sets the root directory for the writer, useful for testing
+// SetRootdir sets the root directory for the writer, useful for testing.
 func (w *writer) SetRootdir(path string) {
 	w.rootDir = path
 }
@@ -104,7 +37,7 @@ func (w *writer) PathFor(filePath string) string {
 }
 
 // WriteFile writes the provided data to the file at the path with the provided permissions and ownership information
-func (w *writer) WriteFile(name string, data []byte, perm fs.FileMode, opts ...FileOption) error {
+func (w *writer) WriteFile(name string, data []byte, perm os.FileMode, opts ...FileOption) error {
 	fopts := &fileOptions{uid: -1, gid: -1}
 	for _, opt := range opts {
 		opt(fopts)
@@ -113,7 +46,7 @@ func (w *writer) WriteFile(name string, data []byte, perm fs.FileMode, opts ...F
 	var uid, gid int
 	// if rootDir is set use the default UID and GID
 	if w.rootDir != "" {
-		defaultUID, defaultGID, err := getUserIdentity()
+		defaultUID, defaultGID, err := GetUserIdentity()
 		if err != nil {
 			return err
 		}
@@ -151,7 +84,6 @@ func (w *writer) RemoveContents(path string) error {
 	entries, err := os.ReadDir(fullPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			// nothing to do
 			return nil
 		}
 		return fmt.Errorf("read contents of %q: %w", fullPath, err)
@@ -176,11 +108,11 @@ func (w *writer) MkdirTemp(prefix string) (string, error) {
 	if err := os.MkdirAll(baseDir, DefaultDirectoryPermissions); err != nil {
 		return "", err
 	}
-	path, err := os.MkdirTemp(baseDir, prefix)
+	tmpPath, err := os.MkdirTemp(baseDir, prefix)
 	if err != nil {
 		return "", err
 	}
-	return strings.TrimPrefix(path, w.rootDir), nil
+	return strings.TrimPrefix(tmpPath, w.rootDir), nil
 }
 
 func (w *writer) CopyFile(src, dst string) error {
@@ -429,10 +361,6 @@ func (w *writer) preserveSymlinkWithinRoot(srcPath, dstPath string, opts *copyDi
 	return w.preserveSymlink(srcPath, dstPath)
 }
 
-func (w *writer) CreateManagedFile(file v1beta1.FileSpec) (ManagedFile, error) {
-	return newManagedFile(file, w)
-}
-
 func (w *writer) OverwriteAndWipe(file string) error {
 	if err := w.overwriteFileWithRandomData(file); err != nil {
 		return fmt.Errorf("could not overwrite file %s with random data: %w", file, err)
@@ -482,7 +410,6 @@ func writeFileAtomically(fpath string, b []byte, dirMode, fileMode os.FileMode, 
 	defer func() {
 		_ = t.Cleanup()
 	}()
-	// Set permissions before writing data, in case the data is sensitive.
 	if err := t.Chmod(fileMode); err != nil {
 		return err
 	}
@@ -501,53 +428,8 @@ func writeFileAtomically(fpath string, b []byte, dirMode, fileMode os.FileMode, 
 	return t.CloseAtomicallyReplace()
 }
 
-// This is essentially ResolveNodeUidAndGid() from Ignition; XXX should dedupe
-func getFileOwnership(file v1beta1.FileSpec) (int, int, error) {
-	uid, gid := 0, 0 // default to root
-	var err error
-	user := lo.FromPtr(file.User)
-	if user != "" {
-		uid, err = userToUID(user)
-		if err != nil {
-			return uid, gid, err
-		}
-	}
-
-	group := lo.FromPtr(file.Group)
-	if group != "" {
-		gid, err = groupToGID(*file.Group)
-		if err != nil {
-			return uid, gid, err
-		}
-	}
-	return uid, gid, nil
-}
-
-func userToUID(user string) (int, error) {
-	userID, err := strconv.Atoi(user)
-	if err != nil {
-		uid, err := lookupUID(user)
-		if err != nil {
-			return 0, fmt.Errorf("failed to convert user to UID: %w", err)
-		}
-		return uid, nil
-	}
-	return userID, nil
-}
-
-func groupToGID(group string) (int, error) {
-	groupID, err := strconv.Atoi(group)
-	if err != nil {
-		gid, err := lookupGID(group)
-		if err != nil {
-			return 0, fmt.Errorf("failed to convert group to GID: %w", err)
-		}
-		return gid, nil
-	}
-	return groupID, nil
-}
-
-func getUserIdentity() (int, int, error) {
+// GetUserIdentity returns the current user's UID and GID.
+func GetUserIdentity() (int, int, error) {
 	currentUser, err := user.Current()
 	if err != nil {
 		return 0, 0, fmt.Errorf("failed retrieving current user: %w", err)
@@ -563,7 +445,8 @@ func getUserIdentity() (int, int, error) {
 	return uid, gid, nil
 }
 
-func lookupUID(username string) (int, error) {
+// LookupUID looks up a user by username and returns the UID.
+func LookupUID(username string) (int, error) {
 	osUser, err := user.Lookup(username)
 	if err != nil {
 		return 0, fmt.Errorf("failed to retrieve UserID for username: %s", username)
@@ -572,172 +455,12 @@ func lookupUID(username string) (int, error) {
 	return uid, nil
 }
 
-func lookupGID(group string) (int, error) {
+// LookupGID looks up a group by name and returns the GID.
+func LookupGID(group string) (int, error) {
 	osGroup, err := user.LookupGroup(group)
 	if err != nil {
 		return 0, fmt.Errorf("failed to retrieve GroupID for group: %v", group)
 	}
 	gid, _ := strconv.Atoi(osGroup.Gid)
 	return gid, nil
-}
-
-// DecodeContents decodes the content based on the encoding type and returns the
-// decoded content as a byte slice.
-func DecodeContent(content string, encoding *v1beta1.EncodingType) ([]byte,
-	error) {
-	if encoding == nil || *encoding == "plain" {
-		return []byte(content), nil
-	}
-
-	switch *encoding {
-	case "base64":
-		decoded, err := base64.StdEncoding.DecodeString(content)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decode base64 content: %w", err)
-		}
-		return decoded, nil
-	default:
-		return nil, fmt.Errorf("unsupported content encoding: %q", *encoding)
-	}
-}
-
-// WriteTmpFile writes the given content to a temporary file with the specified name prefix.
-// It returns the path to the tmp file and a cleanup function to remove it.
-func WriteTmpFile(rw ReadWriter, prefix, filename string, content []byte, perm os.FileMode) (path string, cleanup func(), err error) {
-	tmpDir, err := rw.MkdirTemp(prefix)
-	if err != nil {
-		return "", nil, fmt.Errorf("creating tmp dir: %w", err)
-	}
-
-	tmpPath := filepath.Join(tmpDir, filename)
-	if err := rw.WriteFile(tmpPath, content, perm); err != nil {
-		_ = rw.RemoveAll(tmpDir)
-		return "", nil, fmt.Errorf("writing tmp file: %w", err)
-	}
-
-	cleanup = func() {
-		_ = rw.RemoveAll(tmpDir)
-	}
-	return tmpPath, cleanup, nil
-}
-
-// AppendFile appends the provided data to the file at the path, creating the file if it doesn't exist.
-func AppendFile(w Writer, name string, data []byte, perm fs.FileMode, opts ...FileOption) error {
-	fopts := &fileOptions{uid: -1, gid: -1}
-	for _, opt := range opts {
-		opt(fopts)
-	}
-
-	var uid, gid int
-	// Check if we're in test mode by checking if PathFor returns a modified path
-	testPath := w.PathFor("")
-	if testPath != "" {
-		// Test mode: use default UID and GID
-		defaultUID, defaultGID, err := getUserIdentity()
-		if err != nil {
-			return err
-		}
-		uid = defaultUID
-		gid = defaultGID
-	} else {
-		// Production mode: use provided or default ownership
-		uid = fopts.uid
-		gid = fopts.gid
-	}
-
-	filePath := w.PathFor(name)
-
-	// Create directory if it doesn't exist
-	if err := os.MkdirAll(filepath.Dir(filePath), DefaultDirectoryPermissions); err != nil {
-		return err
-	}
-
-	// Open file for appending, create if not exists
-	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, perm)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	// Set ownership if specified (use -1 as "don't change ownership" sentinel)
-	if uid != -1 && gid != -1 {
-		if err := file.Chown(uid, gid); err != nil {
-			return err
-		}
-	}
-
-	// Append data
-	_, err = file.Write(data)
-	return err
-}
-
-// UnpackTar unpacks a tar or tar.gz file to the destination directory.
-func UnpackTar(writer Writer, tarPath, destDir string) error {
-	// Open the tar file for streaming
-	file, err := os.Open(writer.PathFor(tarPath))
-	if err != nil {
-		return fmt.Errorf("opening tar file: %w", err)
-	}
-	defer file.Close()
-
-	var tarReader *tar.Reader
-	if strings.HasSuffix(tarPath, ".gz") || strings.HasSuffix(tarPath, ".tgz") {
-		gzr, err := gzip.NewReader(file)
-		if err != nil {
-			return fmt.Errorf("creating gzip reader: %w", err)
-		}
-		defer gzr.Close()
-		tarReader = tar.NewReader(gzr)
-	} else {
-		tarReader = tar.NewReader(file)
-	}
-
-	// Extract tar contents
-	for {
-		header, err := tarReader.Next()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return fmt.Errorf("reading tar header: %w", err)
-		}
-
-		cleanName := filepath.Clean(header.Name)
-		if strings.HasPrefix(cleanName, "..") || filepath.IsAbs(cleanName) {
-			return fmt.Errorf("invalid file path in tar: %s", header.Name)
-		}
-		destPath := filepath.Join(destDir, cleanName)
-
-		perm := header.FileInfo().Mode().Perm()
-
-		switch header.Typeflag {
-		case tar.TypeDir:
-			if perm == 0 {
-				perm = DefaultDirectoryPermissions
-			}
-			if err := writer.MkdirAll(destPath, perm); err != nil {
-				return fmt.Errorf("creating directory %s: %w", destPath, err)
-			}
-		case tar.TypeReg:
-			if perm == 0 {
-				perm = DefaultFilePermissions
-			}
-			if err := os.MkdirAll(filepath.Dir(writer.PathFor(destPath)), DefaultDirectoryPermissions); err != nil {
-				return fmt.Errorf("creating parent directory: %w", err)
-			}
-			destFile, err := os.OpenFile(writer.PathFor(destPath), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, perm)
-			if err != nil {
-				return fmt.Errorf("creating file %s: %w", destPath, err)
-			}
-			// Use LimitReader to prevent decompression bombs
-			limitedReader := io.LimitReader(tarReader, header.Size)
-			if _, err := io.Copy(destFile, limitedReader); err != nil { // #nosec G110
-				destFile.Close()
-				return fmt.Errorf("writing file %s: %w", destPath, err)
-			}
-			destFile.Close()
-		}
-	}
-
-	return nil
 }

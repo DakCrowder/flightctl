@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/pkg/log"
 	"github.com/stretchr/testify/require"
 )
@@ -461,7 +462,8 @@ func TestProcessInstallManifest(t *testing.T) {
 			manifest := tt.setup(t, sourceDir, config)
 
 			logger := log.NewPrefixLogger("test")
-			err := processInstallManifest(manifest, config, logger)
+			rw := fileio.NewReadWriter()
+			err := processInstallManifest(rw, manifest, config, logger)
 
 			if tt.expectError {
 				require.Error(t, err, "Expected error but got none")

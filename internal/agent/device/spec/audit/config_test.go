@@ -3,7 +3,7 @@ package audit
 import (
 	"testing"
 
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )

@@ -74,7 +74,7 @@ func TestMkdirTemp(t *testing.T) {
 			_ = rw.RemoveAll(dir)
 		}()
 
-		uid, gid, err := getUserIdentity()
+		uid, gid, err := GetUserIdentity()
 		require.NoError(err)
 
 		err = rw.WriteFile(filepath.Join(dir, testFileName), testFileBytes, DefaultFilePermissions, WithUid(uid), WithGid(gid))

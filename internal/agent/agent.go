@@ -13,7 +13,7 @@ import (
 	"github.com/flightctl/flightctl/internal/agent/device/config"
 	"github.com/flightctl/flightctl/internal/agent/device/console"
 	"github.com/flightctl/flightctl/internal/agent/device/dependency"
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	managedfileio "github.com/flightctl/flightctl/internal/agent/device/fileio"
 	"github.com/flightctl/flightctl/internal/agent/device/hook"
 	"github.com/flightctl/flightctl/internal/agent/device/lifecycle"
 	"github.com/flightctl/flightctl/internal/agent/device/os"
@@ -30,6 +30,7 @@ import (
 	"github.com/flightctl/flightctl/internal/agent/shutdown"
 	"github.com/flightctl/flightctl/internal/tpm"
 	"github.com/flightctl/flightctl/pkg/executer"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/pkg/log"
 	"github.com/flightctl/flightctl/pkg/poll"
 	"github.com/flightctl/flightctl/pkg/version"
@@ -73,7 +74,7 @@ func (a *Agent) Run(ctx context.Context) error {
 	go instrumentation.NewAgentInstrumentation(a.log, a.config).Run(ctx)
 
 	// create file io writer and reader
-	deviceReadWriter := fileio.NewReadWriter(fileio.WithTestRootDir(a.config.GetTestRootDir()))
+	deviceReadWriter := managedfileio.NewManagedReadWriter(managedfileio.WithTestRootDir(a.config.GetTestRootDir()))
 
 	tpmClient, err := a.tryLoadTPM(deviceReadWriter)
 	if err != nil {

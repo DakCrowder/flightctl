@@ -11,10 +11,11 @@ import (
 	"time"
 
 	"github.com/flightctl/flightctl/api/v1beta1"
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	managedfileio "github.com/flightctl/flightctl/internal/agent/device/fileio"
 	client "github.com/flightctl/flightctl/internal/api/client/agent"
 	baseclient "github.com/flightctl/flightctl/internal/client"
 	"github.com/flightctl/flightctl/internal/container"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/pkg/log"
 	"github.com/flightctl/flightctl/pkg/poll"
 	"github.com/flightctl/flightctl/pkg/reqid"
@@ -175,7 +176,7 @@ func authFromSpec(log *log.PrefixLogger, device *v1beta1.DeviceSpec, authPath st
 		for _, file := range spec.Inline {
 			if strings.TrimSpace(file.Path) == authPath {
 				// ensure content is properly decoded
-				contents, err := fileio.DecodeContent(file.Content, file.ContentEncoding)
+				contents, err := managedfileio.DecodeContent(file.Content, file.ContentEncoding)
 				if err != nil {
 					log.Errorf("decode content: %v", err)
 					continue

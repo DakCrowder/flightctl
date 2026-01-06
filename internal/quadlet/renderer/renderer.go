@@ -2,12 +2,12 @@ package renderer
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/sirupsen/logrus"
 )
 
@@ -79,49 +79,53 @@ func NewRendererConfig() *RendererConfig {
 	}
 }
 
-func findBinarySource(binaryName string, searchDirs []string) (string, error) {
+func findBinarySource(rw fileio.ReadWriter, binaryName string, searchDirs []string) (string, error) {
 	for _, dir := range searchDirs {
 		path := filepath.Join(dir, binaryName)
-		if _, err := os.Stat(path); err == nil {
+		exists, err := rw.PathExists(path)
+		if err != nil {
+			continue
+		}
+		if exists {
 			return path, nil
 		}
 	}
 	return "", fmt.Errorf("binary %q not found in directories: %v", binaryName, searchDirs)
 }
 
-func processInstallManifest(manifest []InstallAction, config *RendererConfig, log logrus.FieldLogger) error {
+func processInstallManifest(rw fileio.ReadWriter, manifest []InstallAction, config *RendererConfig, log logrus.FieldLogger) error {
 	for _, action := range manifest {
 		switch action.Action {
 		case ActionCopyFile:
-			if err := processFile(action.Source, action.Destination, action.Template, action.Mode, config); err != nil {
+			if err := processFile(rw, action.Source, action.Destination, action.Template, action.Mode, config); err != nil {
 				return fmt.Errorf("failed to process file %s: %w", action.Source, err)
 			}
 			log.Infof("Processed file: %s -> %s (template=%t)", action.Source, action.Destination, action.Template)
 
 		case ActionCopyDir:
-			if err := copyDir(action.Source, action.Destination, action.Mode); err != nil {
+			if err := copyDir(rw, action.Source, action.Destination, action.Mode); err != nil {
 				return fmt.Errorf("failed to copy directory %s to %s: %w", action.Source, action.Destination, err)
 			}
 			log.Infof("Copied directory: %s -> %s", action.Source, action.Destination)
 
 		case ActionCopyBinary:
-			sourcePath, err := findBinarySource(action.Source, config.BinSourceDirs)
+			sourcePath, err := findBinarySource(rw, action.Source, config.BinSourceDirs)
 			if err != nil {
 				return fmt.Errorf("failed to find binary %s: %w", action.Source, err)
 			}
-			if err := processFile(sourcePath, action.Destination, action.Template, action.Mode, config); err != nil {
+			if err := processFile(rw, sourcePath, action.Destination, action.Template, action.Mode, config); err != nil {
 				return fmt.Errorf("failed to process binary %s: %w", action.Source, err)
 			}
 			log.Infof("Processed binary: %s -> %s (found at %s)", action.Source, action.Destination, sourcePath)
 
 		case ActionCreateEmptyFile:
-			if err := createEmptyFile(action.Destination, action.Mode, log); err != nil {
+			if err := createEmptyFile(rw, action.Destination, action.Mode, log); err != nil {
 				return fmt.Errorf("failed to create empty file %s: %w", action.Destination, err)
 			}
 			log.Infof("Created empty file: %s", action.Destination)
 
 		case ActionCreateEmptyDir:
-			if err := createEmptyDirectory(action.Destination, action.Mode, log); err != nil {
+			if err := createEmptyDirectory(rw, action.Destination, action.Mode, log); err != nil {
 				return fmt.Errorf("failed to create empty directory %s: %w", action.Destination, err)
 			}
 			log.Infof("Created empty directory: %s", action.Destination)
@@ -133,13 +137,8 @@ func processInstallManifest(manifest []InstallAction, config *RendererConfig, lo
 	return nil
 }
 
-func processFile(sourcePath, destPath string, isTemplate bool, mode os.FileMode, config *RendererConfig) error {
-	destDir := filepath.Dir(destPath)
-	if err := os.MkdirAll(destDir, ExecutableFileMode); err != nil {
-		return fmt.Errorf("failed to create destination directory %s: %w", destDir, err)
-	}
-
-	content, err := os.ReadFile(sourcePath)
+func processFile(rw fileio.ReadWriter, sourcePath, destPath string, isTemplate bool, mode os.FileMode, config *RendererConfig) error {
+	content, err := rw.ReadFile(sourcePath)
 	if err != nil {
 		return fmt.Errorf("failed to read source file: %w", err)
 	}
@@ -160,103 +159,61 @@ func processFile(sourcePath, destPath string, isTemplate bool, mode os.FileMode,
 		finalContent = content
 	}
 
-	if err := os.WriteFile(destPath, finalContent, mode); err != nil {
+	if err := rw.WriteFile(destPath, finalContent, mode); err != nil {
 		return fmt.Errorf("failed to write destination file: %w", err)
 	}
 
 	return nil
 }
 
-func createEmptyFile(destPath string, mode os.FileMode, log logrus.FieldLogger) error {
-	destDir := filepath.Dir(destPath)
-	if err := os.MkdirAll(destDir, ExecutableFileMode); err != nil {
-		return fmt.Errorf("failed to create destination directory %s: %w", destDir, err)
+func createEmptyFile(rw fileio.ReadWriter, destPath string, mode os.FileMode, log logrus.FieldLogger) error {
+	exists, err := rw.PathExists(destPath, fileio.WithSkipContentCheck())
+	if err != nil {
+		return fmt.Errorf("failed to check if file exists: %w", err)
 	}
-
-	if _, err := os.Stat(destPath); err == nil {
+	if exists {
 		log.Infof("File already exists, skipping: %s", destPath)
 		return nil
 	}
 
-	file, err := os.Create(destPath)
-	if err != nil {
+	if err := rw.WriteFile(destPath, []byte{}, mode); err != nil {
 		return fmt.Errorf("failed to create file: %w", err)
-	}
-	file.Close()
-
-	if err := os.Chmod(destPath, mode); err != nil {
-		return fmt.Errorf("failed to set permissions: %w", err)
 	}
 
 	return nil
 }
 
-func createEmptyDirectory(destPath string, mode os.FileMode, log logrus.FieldLogger) error {
-	if stat, err := os.Stat(destPath); err == nil {
-		if stat.IsDir() {
-			log.Infof("Directory already exists, skipping: %s", destPath)
-			return nil
-		}
-		return fmt.Errorf("path exists but is not a directory: %s", destPath)
+func createEmptyDirectory(rw fileio.ReadWriter, destPath string, mode os.FileMode, log logrus.FieldLogger) error {
+	exists, err := rw.PathExists(destPath, fileio.WithSkipContentCheck())
+	if err != nil {
+		return fmt.Errorf("failed to check if directory exists: %w", err)
+	}
+	if exists {
+		log.Infof("Directory already exists, skipping: %s", destPath)
+		return nil
 	}
 
-	if err := os.MkdirAll(destPath, mode); err != nil {
+	if err := rw.MkdirAll(destPath, mode); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
 	return nil
 }
 
-func copyDir(src, dst string, mode os.FileMode) error {
-	if err := os.MkdirAll(dst, ExecutableFileMode); err != nil {
+func copyDir(rw fileio.ReadWriter, src, dst string, mode os.FileMode) error {
+	if err := rw.CopyDir(src, dst); err != nil {
 		return err
 	}
 
-	entries, err := os.ReadDir(src)
-	if err != nil {
-		return err
-	}
-
-	for _, entry := range entries {
-		srcPath := filepath.Join(src, entry.Name())
-		dstPath := filepath.Join(dst, entry.Name())
-
-		if entry.IsDir() {
-			if err := copyDir(srcPath, dstPath, mode); err != nil {
-				return err
-			}
-		} else {
-			if err := copyFile(srcPath, dstPath, mode); err != nil {
-				return err
-			}
+	return filepath.Walk(rw.PathFor(dst), func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
 		}
-	}
-
-	return nil
-}
-
-func copyFile(src, dst string, mode os.FileMode) error {
-	sourceFile, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer sourceFile.Close()
-
-	destFile, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer destFile.Close()
-
-	if _, err := io.Copy(destFile, sourceFile); err != nil {
-		return err
-	}
-
-	if err := os.Chmod(dst, mode); err != nil {
-		return err
-	}
-
-	return nil
+		if info.IsDir() {
+			return os.Chmod(path, ExecutableFileMode)
+		}
+		return os.Chmod(path, mode)
+	})
 }
 
 func (config *RendererConfig) ApplyFlightctlServicesTagOverride(log logrus.FieldLogger) {
@@ -287,13 +244,13 @@ func (config *RendererConfig) ApplyFlightctlServicesTagOverride(log logrus.Field
 }
 
 // RenderQuadlets orchestrates all installation operations
-func RenderQuadlets(config *RendererConfig, log logrus.FieldLogger) error {
+func RenderQuadlets(rw fileio.ReadWriter, config *RendererConfig, log logrus.FieldLogger) error {
 	log.Info("Starting installation")
 
 	config.ApplyFlightctlServicesTagOverride(log)
 
 	manifest := servicesManifest(config)
-	if err := processInstallManifest(manifest, config, log); err != nil {
+	if err := processInstallManifest(rw, manifest, config, log); err != nil {
 		return fmt.Errorf("failed to process install manifest: %w", err)
 	}
 

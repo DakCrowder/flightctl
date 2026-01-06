@@ -1,7 +1,7 @@
 package audit
 
 import (
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	"github.com/flightctl/flightctl/pkg/fileio"
 )
 
 const (

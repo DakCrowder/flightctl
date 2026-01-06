@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	"github.com/flightctl/flightctl/pkg/certmanager"
 	fccrypto "github.com/flightctl/flightctl/pkg/crypto"
 	oscrypto "github.com/openshift/library-go/pkg/crypto"

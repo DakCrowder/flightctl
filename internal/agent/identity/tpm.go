@@ -15,7 +15,7 @@ import (
 	"github.com/flightctl/flightctl/api/v1beta1"
 	"github.com/flightctl/flightctl/internal/agent/client"
 	agent_config "github.com/flightctl/flightctl/internal/agent/config"
-	"github.com/flightctl/flightctl/internal/agent/device/fileio"
+	"github.com/flightctl/flightctl/pkg/fileio"
 	agent_client "github.com/flightctl/flightctl/internal/api/client/agent"
 	base_client "github.com/flightctl/flightctl/internal/client"
 	"github.com/flightctl/flightctl/internal/tpm"

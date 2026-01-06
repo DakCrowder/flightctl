@@ -19,7 +19,7 @@ func TestSync(t *testing.T) {
 		name       string
 		current    *v1beta1.DeviceSpec
 		desired    *v1beta1.DeviceSpec
-		setupMocks func(mockWriter *fileio.MockWriter, mockManagedFile *fileio.MockManagedFile, f string)
+		setupMocks func(mockWriter *fileio.MockManagedWriter, mockManagedFile *fileio.MockManagedFile, f string)
 		wantErr    error
 		// files which are created via the sync operation
 		createdFiles []string
@@ -80,7 +80,7 @@ func TestSync(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			mockWriter := fileio.NewMockWriter(ctrl)
+			mockWriter := fileio.NewMockManagedWriter(ctrl)
 			mockManagedFile := fileio.NewMockManagedFile(ctrl)
 			controller := NewController(
 				mockWriter,
@@ -163,14 +163,14 @@ func TestComputeRemoval(t *testing.T) {
 	}
 }
 
-func expectCreateFile(mockWriter *fileio.MockWriter, mockManagedFile *fileio.MockManagedFile, _ string) {
+func expectCreateFile(mockWriter *fileio.MockManagedWriter, mockManagedFile *fileio.MockManagedFile, _ string) {
 	mockWriter.EXPECT().CreateManagedFile(gomock.Any()).Return(mockManagedFile, nil)
 	mockManagedFile.EXPECT().IsUpToDate().Return(false, nil)
 	mockManagedFile.EXPECT().Exists().Return(false, nil)
 	mockManagedFile.EXPECT().Write().Return(nil)
 }
 
-func expectRemoveFile(mockWriter *fileio.MockWriter, f string) {
+func expectRemoveFile(mockWriter *fileio.MockManagedWriter, f string) {
 	mockWriter.EXPECT().RemoveFile(f).Return(nil)
 }
 

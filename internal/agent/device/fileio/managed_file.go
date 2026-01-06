@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"strconv"
 	"syscall"
 
 	"github.com/ccoveille/go-safecast"
 	"github.com/flightctl/flightctl/api/v1beta1"
-	"github.com/flightctl/flightctl/internal/agent/device/errors"
+	"github.com/flightctl/flightctl/pkg/fileio"
+	"github.com/samber/lo"
 )
 
 type managedFile struct {
@@ -19,10 +21,10 @@ type managedFile struct {
 	uid      int
 	gid      int
 	contents []byte
-	writer   Writer
+	writer   ManagedWriter
 }
 
-func newManagedFile(f v1beta1.FileSpec, writer Writer) (ManagedFile, error) {
+func newManagedFile(f v1beta1.FileSpec, writer ManagedWriter) (ManagedFile, error) {
 	mf := &managedFile{
 		file:   f,
 		writer: writer,
@@ -44,7 +46,7 @@ func (m *managedFile) initExistingFileMetadata() error {
 		return err
 	}
 	if fileInfo.IsDir() {
-		return fmt.Errorf("%w: %s", errors.ErrPathIsDir, path)
+		return fmt.Errorf("%w: %s", fileio.ErrPathIsDir, path)
 	}
 	m.exists = true
 	m.size = fileInfo.Size()
@@ -158,11 +160,11 @@ func (m *managedFile) Write() error {
 		return fmt.Errorf("failed to retrieve file ownership for file %q: %w", m.Path(), err)
 	}
 
-	return m.writer.WriteFile(m.Path(), m.contents, mode, WithGid(gid), WithUid(uid))
+	return m.writer.WriteFile(m.Path(), m.contents, mode, fileio.WithGid(gid), fileio.WithUid(uid))
 }
 
 func intToFileMode(i *int) (os.FileMode, error) {
-	mode := DefaultFilePermissions
+	mode := fileio.DefaultFilePermissions
 	if i != nil {
 		filemode, err := safecast.ToUint32(*i)
 		if err != nil {
@@ -183,4 +185,50 @@ func intToFileMode(i *int) (os.FileMode, error) {
 		}
 	}
 	return mode, nil
+}
+
+// This is essentially ResolveNodeUidAndGid() from Ignition; XXX should dedupe
+func getFileOwnership(file v1beta1.FileSpec) (int, int, error) {
+	uid, gid := 0, 0 // default to root
+	var err error
+	user := lo.FromPtr(file.User)
+	if user != "" {
+		uid, err = userToUID(user)
+		if err != nil {
+			return uid, gid, err
+		}
+	}
+
+	group := lo.FromPtr(file.Group)
+	if group != "" {
+		gid, err = groupToGID(*file.Group)
+		if err != nil {
+			return uid, gid, err
+		}
+	}
+	return uid, gid, nil
+}
+
+func userToUID(user string) (int, error) {
+	userID, err := strconv.Atoi(user)
+	if err != nil {
+		uid, err := fileio.LookupUID(user)
+		if err != nil {
+			return 0, fmt.Errorf("failed to convert user to UID: %w", err)
+		}
+		return uid, nil
+	}
+	return userID, nil
+}
+
+func groupToGID(group string) (int, error) {
+	groupID, err := strconv.Atoi(group)
+	if err != nil {
+		gid, err := fileio.LookupGID(group)
+		if err != nil {
+			return 0, fmt.Errorf("failed to convert group to GID: %w", err)
+		}
+		return gid, nil
+	}
+	return groupID, nil
 }
