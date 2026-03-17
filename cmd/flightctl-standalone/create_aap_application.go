@@ -141,7 +141,7 @@ func (o *CreateAAPApplicationOptions) Run() error {
 		return fmt.Errorf("failed to create AAP client: %w", err)
 	}
 
-	return standalone.CreateAAPApplication(ctx, standalone.CreateAAPApplicationOptions{
+	return standalone.EnsureAAPApplication(ctx, standalone.EnsureAAPApplicationOptions{
 		AAPConfig:    aapConfig,
 		BaseDomain:   config.Global.BaseDomain,
 		Client:       client,

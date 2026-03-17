@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -14,8 +15,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type OAuthApplicationCreator interface {
+type OAuthApplicationClient interface {
 	CreateOAuthApplication(ctx context.Context, token string, req *aap.AAPOAuthApplicationRequest) (*aap.AAPOAuthApplicationResponse, error)
+	GetOAuthApplicationByName(ctx context.Context, token string, name string, organization int) (*aap.AAPOAuthApplicationResponse, error)
 }
 
 type CreateAAPClientOptions struct {
@@ -65,8 +67,8 @@ func buildTLSConfig(opts CreateAAPClientOptions) (*tls.Config, error) {
 	return tlsConfig, nil
 }
 
-type CreateAAPApplicationOptions struct {
-	Client       OAuthApplicationCreator
+type EnsureAAPApplicationOptions struct {
+	Client       OAuthApplicationClient
 	Logger       logrus.FieldLogger
 	AAPConfig    *standaloneconfig.AAPConfig
 	BaseDomain   string
@@ -75,16 +77,32 @@ type CreateAAPApplicationOptions struct {
 	OutputFile   string
 }
 
-// CreateAAPApplication creates an OAuth application in AAP Gateway and writes
-// the client_id to the specified output file.
-func CreateAAPApplication(ctx context.Context, opts CreateAAPApplicationOptions) error {
+// EnsureAAPApplication ensures an OAuth application exists in AAP Gateway and writes
+// the client_id to the specified output file. It first checks if the application
+// already exists by name, and only creates a new one if not found.
+func EnsureAAPApplication(ctx context.Context, opts EnsureAAPApplicationOptions) error {
 	request := buildOAuthApplicationRequest(opts.BaseDomain, opts.AppName, opts.Organization)
-	clientID, err := createOAuthApplication(ctx, opts.Client, opts.AAPConfig.Token, request)
+	token := opts.AAPConfig.Token
+
+	existingClientID, err := getOAuthApplication(ctx, opts.Client, token, request.Name, request.Organization)
 	if err != nil {
-		return fmt.Errorf("failed to create OAuth application: %w", err)
+		if errors.Is(err, aap.ErrNotFound) {
+			opts.Logger.Infof("OAuth application %q not found, creating new one", request.Name)
+		} else {
+			opts.Logger.Warnf("failed to get OAuth application %q: %v", request.Name, err)
+		}
 	}
 
-	opts.Logger.Info("OAuth application created successfully")
+	var clientID string
+	if existingClientID != "" {
+		opts.Logger.Infof("Found existing OAuth application %q, using its client_id", request.Name)
+		clientID = existingClientID
+	} else {
+		clientID, err = createOAuthApplication(ctx, opts.Client, token, request)
+		if err != nil {
+			return fmt.Errorf("failed to create OAuth application: %w", err)
+		}
+	}
 
 	if err := writeClientIDToFile(clientID, opts.OutputFile); err != nil {
 		return fmt.Errorf("failed to write client_id to %s: %w", opts.OutputFile, err)
@@ -111,7 +129,7 @@ func buildOAuthApplicationRequest(baseDomain string, appName string, organizatio
 	}
 }
 
-func createOAuthApplication(ctx context.Context, client OAuthApplicationCreator, token string, request *aap.AAPOAuthApplicationRequest) (string, error) {
+func createOAuthApplication(ctx context.Context, client OAuthApplicationClient, token string, request *aap.AAPOAuthApplicationRequest) (string, error) {
 	response, err := client.CreateOAuthApplication(ctx, token, request)
 	if err != nil {
 		return "", err
@@ -126,6 +144,23 @@ func createOAuthApplication(ctx context.Context, client OAuthApplicationCreator,
 	}
 
 	return response.ClientID, nil
+}
+
+func getOAuthApplication(ctx context.Context, client OAuthApplicationClient, token string, name string, organization int) (string, error) {
+	application, err := client.GetOAuthApplicationByName(ctx, token, name, organization)
+	if err != nil {
+		return "", err
+	}
+
+	if application == nil {
+		return "", fmt.Errorf("AAP returned nil application")
+	}
+
+	if application.ClientID == "" {
+		return "", fmt.Errorf("AAP returned empty client_id")
+	}
+
+	return application.ClientID, nil
 }
 
 func writeClientIDToFile(clientID string, outputFile string) error {
