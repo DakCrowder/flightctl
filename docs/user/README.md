@@ -18,6 +18,7 @@ Welcome to the Flight Control user documentation.
   * **[Installing the Flight Control Service on Linux](installing/installing-service-on-linux.md)**
 
   * Configuring the Flight Control Service
+    * [Configuring Certificates on Linux](installing/installing-service-on-linux.md#certificate-management) | [on Kubernetes](installing/installing-service-on-kubernetes.md#certificate-management)
     * [Configuring Authentication and Authorization](installing/configuring-auth/overview.md)
     * [Configuring an External PostgreSQL Database](installing/configuring-external-database.md)
     * [Configuring the ImageBuilder Worker](installing/configuring-imagebuilder.md)

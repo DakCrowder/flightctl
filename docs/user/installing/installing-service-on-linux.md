@@ -134,15 +134,46 @@ Required certificates are stored in the `/etc/flightctl/pki` directory. The cert
 
 ```bash
 /etc/flightctl/pki/
-├── ca.crt                                # Root CA certificate
-├── ca.key                                # Root CA private key
-├── ca-bundle.crt                         # CA bundle (ca.crt + client-signer.crt)
-└── flightctl-api/
-    ├── server.crt                        # API server TLS certificate
-    ├── server.key                        # API server private key
-    ├── client-signer.crt                 # Client certificate signing CA
-    └── client-signer.key                 # Client signer private key
+├── ca.crt                                        # Root CA certificate
+├── ca.key                                        # Root CA private key
+├── ca-bundle.crt                                 # CA bundle
+├── flightctl-api/
+│   ├── server.crt                                # API server TLS certificate
+│   ├── server.key                                # API server private key
+│   ├── client-signer.crt                         # Client certificate signing CA
+│   └── client-signer.key                         # Client signer private key
+├── flightctl-ui/
+│   ├── server.crt                                # UI server TLS certificate
+│   └── server.key                                # UI server private key
+├── flightctl-cli-artifacts/
+│   ├── server.crt                                # CLI artifacts server TLS certificate
+│   └── server.key                                # CLI artifacts server private key
+├── flightctl-pam-issuer/
+│   ├── token-signer.crt                          # PAM issuer token signing CA
+│   ├── token-signer.key                          # PAM issuer token signing key
+│   ├── server.crt                                # PAM issuer server TLS certificate
+│   └── server.key                                # PAM issuer server private key
+├── flightctl-alertmanager-proxy/
+│   ├── server.crt                                # Alertmanager proxy TLS certificate
+│   └── server.key                                # Alertmanager proxy private key
+├── flightctl-imagebuilder-api/
+│   ├── server.crt                                # ImageBuilder API TLS certificate
+│   └── server.key                                # ImageBuilder API private key
+├── flightctl-telemetry-gateway/
+│   ├── server.crt                                # Telemetry gateway TLS certificate
+│   └── server.key                                # Telemetry gateway private key
+├── flightctl-grafana/
+│   ├── server.crt                                # Grafana server TLS certificate
+│   └── server.key                                # Grafana server private key
+├── flightctl-prometheus/
+│   ├── server.crt                                # Prometheus server TLS certificate
+│   └── server.key                                # Prometheus server private key
+└── flightctl-userinfo-proxy/
+    ├── server.crt                                # UserInfo proxy TLS certificate
+    └── server.key                                # UserInfo proxy private key
 ```
+
+Not all certificates are required for every deployment. See the tables below for which certificates are conditional on enabled features.
 
 For general info on the certificate architecture, see [Certificate Architecture](../references/certificate-architecture.md).
 
@@ -174,17 +205,62 @@ global:
 
 Populate `/etc/flightctl/pki` with the following certificates:
 
+**Always required:**
+
 | File | Description |
 |------|-------------|
 | `ca.crt` | Root CA certificate |
 | `ca.key` | Root CA private key |
-| `flightctl-api/server.crt` | API server TLS certificate, signed by the root CA. **Must include a SAN** matching the API domain (must match the configured baseDomain) |
+| `ca-bundle.crt` | Concatenation of `ca.crt` + `client-signer.crt` (also include `token-signer.crt` if PAM issuer is enabled) |
+| `flightctl-api/server.crt` | API server TLS certificate, signed by the root CA. Must include a SAN matching `<baseDomain>` |
 | `flightctl-api/server.key` | API server private key |
-| `flightctl-api/client-signer.crt` | Intermediate CA for signing device/client certificates, signed by the root CA |
+| `flightctl-api/client-signer.crt` | Intermediate CA for signing device and client certificates, signed by the root CA |
 | `flightctl-api/client-signer.key` | Client signer CA private key |
-| `ca-bundle.crt` | Concatenation of `ca.crt` + `client-signer.crt` |
+| `flightctl-ui/server.crt` | UI server TLS certificate, signed by the root CA |
+| `flightctl-ui/server.key` | UI server private key |
+| `flightctl-cli-artifacts/server.crt` | CLI artifacts server TLS certificate, signed by the root CA |
+| `flightctl-cli-artifacts/server.key` | CLI artifacts server private key |
 
-Start the Services
+**Required when PAM issuer authentication is enabled (default):**
+
+| File | Description |
+|------|-------------|
+| `flightctl-pam-issuer/token-signer.crt` | Intermediate CA for signing JWT tokens, signed by the root CA |
+| `flightctl-pam-issuer/token-signer.key` | Token signer CA private key |
+| `flightctl-pam-issuer/server.crt` | PAM issuer server TLS certificate, signed by the root CA |
+| `flightctl-pam-issuer/server.key` | PAM issuer server private key |
+
+**Required when ImageBuilder is enabled:**
+
+| File | Description |
+|------|-------------|
+| `flightctl-imagebuilder-api/server.crt` | ImageBuilder API TLS certificate, signed by the root CA |
+| `flightctl-imagebuilder-api/server.key` | ImageBuilder API private key |
+
+**Required when the observability stack is deployed:**
+
+| File | Description |
+|------|-------------|
+| `flightctl-alertmanager-proxy/server.crt` | Alertmanager proxy TLS certificate, signed by the root CA |
+| `flightctl-alertmanager-proxy/server.key` | Alertmanager proxy private key |
+| `flightctl-telemetry-gateway/server.crt` | Telemetry gateway TLS certificate, signed by the root CA |
+| `flightctl-telemetry-gateway/server.key` | Telemetry gateway private key |
+| `flightctl-grafana/server.crt` | Grafana server TLS certificate, signed by the root CA |
+| `flightctl-grafana/server.key` | Grafana server private key |
+| `flightctl-prometheus/server.crt` | Prometheus server TLS certificate, signed by the root CA |
+| `flightctl-prometheus/server.key` | Prometheus server private key |
+| `flightctl-userinfo-proxy/server.crt` | UserInfo proxy TLS certificate, signed by the root CA |
+| `flightctl-userinfo-proxy/server.key` | UserInfo proxy private key |
+
+**Certificate requirements:**
+
+- CA certificates must have `basicConstraints = CA:TRUE` and `keyUsage = keyCertSign, cRLSign, digitalSignature`
+- Server certificates must have `extendedKeyUsage = serverAuth`
+- Server certificates must include SANs matching `<service>.<baseDomain>`, the container name (for example, `flightctl-api`), and `localhost`
+
+For the complete certificate chain of trust and validity periods, see [Certificate Architecture](../references/certificate-architecture.md).
+
+Start the services
 
 ```bash
 sudo systemctl start flightctl.target
@@ -193,9 +269,9 @@ sudo systemctl start flightctl.target
 > [!NOTE]
 > Services do not currently support automatic reloading of certificates and will need to be restarted to load new certificates.
 
-#### Using an existing Certificate Authority
+#### Using an existing certificate authority
 
-To use an existing CA instead of the automatically generated self-signed CA:
+To use an existing CA instead of the automatically generated self-signed CA, provide only the root CA certificate and key. The `builtin` mode derives all other certificates from the provided CA, including the client-signer intermediate CA and all server certificates (API, UI, PAM issuer, telemetry, and others).
 
 Ensure that the `global.generateCertificates` value in `service-config.yaml` is set to `builtin`
 

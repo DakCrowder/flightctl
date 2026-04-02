@@ -38,16 +38,32 @@ For TPM attestation certificates, see [Configuring Device Attestation](../instal
 
 ### Kubernetes/OpenShift
 
-| Secret                                      | Contents                |
-| ------------------------------------------- | ----------------------- |
-| `flightctl-ca`                            | Root CA                 |
-| `flightctl-client-signer-ca`              | Intermediate CA         |
-| `flightctl-api-server-tls`                | API server cert         |
-| `flightctl-telemetry-gateway-server-tls`  | Telemetry gateway cert  |
-| `flightctl-alertmanager-proxy-server-tls` | Alertmanager proxy cert |
-| `flightctl-ca-bundle`                     | CA bundle               |
+| Secret                                      | Contents                | Required          |
+| ------------------------------------------- | ----------------------- | ----------------- |
+| `flightctl-ca`                            | Root CA                 | Always            |
+| `flightctl-client-signer-ca`              | Intermediate CA         | Always            |
+| `flightctl-api-server-tls`                | API server cert         | Always            |
+| `flightctl-telemetry-gateway-server-tls`  | Telemetry gateway cert  | If telemetry enabled |
+| `flightctl-alertmanager-proxy-server-tls` | Alertmanager proxy cert | If alertmanager enabled |
+| `flightctl-imagebuilder-api-server-tls`   | ImageBuilder API cert   | If imagebuilder enabled |
+| `flightctl-ui-server-tls`                 | UI server cert          | If UI enabled     |
+| `flightctl-cli-artifacts-server-tls`      | CLI artifacts cert      | If CLI artifacts enabled |
+| `flightctl-ca-bundle`                     | CA bundle               | Always            |
 
-Generation controlled by `global.generateCertificates` in Helm `values.yaml`: `auto`, `cert-manager`, `builtin`, or `none`
+Generation controlled by `global.generateCertificates` in Helm `values.yaml`: `auto`, `cert-manager`, `builtin`, or `none`. For custom certificate procedures, see [Certificate management on Kubernetes](../installing/installing-service-on-kubernetes.md#certificate-management).
+
+#### Required DNS SANs per service
+
+When providing custom server certificates for Kubernetes deployments, each certificate must include the following DNS Subject Alternative Names (SANs). Replace `<baseDomain>` with your configured `global.baseDomain` value and `<namespace>` with the Flight Control namespace.
+
+| Service | Required DNS SANs |
+| ------- | ----------------- |
+| API server | `api.<baseDomain>`, `agent-api.<baseDomain>`, `flightctl-api`, `flightctl-api.<namespace>`, `flightctl-api.<namespace>.svc.cluster.local` |
+| Telemetry gateway | `telemetry.<baseDomain>`, `flightctl-telemetry-gateway`, `flightctl-telemetry-gateway.<namespace>`, `flightctl-telemetry-gateway.<namespace>.svc.cluster.local` |
+| Alertmanager proxy | `alertmanager-proxy.<baseDomain>`, `flightctl-alertmanager-proxy`, `flightctl-alertmanager-proxy.<namespace>`, `flightctl-alertmanager-proxy.<namespace>.svc.cluster.local` |
+| UI | `ui.<baseDomain>`, `flightctl-ui`, `flightctl-ui.<namespace>`, `flightctl-ui.<namespace>.svc.cluster.local` |
+| CLI artifacts | `cli-artifacts.<baseDomain>`, `flightctl-cli-artifacts`, `flightctl-cli-artifacts.<namespace>`, `flightctl-cli-artifacts.<namespace>.svc.cluster.local` |
+| ImageBuilder API | `imagebuilder-api.<baseDomain>`, `flightctl-imagebuilder-api`, `flightctl-imagebuilder-api.<namespace>`, `flightctl-imagebuilder-api.<namespace>.svc.cluster.local` |
 
 ### Linux
 
@@ -156,6 +172,6 @@ For database backup procedures, see [Performing Database Backup](../installing/p
 
 * [Security Guidelines](security-guidelines.md)
 * [Installing the Agent](../installing/installing-agent.md)
-* [Installing on Kubernetes](../installing/installing-service-on-kubernetes.md)
-* [Installing on Linux](../installing/installing-service-on-linux.md)
+* [Certificate Management on Kubernetes](../installing/installing-service-on-kubernetes.md#certificate-management)
+* [Certificate Management on Linux](../installing/installing-service-on-linux.md#certificate-management)
 * [Deploying the Observability Stack on Linux](../installing/deploying-observability-linux.md)

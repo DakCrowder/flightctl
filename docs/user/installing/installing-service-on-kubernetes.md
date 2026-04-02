@@ -313,6 +313,168 @@ Procedure:
 
 If you need to access your service using the `flightctl` CLI, find and click the "Copy login command" button to see the command to use to log the `flightctl` CLI in to your service.
 
+## Certificate management
+
+Flight Control uses mutual TLS (mTLS) for all agent-to-service communication, requiring a full certificate chain. By default, certificates are auto-generated during installation. For production deployments, you can provide certificates from your own PKI infrastructure.
+
+For the complete certificate chain of trust, validity periods, and file locations, see [Certificate Architecture](../references/certificate-architecture.md).
+
+> [!NOTE]
+> This section covers internal mTLS certificates used for service-to-service and agent-to-service communication. These are separate from the optional wildcard TLS secret (`baseDomainTlsSecretName`) used for gateway or ingress TLS termination.
+
+### Automatic certificate generation
+
+Flight Control supports four certificate generation modes, configured with `global.generateCertificates` in Helm values:
+
+| Mode | Description |
+|------|-------------|
+| `auto` (default) | Uses `cert-manager` if installed, otherwise falls back to `builtin` |
+| `cert-manager` | Requires cert-manager to be pre-installed. Handles automatic certificate renewal |
+| `builtin` | Runs a one-time Job using openssl to generate certificates. Does not handle renewal |
+| `none` | User must create all required Kubernetes secrets before deployment |
+
+### Providing all certificates
+
+Use this approach when you have an existing PKI and want to provide every certificate yourself.
+
+Prerequisites:
+
+- Certificates generated from your PKI meeting the requirements below.
+- `kubectl` or `oc` access with permission to create secrets in the target namespace.
+
+Certificate requirements:
+
+- CA certificates must have `basicConstraints = CA:TRUE` and `keyUsage = keyCertSign, cRLSign, digitalSignature`
+- Server certificates must have `extendedKeyUsage = serverAuth`
+- Server certificates must include the DNS SANs listed in [Certificate Architecture](../references/certificate-architecture.md#required-dns-sans-per-service)
+
+Procedure:
+
+1. Create the root CA secret:
+
+    ```console
+    kubectl create secret tls flightctl-ca \
+      --namespace <namespace> \
+      --cert=<path_to_ca_crt> \
+      --key=<path_to_ca_key>
+    ```
+
+2. Create the client-signer intermediate CA secret:
+
+    ```console
+    kubectl create secret tls flightctl-client-signer-ca \
+      --namespace <namespace> \
+      --cert=<path_to_client_signer_crt> \
+      --key=<path_to_client_signer_key>
+    ```
+
+3. Create the API server TLS secret:
+
+    ```console
+    kubectl create secret tls flightctl-api-server-tls \
+      --namespace <namespace> \
+      --cert=<path_to_api_server_crt> \
+      --key=<path_to_api_server_key>
+    ```
+
+4. Create secrets for additional services as needed:
+
+    | Secret name | When required |
+    |-------------|---------------|
+    | `flightctl-telemetry-gateway-server-tls` | If telemetry is enabled |
+    | `flightctl-alertmanager-proxy-server-tls` | If Alertmanager is enabled |
+    | `flightctl-imagebuilder-api-server-tls` | If imagebuilder is enabled |
+    | `flightctl-ui-server-tls` | If the UI is enabled |
+    | `flightctl-cli-artifacts-server-tls` | If CLI artifacts serving is enabled |
+
+    Create each secret using the same `kubectl create secret tls` pattern shown above.
+
+5. Create the CA bundle secret. The bundle must contain `ca.crt` concatenated with `client-signer.crt`:
+
+    ```console
+    cat <path_to_ca_crt> <path_to_client_signer_crt> > ca-bundle.crt
+
+    kubectl create secret generic flightctl-ca-bundle \
+      --namespace <namespace> \
+      --from-file=ca-bundle.crt=ca-bundle.crt
+    ```
+
+6. Deploy Flight Control with certificate generation disabled:
+
+    ```console
+    helm upgrade --install flightctl oci://quay.io/flightctl/charts/flightctl:${FC_VERSION} \
+      --namespace <namespace> --create-namespace \
+      --set global.baseDomain=<base_domain> \
+      --set global.generateCertificates=none \
+      --set global.gateway.gatewayClassName=<gateway_class>
+    ```
+
+7. Verify that pods start correctly:
+
+    ```console
+    kubectl get pods -n <namespace>
+    ```
+
+> [!NOTE]
+> When using `generateCertificates: none`, certificates are not automatically rotated. You must track expiration dates and manually renew certificates before they expire.
+
+### Using an existing certificate authority
+
+Use this approach when you have an existing root CA and want Flight Control to derive all other certificates (intermediate CA, server certificates) from it.
+
+The Helm chart checks for an existing CA before generating a self-signed one. In `cert-manager` mode, it looks for an existing `cert-manager.io/v1 Certificate` resource named `flightctl-ca`. In `builtin` mode, it looks for an existing `flightctl-ca` secret containing `tls.crt` and `tls.key`. In both cases, if the CA already exists, the installer uses it as the root of trust and derives all other certificates automatically, including the client-signer intermediate CA and all server certificates.
+
+> [!NOTE]
+> Using `cert-manager` is recommended for this scenario because it provides automatic certificate renewal. The `builtin` mode generates certificates once and does not manage renewal.
+
+Prerequisites:
+
+- Your root CA certificate and private key files in PEM format.
+- `kubectl` or `oc` access with permission to create secrets in the target namespace.
+
+Procedure:
+
+1. Create the namespace if it does not already exist:
+
+    ```console
+    kubectl create namespace <namespace>
+    ```
+
+2. Create the `flightctl-ca` secret with your root CA certificate and key:
+
+    ```console
+    kubectl create secret tls flightctl-ca \
+      --namespace <namespace> \
+      --cert=<path_to_ca_crt> \
+      --key=<path_to_ca_key>
+    ```
+
+3. Deploy Flight Control. The installer detects the existing `flightctl-ca` secret, skips self-signed CA generation, and derives all other certificates from your CA:
+
+    ```console
+    helm upgrade --install flightctl oci://quay.io/flightctl/charts/flightctl:${FC_VERSION} \
+      --namespace <namespace> --create-namespace \
+      --set global.baseDomain=<base_domain> \
+      --set global.gateway.gatewayClassName=<gateway_class>
+    ```
+
+    To explicitly select a generation mode, add `--set global.generateCertificates=cert-manager` or `--set global.generateCertificates=builtin`.
+
+4. Verify that pods start correctly:
+
+    ```console
+    kubectl get pods -n <namespace>
+    ```
+
+5. Verify that all certificates were derived from your CA:
+
+    ```console
+    kubectl get secrets -n <namespace> | grep flightctl
+    ```
+
+> [!IMPORTANT]
+> Back up your CA private keys. If lost, all issued certificates become unverifiable and devices must be re-enrolled.
+
 ## Installing with Advanced Cluster Management
 
 ## Installing with Ansible Automation Platform
